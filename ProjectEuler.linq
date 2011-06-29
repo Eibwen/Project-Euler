@@ -2,11 +2,17 @@
 
 void Main()
 {
-	Question49().Dump("Result");
+	Question17().Dump("Result");
 }
 
 // Define other methods and classes here
 
+/* Thoughts
+#314: I'm thinking take 1 quadrant
+	take from both outer corners a straight line
+	recursive algorithm? to move the center of the line out for the best area... then do that for each sub lines
+
+*/
 
 //Fuck this bullshit statistics
 #region Question298
@@ -200,6 +206,340 @@ public static Truncatable Question37_CheckTruncatable(int num)
 	return trun;
 }
 #endregion Question37
+
+public static long Question17()
+{
+//	Question17_GetWordLength(908).Dump("=17");
+//	return 0;
+	
+	int[] tests = new int[]
+	{
+		342, 23,
+		115, 20,
+		892, 24,
+		893, 26,
+		894, 25,
+		895, 25,
+		896, 24,
+		897, 26,
+		898, 26,
+		899, 25,
+		900, 11,
+		901, 17,
+		
+		908, 19,
+		909, 18,
+		910, 17,
+		911, 20,
+		912, 20
+	};
+	for (int k = 0; k < tests.Length; ++k)
+	{
+		if (Question17_GetWordLength(tests[k]) != tests[++k])
+			tests[k-1].Dump("FAIL");
+	}
+	
+	Question17_GetWordLength(900).Dump();
+	Question17_GetWordLength(99).Dump();
+	Question17_GetWordLength(999).Dump();
+	
+	int LOOP = 1000;
+	
+	long outputSum = 0;
+	for (int i = 1; i <= LOOP; ++i)
+	{
+		outputSum += Question17_GetWordLength(i);//.Dump(i.ToString());
+	}
+	return outputSum;
+}
+public static long Question17_GetWordLength(int num)
+{
+	if (num > 1000)
+	{
+		throw new ApplicationException("Not coded to support over 1000");
+	}
+	
+	
+	int[] singles = new int[]
+	{
+		-99,
+		"one".Length,
+		"two".Length,
+		"three".Length,
+		"four".Length,
+		"five".Length,
+		"six".Length,
+		"seven".Length,
+		"eight".Length,
+		"nine".Length,
+		"ten".Length
+	};
+	int[] tens = new int[]
+	{
+		-99,
+		"ten".Length,
+		"twenty".Length,
+		"thirty".Length,
+		"forty".Length,
+		"fifty".Length,
+		"sixty".Length,
+		"seventy".Length,
+		"eighty".Length,
+		"ninety".Length
+	};
+	int[] teens = new int[]
+	{
+		"ten".Length,
+		"eleven".Length,
+		"twelve".Length,
+		"thirteen".Length,
+		"fourteen".Length,
+		"fifteen".Length,
+		"sixteen".Length,
+		"seventeen".Length,
+		"eighteen".Length,
+		"nineteen".Length,
+		"twenty".Length
+	};
+	
+	//Thousand... only need to handle 1000
+	if (num == 1000) return "onethousand".Length;
+	
+	if (num <= 10) return singles[num];
+	
+	int length = 0;
+	
+	if (num >= 100)
+	{
+		length += singles[num / 100] + "hundred".Length;
+	}
+	int andTens = num % 100;
+	if (andTens > 0)
+	{
+		if (num >= 100) length += "and".Length;
+		
+		int andOnes = andTens % 10;
+		if (andOnes > 0)
+		{
+			if (andTens <= 10) length += singles[andTens];
+			else if (andTens < 20)
+				length += teens[andOnes];
+			else
+			{
+				length += tens[andTens / 10];
+				length += singles[andOnes];
+			}
+			//length.Dump();
+		}
+		else
+		{
+			length += tens[andTens / 10];
+		}
+	}
+	
+	return length;
+}
+public static long Question35()
+{
+//	int length = 3;
+//	int lengthLimit = 100;
+//	
+//	int rot = 197;
+//	for (int j = 1; j < length; ++j)
+//	{
+//		rot = (rot / 10) + (rot % 10) * lengthLimit;
+//		rot.Dump();
+//		if (!Helpers.isPrime_Q7PDF(rot)) "fail".Dump();
+//	}
+//	return -2;
+	
+	
+	
+	List<int> primes = Helpers.PrimesLessThan(1000000);
+	primes.Count.Dump("Checking Primes");
+	
+	List<int> rotations = new List<int>();
+	
+	int length = 1;
+	int lengthLimit = 10;
+	foreach (int i in primes)
+	{
+		Util.Progress = i * 100 / primes.Count;
+		
+		if (i >= lengthLimit)
+		{
+			++length;
+			lengthLimit *= 10;
+		}
+		
+		if (length == 1)
+		{
+			//i.Dump("Added");
+			rotations.Add(i);
+			continue;
+		}
+		int rot = i;
+		//rot.Dump("Starting Rot");
+		bool shouldAdd = true;
+		for (int j = 1; j < length; ++j)
+		{
+			rot = (rot / 10) + (rot % 10) * (lengthLimit/10);
+			//rot.Dump();
+			if (!Helpers.isPrime_Q7PDF(rot))
+			{
+				shouldAdd = false;
+				break;
+			}
+		}
+		if (shouldAdd)
+		{
+			//i.Dump("Added");
+			rotations.Add(i);
+		}
+	}
+	
+	rotations.Dump();
+	return rotations.Count;
+}
+public static long Question30()
+{
+	//Read forum, found how to get the max possible digits:
+	long ninesPow = 9 * 9 * 9 * 9 * 9;
+	int length = 1;
+	long ninesDigits = 9;
+	while (length * ninesPow > ninesDigits)
+	{
+		++length;
+		ninesDigits = ninesDigits * 10 + 9;
+	}
+	length.Dump("Smaller than length");
+	long LOOP_MAX = length * ninesPow;
+	LOOP_MAX.Dump("All numbers must be smaller");
+	
+	//My original solution:
+	int LOOP = 1000000;
+	
+	int outputSum = 0;
+	for (int i = 2; i < LOOP; ++i)
+	{
+		if (i == Question30_DigitsFifthPowerSum(i))
+		{
+			outputSum += i.Dump();
+		}
+	}
+	return outputSum;
+}
+public static long Question30_DigitsFifthPowerSum(long t)
+{
+	long sum = 0;
+	while (t > 0)
+	{
+		long i = (t % 10);
+		sum += i * i * i * i * i;
+		t /= 10;
+	}
+	return sum;
+}
+public static long Question31()
+{
+	int[] answersaaa = new int[] { 1, 2, 4, 9 };
+	
+	int[] Currencies = new int[] { 1, 2, 5, 10, 20, 50, 100, 200 };
+	
+//	for (int i = 1; i < Currencies.Length; ++i)
+//	{
+//		int count = 1;
+//		for (int j = i; j > 0; --j)
+//		{
+//			
+//		}
+//	}
+	
+	//LOL sort shocked this worked... wrote in like 2 minutes after trying a loop first
+	Question31_recurse(ref Currencies, 7, 0, 0).Dump();
+	
+	return -1;
+}
+public static long Question31_recurse(ref int[] Currencies, int index, long count, int sum)
+{
+	if (sum > 200) return count;
+	if (sum == 200) return ++count;
+	
+	count = Question31_recurse(ref Currencies, index, count, sum + Currencies[index]);
+	if (index > 0)
+	{
+		count = Question31_recurse(ref Currencies, index-1, count, sum);
+	}
+	return count;
+}
+public static long Question12()
+{
+	//return Question12_CountFactors(24);
+	
+	int loop = 10000;
+	int skip = 9900;
+	
+	int best = 0;
+	
+	long triangleNumber = 0;
+	for (int i = 1; i < loop; ++i)
+	{
+		triangleNumber += i;
+		
+		if (i < skip) continue;
+		
+		int curFactors = Question12_CountFactors(triangleNumber);
+		if (curFactors > best) best = curFactors;
+		if (curFactors > 500)
+		{
+			return triangleNumber;
+		}
+	}
+	
+	best.Dump();
+	return -1;
+}
+public static int Question12_CountFactors(long num)
+{
+	if (num == 1) return 1;
+	
+	//Itself and 1
+	int count = 2;
+	
+	if (num % 2 == 0) ++count;
+	if (num % 3 == 0) ++count;
+	
+	//long upperLimit = num / 2;
+	for (long i = num / 2; i > 3; --i)
+	{
+		if (num % i == 0)
+		{
+			//i.Dump();
+			++count;
+//			upperLimit /= 2;
+//			i = upperLimit;
+			//i = (i+3)/2;
+			//i.Dump();
+			//("==" + upperLimit).Dump();
+		}
+	}
+	return count;
+	
+//	int count = 0;
+//	int t = 21;
+//	int f = 2;
+//	while (f > 1)
+//	{
+//		++count;
+//		f = Helpers.GetAFactor_Basedon_Q7PDF(t).Dump();
+//		t /= f;
+//	}
+//	count.Dump("c");
+//	
+//	Helpers.Factorial(count).Dump();
+//	
+//	return -1;
+}
 
 public static long Question67()
 {
@@ -693,7 +1033,7 @@ public static long Question13()
 	return long.Parse(trimmed.Sum().ToString().Substring(0, 10));
 }
 
-public static long Question12()
+public static long Question125()
 {
 	long MAX_NUMBER = 100000000;
 	int MAX_LOOP = 10000;
@@ -733,8 +1073,8 @@ public static long Question12()
 	}
 	
 	outputList.OrderBy(i => i).Dump();
-	outputList.Distinct().Sum().Dump("YAY");
-	return outputSum;
+	return outputList.Distinct().Sum().Dump("YAY");
+	//return outputSum;
 }
 public static long Question11()
 {
@@ -1268,15 +1608,16 @@ public static class Helpers
 			&& i <= maxValue
 			; ++i, ++i)
 		{
-			bool hasFactor = false;
-			foreach (int j in output)
-			{
-				if (i % j == 0)
-				{
-					hasFactor = true;
-				}
-			}
-			if (!hasFactor) output.Add(i);
+//			bool hasFactor = false;
+//			foreach (int j in output)
+//			{
+//				if (i % j == 0)
+//				{
+//					hasFactor = true;
+//				}
+//			}
+//			if (!hasFactor) output.Add(i);
+			if (isPrime_Q7PDF(i)) output.Add(i);
 		}
 		
 		return output;

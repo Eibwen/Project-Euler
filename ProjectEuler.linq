@@ -211,23 +211,42 @@ public static Truncatable Question37_CheckTruncatable(int num)
 
 public static long Question25()
 {
-	double phi = 1.61803398874989; //1.61803398874989484820458683436563811772030917980576286213544862270526046281890244970720720418939113748475;
-	double sqrt5 = Math.Sqrt(5);
+	int LOOKING_FOR_LENGTH = 1000; //1000000;
 	
-	//Get Fibonacci(n)
-	int n = 5;
-	int Fn = (int)(Math.Pow(phi, n) / sqrt5 + 0.5);
-	Fn.Dump();
+	BigFib bf = new BigFib();
 	
-	int SEQ_COUNT = 12;
-	
-	//Fibonacci
-	for (int i = 3; i < SEQ_COUNT; ++i)
+	while (bf.EstimateLength(BigFib.EstimateLengthType.Ceiling) < LOOKING_FOR_LENGTH)
 	{
-		
+		bf.Next();
+	}
+	bf.CurrentSequenceNumber.Dump("Within ballpark at");
+	
+	//Find exact...
+	while (bf.ExactLength() < LOOKING_FOR_LENGTH)
+	{
+		bf.Next();
 	}
 	
-	return -2;
+	return bf.CurrentSequenceNumber;
+	
+//	//Thought about trying to do it with the condensed formula or whatever.. but that doesn't help
+//	double phi = 1.61803398874989; //1.61803398874989484820458683436563811772030917980576286213544862270526046281890244970720720418939113748475;
+//	double sqrt5 = Math.Sqrt(5);
+//	
+//	//Get Fibonacci(n)
+//	int n = 5;
+//	int Fn = (int)(Math.Pow(phi, n) / sqrt5 + 0.5);
+//	Fn.Dump();
+//	
+//	int SEQ_COUNT = 12;
+//	
+//	//Fibonacci
+//	for (int i = 3; i < SEQ_COUNT; ++i)
+//	{
+//		
+//	}
+//	
+//	return -2;
 }
 public static long Question17()
 {
@@ -1761,7 +1780,7 @@ public static class Helpers
 }
 public class BigFib
 {
-	const int TRUNC_SIZE = 100000;
+	const int TRUNC_VALUE = 100000;
 	const int TRUNC_LENGTH = 5;
 	
 //	List<int> arrayN1 = new List<int>();
@@ -1769,7 +1788,15 @@ public class BigFib
 	List<long> arrayN1 = new List<long>();
 	List<long> arrayN2 = new List<long>();
 	bool arrayN1IsCurrent = true;
-	long sequenceNumber = 1;
+	long sequenceNumber = 2;
+	
+	public long CurrentSequenceNumber
+	{
+		get
+		{
+			return sequenceNumber;
+		}
+	}
 	
 	public BigFib()
 	{
@@ -1777,22 +1804,198 @@ public class BigFib
 		arrayN2.Add(1);
 	}
 	
+	public void TestLengths()
+	{
+		long testlength = 1234567890123456;
+		
+		int index = 0;
+		while (testlength > 0)
+		{
+			if (index == arrayN1.Count)
+			{
+				arrayN1.Add(0);
+			}
+			arrayN1[index] = testlength % TRUNC_VALUE;
+			testlength /= TRUNC_VALUE;
+			++index;
+		}
+		
+		EstimateLength(EstimateLengthType.Nearest).Dump("Estimated Length");
+		ExactLength().Dump("Exact Length");
+	}
+	public void TestFromSocky()
+	{
+		BigFib bf = new BigFib();
+		
+		//Looked up 38th number
+//		bf.ProgressTo(38);
+//		"39088169".Dump("38th number");
+//		bf.OutputNumber().Dump("my 38th number");
+//		bf.CurrentList().Dump();
+		
+		//Socky gave me huge number
+		bf.ProgressTo(150014);  //Takes 9 seconds on Work computer, has length of 31351
+		//bf.OutputNumber().Dump();
+		bf.ExactLength().Dump("length");
+	}
+	
 	public long Next()
 	{
 		if (arrayN1IsCurrent)
 		{
+			SumArrays(ref arrayN2, ref arrayN1);
 		}
 		else
 		{
+			SumArrays(ref arrayN1, ref arrayN2);
 		}
-		arrayN1IsCurrent = 1 - arrayN1IsCurrent;
+		arrayN1IsCurrent = !arrayN1IsCurrent;
 		
 		return ++sequenceNumber;
 	}
-	public long ExtimateLength()
+	public void ProgressTo(int FibonacciN)
 	{
+		if (sequenceNumber > FibonacciN)
+		{
+			throw new NotSupportedException("Sequence has progressed past that number already");
+		}
+		
+		while (sequenceNumber < FibonacciN)
+		{
+			Next();
+		}
+	}
+	void SumArrays(ref List<long> arrayOut, ref List<long> arrayIn)
+	{
+		//Assuming that arrayIn is larger than or equal to arrayOut
+//		arrayIn.Count.Dump("arrayIn");
+//		arrayOut.Count.Dump("arrayOut");
+		
+		//increase size of arrayOut if needed
+		while (arrayIn.Count > arrayOut.Count)
+		{
+			arrayOut.Add(0);
+		}
+		
+//		arrayIn.Dump();
+//		arrayOut.Dump();
+		
+		long overflow = 0;
+		int i = 0;
+		for (; i < arrayIn.Count; ++i)
+		{
+			long loaded = arrayOut[i] + arrayIn[i] + overflow;
+			overflow = 0;
+			if (loaded > TRUNC_VALUE)
+			{
+				overflow = loaded / TRUNC_VALUE;
+				loaded = loaded % TRUNC_VALUE;
+			}
+			arrayOut[i] = loaded;
+		}
+		if (overflow > 0)
+		{
+			if (i == arrayOut.Count)
+			{
+				arrayOut.Add(0);
+			}
+			arrayOut[i] = overflow;
+		}
+	}
+	
+	public enum EstimateLengthType
+	{
+		Nearest,
+		Floor,
+		Ceiling
+	}
+	/// <summary>
+	/// This returns the length of the number floored by TRUNC_LENGTH
+	/// //This returns the length of the number within half TRUNC_LENGTH
+	///  //if TRUNC_LENGTH=5, and the number is length of 21, should return between [19 and 23]
+	/// </summary>
+	public long EstimateLength(EstimateLengthType type)
+	{
+		long estLength = 1;
+		if (arrayN1IsCurrent)
+		{
+			estLength = (arrayN1.Count-1) * TRUNC_LENGTH;
+		}
+		else
+		{
+			estLength = (arrayN2.Count-1) * TRUNC_LENGTH;
+		}
+		
+		switch (type)
+		{
+			case EstimateLengthType.Nearest:
+				int halfTrunc = (TRUNC_LENGTH + 1)/2;
+				estLength += halfTrunc;
+				return estLength;
+			
+			case EstimateLengthType.Ceiling:
+				return estLength + TRUNC_LENGTH;
+				
+			case EstimateLengthType.Floor:
+			default:
+				return estLength;
+		}
+	}
+	public long ExactLength()
+	{
+		int len = 0;
+		long t = -1;
+		if (arrayN1IsCurrent)
+		{
+			len = (arrayN1.Count-1) * TRUNC_LENGTH;
+			t = arrayN1[arrayN1.Count-1];
+		}
+		else
+		{
+			len = (arrayN2.Count-1) * TRUNC_LENGTH;
+			t = arrayN2[arrayN2.Count-1];
+		}
+		
+		//Find the size of the final number
+		while (t > 0)
+		{
+			++len;
+			t /= 10;
+		}
+		
+		return len;
+	}
+	public string OutputNumber()
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		string format = "{0:d" + TRUNC_LENGTH + "}";
+		List<long> currentList = CurrentList();
+		
+		//Add the first number without padding
+		sb.Append(currentList[currentList.Count-1]);
+		//Add the rest of the numbers, padding to TRUNC_LENGTH
+		for (int i = currentList.Count-2; i >= 0 ; --i)
+		{
+			long l = currentList[i];
+			sb.AppendFormat(format, l);
+		}
+		return sb.ToString();
+	}
+	public List<long> CurrentList()
+	{
+		if (arrayN1IsCurrent)
+		{
+			return arrayN1;
+		}
+		else
+		{
+			return arrayN2;
+		}
 	}
 }
+
+#region InfiniteInt
 [Obsolete("Untested", true)]
 public class InfiniteInt
 {
@@ -1856,7 +2059,9 @@ public class InfiniteInt
 	}
 	public long Length()
 	{
-		long filled = (array.Count-1) * TRUNC_LENGTH;
+		long filled = (array.Count-2) * TRUNC_LENGTH;
+		throw new ApplicationException();
+		//THIS IS NOT SUM DIGITS
 		return filled + Helpers.SumDigits(array[array.Count-1]);
 	}
 	public long SumDigits()
@@ -1875,3 +2080,4 @@ public class InfiniteInt
 		return sum;
 	}
 }
+#endregion InfiniteInt

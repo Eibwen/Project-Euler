@@ -2,7 +2,8 @@
 
 void Main()
 {
-	Question17().Dump("Result");
+	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
+	Question25().Dump("Result");
 }
 
 // Define other methods and classes here
@@ -207,6 +208,27 @@ public static Truncatable Question37_CheckTruncatable(int num)
 }
 #endregion Question37
 
+
+public static long Question25()
+{
+	double phi = 1.61803398874989; //1.61803398874989484820458683436563811772030917980576286213544862270526046281890244970720720418939113748475;
+	double sqrt5 = Math.Sqrt(5);
+	
+	//Get Fibonacci(n)
+	int n = 5;
+	int Fn = (int)(Math.Pow(phi, n) / sqrt5 + 0.5);
+	Fn.Dump();
+	
+	int SEQ_COUNT = 12;
+	
+	//Fibonacci
+	for (int i = 3; i < SEQ_COUNT; ++i)
+	{
+		
+	}
+	
+	return -2;
+}
 public static long Question17()
 {
 //	Question17_GetWordLength(908).Dump("=17");
@@ -1735,5 +1757,121 @@ public static class Helpers
 			output *= i;
 		}
 		return output;
+	}
+}
+public class BigFib
+{
+	const int TRUNC_SIZE = 100000;
+	const int TRUNC_LENGTH = 5;
+	
+//	List<int> arrayN1 = new List<int>();
+//	List<int> arrayN2 = new List<int>();
+	List<long> arrayN1 = new List<long>();
+	List<long> arrayN2 = new List<long>();
+	bool arrayN1IsCurrent = true;
+	long sequenceNumber = 1;
+	
+	public BigFib()
+	{
+		arrayN1.Add(1);
+		arrayN2.Add(1);
+	}
+	
+	public long Next()
+	{
+		if (arrayN1IsCurrent)
+		{
+		}
+		else
+		{
+		}
+		arrayN1IsCurrent = 1 - arrayN1IsCurrent;
+		
+		return ++sequenceNumber;
+	}
+	public long ExtimateLength()
+	{
+	}
+}
+[Obsolete("Untested", true)]
+public class InfiniteInt
+{
+	const int TRUNC_SIZE = 10;
+	const int TRUNC_LENGTH = 1;
+//	const int TRUNC_SIZE = 100000;
+//	const int TRUNC_LENGTH = 5;
+	List<int> array = new List<int>();
+	
+	public InfiniteInt(int start)
+	{
+		array.Add(start);
+	}
+	
+	public void Add(InfiniteInt num)
+	{
+		
+	}
+	public void Add(int num)
+	{
+		for (int j = 0; j < array.Count; ++j)
+		{
+			array[j] += num;
+			if (array[j] >= TRUNC_SIZE)
+			{
+				num = array[j] / TRUNC_SIZE;
+				array[j] %= TRUNC_SIZE;
+			}
+			else
+			{
+				return;
+			}
+		}
+//		int pos = array.Count-1;
+//		if (array[pos] + num >= TRUNC_SIZE) array.Add(0);
+//		
+//		for (int j = pos; j >= 0; --j)
+//		{
+//			array[j] += num;
+//			if (array[j] >= TRUNC_SIZE)
+//			{
+//				array[j+1] += array[j] / TRUNC_SIZE;
+//				array[j] %= TRUNC_SIZE;
+//			}
+//		}
+	}
+	public void Multiply(int factor)
+	{
+		int pos = array.Count-1;
+		if (array[pos] * factor >= TRUNC_SIZE) array.Add(0);
+		
+		for (int j = pos; j >= 0; --j)
+		{
+			array[j] *= factor;
+			if (array[j] >= TRUNC_SIZE)
+			{
+				array[j+1] += array[j] / TRUNC_SIZE;
+				array[j] %= TRUNC_SIZE;
+			}
+		}
+	}
+	public long Length()
+	{
+		long filled = (array.Count-1) * TRUNC_LENGTH;
+		return filled + Helpers.SumDigits(array[array.Count-1]);
+	}
+	public long SumDigits()
+	{
+		//Sum them up
+		int sum = 0;
+		for (int i = 0; i < array.Count; ++i)
+		{
+			int t = array[i];
+			while (t > 0)
+			{
+				sum += t % 10;
+				t /= 10;
+			}
+		}
+		return sum;
 	}
 }

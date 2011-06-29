@@ -3,7 +3,7 @@
 void Main()
 {
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
-	Question25().Dump("Result");
+	Question24().Dump("Result");
 }
 
 // Define other methods and classes here
@@ -209,9 +209,118 @@ public static Truncatable Question37_CheckTruncatable(int num)
 #endregion Question37
 
 
+public static long Question24()
+{
+//	//With: int[] BASE = new int[] { 0, 1, 2 };
+//	int[] correct = new int[] { 0, 012, 021, 102, 120, 201, 210 };
+//	Debug.Assert(Question24_GetPermutation(1) == correct[1], "1");
+//	Debug.Assert(Question24_GetPermutation(2) == correct[2], "2");
+//	Debug.Assert(Question24_GetPermutation(3) == correct[3], "3");
+//	Debug.Assert(Question24_GetPermutation(4) == correct[4], "4");
+//	Debug.Assert(Question24_GetPermutation(5) == correct[5], "5");
+//	Debug.Assert(Question24_GetPermutation(6) == correct[6], "6");
+
+	int[] correct = new int[] { 0, 0123, 0132, 0213, 0231, 0312, 0321,
+									1023, 1032, 1203, 1230, 1302, 1320,
+									2013, 2031, 2103, 2130, 2301, 2310,
+									3012, 3021, 3102, 3120, 3201, 3210 };
+	for (int i = 1; i < correct.Length; ++i)
+	{
+		Debug.Assert(Question24_GetPermutation(i) == correct[i], i.ToString() + " :: " + correct[i]);
+	}
+
+	
+	
+	
+//	int[] BASE = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+//							// 8, 7, 6, 5, 4, 3, 2, 1, 0 };
+//							// 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+//	
+//	int getNum = 2;
+//	
+//	getNum = getNum-1;
+//	
+//	BASE[getNum % 10].Dump();
+//	BASE[getNum % 10 + 1].Dump();
+//	BASE[getNum % 10 + 2].Dump();
+//	BASE[getNum % 10 + 3].Dump();
+//	BASE[getNum % 10 + 4].Dump();
+//	BASE[getNum % 10 + 5].Dump();
+//	BASE[getNum % 10 + 6].Dump();
+//	BASE[getNum % 10 + 7].Dump();
+//	BASE[getNum / 10 % 10 + 8].Dump();
+//	BASE[getNum % 10 + 9].Dump();
+	
+	return -1;
+}
+public static long Question24_GetPermutation(int number)
+{
+	//Consecutivly found: Could step through and swap each position up from the bottom...
+	//  Once the largest value is at the top, its ended
+	
+	
+	int[] BASE = new int[] { 0, 1, 2, 3 };
+	
+	//reduce to 0-index
+	--number;
+	
+	int[] output = BASE;
+	Array.Reverse(output);
+	if ((number & (1 << 3)) > 0)
+	{
+		"4 idk".Dump();
+//		int tmp = output[0];
+//		output[0] = output[1];
+//		output[1] = output[2];
+//		output[2] = tmp;
+	}
+	if ((number & (1 << 2)) > 0)
+	{
+		"3 Shift".Dump();
+		int tmp = output[0];
+		output[0] = output[1];
+		output[1] = output[2];
+		output[2] = tmp;
+	}
+	if ((number & (1 << 1)) > 0)
+	{
+		"2 Swap".Dump();
+		int tmp = output[1];
+		output[1] = output[2];
+		output[2] = tmp;
+	}
+	if ((number & (1 << 0)) > 0)
+	{
+		"1 Swap".Dump();
+		int tmp = output[0];
+		output[0] = output[1];
+		output[1] = tmp;
+	}
+	long retOutput = 0;
+	for (int i = output.Length-1; i >= 0; --i)
+	{
+		retOutput = retOutput * 10 + output[i];
+	}
+	return retOutput.Dump((number+1).ToString());
+	
+	
+	
+	int baseVal = BASE.Length;
+	
+	int placeValue = baseVal;
+	for (int x = 0; x < baseVal; ++x)
+	{
+		int placeDigit = number % placeValue;
+		BASE[(placeDigit + x) % baseVal].Dump();
+		//placeDigit.Dump();
+		number /= placeValue;
+	}
+	
+	return -2;
+}
 public static long Question25()
 {
-	int LOOKING_FOR_LENGTH = 1000; //1000000;
+	int LOOKING_FOR_LENGTH = 1000;
 	
 	BigFib bf = new BigFib();
 	
@@ -1655,6 +1764,7 @@ public static class Helpers
 //				if (i % j == 0)
 //				{
 //					hasFactor = true;
+//					break;
 //				}
 //			}
 //			if (!hasFactor) output.Add(i);

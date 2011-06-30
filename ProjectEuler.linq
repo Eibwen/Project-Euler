@@ -3,7 +3,7 @@
 void Main()
 {
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
-	Question24().Dump("Result");
+	Question34().Dump("Result");
 }
 
 // Define other methods and classes here
@@ -209,16 +209,107 @@ public static Truncatable Question37_CheckTruncatable(int num)
 #endregion Question37
 
 
-public static long Question24()
+public static long Question34()
+{
+	//FactorialCache fc = new FactorialCache(9);
+	int[] fc = new int[] { 0, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
+	
+	//Question34_FactorialDigitSum(fc, 145).Dump();
+	
+	long outputSum = 0;
+	
+//	for (int i = 1; i < 100; ++i)
+//	{
+//		if (Question34_FactorialDigitSum(factorials, i).Dump() == i)
+//		{
+//			outputSum += i;//.Dump();
+//		}
+//	}
+	
+//	int startSum = 0;
+//	for (int i = 1; i <= 9; ++i)
+//	{
+//		startSum += factorials[i];
+//		startSum.Dump();
+//		for (int j = i; j <= 9; ++j)
+//		{
+//			int curSum = startSum + factorials[j];
+//			if (curSum == Question34_FactorialDigitSum(factorials, curSum))
+//			{
+//				outputSum += curSum.Dump();
+//			}
+//		}
+//	}
+	
+//	outputSum = Question34_recurse(factorials, 0, 0, 0);
+	
+	int MAX_LENGTH = 5;
+	
+	//Each Digit
+	for (int i = 1; i <= 9; ++i)
+	{
+		long CurrentString = i;
+		long place = 1;
+		for (int j = 1; j < MAX_LENGTH; ++j)
+		{
+			place *= 10;
+			//place.Dump();
+			for (int k = 1; k <= i; ++k)
+			{
+				CurrentString += place * 1;
+				
+				CurrentString.Dump();
+				
+				long curStrSum = Question34_FactorialDigitSum(fc, CurrentString);
+				if (curStrSum == Question34_FactorialDigitSum(fc, curStrSum))
+				{
+					curStrSum.Dump("w");
+				}
+			}
+		}
+	}
+	
+	
+	return outputSum;
+}
+//public static long Question34_recurse(int[] fc, int sum, int largest, long resultSum)
+//{
+//	if (largest > 9) return resultSum;
+//	
+//	//Check if its a match
+//	if (sum == Question34_FactorialDigitSum(fc, sum))
+//	{
+//		resultSum += sum.Dump();
+//	}
+//	
+//	for (int i = largest; i <= 9; ++i)
+//	{
+//		Question34_recurse(fc, sum + fc[i], largest + 1, resultSum);
+//	}
+//	
+//	return resultSum;
+//}
+//public static long Question34_FactorialDigitSum(FactorialCache fc, int num)
+public static long Question34_FactorialDigitSum(int[] fc, long num)
+{
+	long sum = 0;
+	while (num > 0)
+	{
+		sum += fc[num % 10];
+		num /= 10;
+	}
+	return sum;
+}
+public static long Question24_TODO()
 {
 //	//With: int[] BASE = new int[] { 0, 1, 2 };
 //	int[] correct = new int[] { 0, 012, 021, 102, 120, 201, 210 };
-//	Debug.Assert(Question24_GetPermutation(1) == correct[1], "1");
-//	Debug.Assert(Question24_GetPermutation(2) == correct[2], "2");
-//	Debug.Assert(Question24_GetPermutation(3) == correct[3], "3");
-//	Debug.Assert(Question24_GetPermutation(4) == correct[4], "4");
-//	Debug.Assert(Question24_GetPermutation(5) == correct[5], "5");
-//	Debug.Assert(Question24_GetPermutation(6) == correct[6], "6");
+//	Debug.Assert(Question24_GetPermutation(3, 1) == correct[1], "1");
+//	Debug.Assert(Question24_GetPermutation(3, 2) == correct[2], "2");
+//	Debug.Assert(Question24_GetPermutation(3, 3) == correct[3], "3");
+//	Debug.Assert(Question24_GetPermutation(3, 4) == correct[4], "4");
+//	Debug.Assert(Question24_GetPermutation(3, 5) == correct[5], "5");
+//	Debug.Assert(Question24_GetPermutation(3, 6) == correct[6], "6");
 
 	int[] correct = new int[] { 0, 0123, 0132, 0213, 0231, 0312, 0321,
 									1023, 1032, 1203, 1230, 1302, 1320,
@@ -226,10 +317,12 @@ public static long Question24()
 									3012, 3021, 3102, 3120, 3201, 3210 };
 	for (int i = 1; i < correct.Length; ++i)
 	{
-		Debug.Assert(Question24_GetPermutation(i) == correct[i], i.ToString() + " :: " + correct[i]);
+		Debug.Assert(Question24_GetPermutation(4, i) == correct[i], i.ToString() + " :: " + correct[i]);
 	}
 
 	
+	//Somewhat cheating, wikipedia'd the concepts, havn't seen any code or anything
+	//  was close to deriving it... but its tricky
 	
 	
 //	int[] BASE = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -253,70 +346,105 @@ public static long Question24()
 	
 	return -1;
 }
-public static long Question24_GetPermutation(int number)
+public static long Question24_GetPermutation(int digits, long number)
 {
 	//Consecutivly found: Could step through and swap each position up from the bottom...
 	//  Once the largest value is at the top, its ended
 	
 	
-	int[] BASE = new int[] { 0, 1, 2, 3 };
-	
 	//reduce to 0-index
 	--number;
 	
-	int[] output = BASE;
-	Array.Reverse(output);
-	if ((number & (1 << 3)) > 0)
+	int[] BASE = new int[digits];
+	//int[] LEHMER = new int[] { 5, 2, 5, 0, 1, 3, 2, 0, 0 };
+	for (int i = 0; i < digits; ++i)
 	{
-		"4 idk".Dump();
+		BASE[i] = i;
+	}
+	bool[] CHK = new bool[digits];
+	
+	int baseIndex = 0;
+	long output = 0;
+	long lehmerOutput = 0;
+	
+	for (int i = digits; i > 0; --i)
+	{
+		long lehmer = number % i;
+		lehmerOutput = lehmerOutput * 10 + lehmer;
+		int skip = 0;
+		
+		while (CHK[baseIndex + lehmer + skip])
+		{
+			++skip;
+		}
+		//(baseIndex + lehmer + skip).Dump();
+		output = output * 10 + BASE[baseIndex + lehmer + skip];
+		CHK[baseIndex + lehmer + skip] = true;
+		
+		if (lehmer == 0) ++baseIndex;
+	}
+	(number + " : " + lehmerOutput.ToString("d" + digits.ToString()) + " => " + output).Dump();
+	return output;
+	
+	
+//	int[] BASE = new int[] { 0, 1, 2, 3 };
+//	
+//	//reduce to 0-index
+//	--number;
+//	
+//	int[] output = BASE;
+//	Array.Reverse(output);
+//	if ((number & (1 << 3)) > 0)
+//	{
+//		"4 idk".Dump();
+////		int tmp = output[0];
+////		output[0] = output[1];
+////		output[1] = output[2];
+////		output[2] = tmp;
+//	}
+//	if ((number & (1 << 2)) > 0)
+//	{
+//		"3 Shift".Dump();
 //		int tmp = output[0];
 //		output[0] = output[1];
 //		output[1] = output[2];
 //		output[2] = tmp;
-	}
-	if ((number & (1 << 2)) > 0)
-	{
-		"3 Shift".Dump();
-		int tmp = output[0];
-		output[0] = output[1];
-		output[1] = output[2];
-		output[2] = tmp;
-	}
-	if ((number & (1 << 1)) > 0)
-	{
-		"2 Swap".Dump();
-		int tmp = output[1];
-		output[1] = output[2];
-		output[2] = tmp;
-	}
-	if ((number & (1 << 0)) > 0)
-	{
-		"1 Swap".Dump();
-		int tmp = output[0];
-		output[0] = output[1];
-		output[1] = tmp;
-	}
-	long retOutput = 0;
-	for (int i = output.Length-1; i >= 0; --i)
-	{
-		retOutput = retOutput * 10 + output[i];
-	}
-	return retOutput.Dump((number+1).ToString());
+//	}
+//	if ((number & (1 << 1)) > 0)
+//	{
+//		"2 Swap".Dump();
+//		int tmp = output[1];
+//		output[1] = output[2];
+//		output[2] = tmp;
+//	}
+//	if ((number & (1 << 0)) > 0)
+//	{
+//		"1 Swap".Dump();
+//		int tmp = output[0];
+//		output[0] = output[1];
+//		output[1] = tmp;
+//	}
+//	long retOutput = 0;
+//	for (int i = output.Length-1; i >= 0; --i)
+//	{
+//		retOutput = retOutput * 10 + output[i];
+//	}
+//	return retOutput.Dump((number+1).ToString());
 	
 	
 	
-	int baseVal = BASE.Length;
-	
-	int placeValue = baseVal;
-	for (int x = 0; x < baseVal; ++x)
-	{
-		int placeDigit = number % placeValue;
-		BASE[(placeDigit + x) % baseVal].Dump();
-		//placeDigit.Dump();
-		number /= placeValue;
-	}
-	
-	return -2;
+//	int baseVal = BASE.Length;
+//	
+//	int placeValue = baseVal;
+//	for (int x = 0; x < baseVal; ++x)
+//	{
+//		int placeDigit = number % placeValue;
+//		BASE[(placeDigit + x) % baseVal].Dump();
+//		//placeDigit.Dump();
+//		number /= placeValue;
+//	}
+//	
+//	return -2;
 }
 public static long Question25()
 {
@@ -2101,6 +2229,27 @@ public class BigFib
 		else
 		{
 			return arrayN2;
+		}
+	}
+}
+
+public class FactorialCache
+{
+	public FactorialCache(int highest)
+	{
+		dict.Add(0, 0);
+		for (int i = 1; i <= highest; ++i)
+		{
+			dict.Add(i, Helpers.Factorial(i));
+		}
+		dict.Dump();
+	}
+	Dictionary<int, long> dict = new Dictionary<int, long>();
+	public long this[int number]
+	{
+		get
+		{
+			return dict[number];
 		}
 	}
 }

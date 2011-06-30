@@ -243,34 +243,52 @@ public static long Question34()
 	
 //	outputSum = Question34_recurse(factorials, 0, 0, 0);
 	
-	int MAX_LENGTH = 5;
 	
-	//Each Digit
-	for (int i = 1; i <= 9; ++i)
+	////This is very close... but has some bug that i'm not able to debug right now...
+	////Switching to IEnumerator
+//	int MAX_LENGTH = 5;
+//	long baseCurrent = 0;
+//	
+//	for (int m = 0; m < MAX_LENGTH; ++m)
+//	{
+//	
+//	baseCurrent = baseCurrent + 1;
+//	if (m > 0) baseCurrent *= 10;
+//	
+//	
+//	//Each Digit
+//	for (int i = 1; i <= 9; ++i)
+//	{
+//		long CurrentString = baseCurrent + i;
+//		long place = 1;
+//		for (int j = 1; j < m; ++j)
+//		{
+//			place *= 10;
+//			//place.Dump();
+//			for (int k = 0; k < i; ++k)
+//			{
+//				if (k > 0) CurrentString += place * 1;
+//				
+//				CurrentString.Dump();
+//				
+//				long curStrSum = Question34_FactorialDigitSum(fc, CurrentString);
+//				if (curStrSum == Question34_FactorialDigitSum(fc, curStrSum))
+//				{
+//					curStrSum.Dump("w");
+//				}
+//			}
+//		}
+//	}
+//	}
+	
+	Question34_enum en = new Question34_enum();
+	while (en.MoveNext())
 	{
-		long CurrentString = i;
-		long place = 1;
-		for (int j = 1; j < MAX_LENGTH; ++j)
-		{
-			place *= 10;
-			//place.Dump();
-			for (int k = 1; k <= i; ++k)
-			{
-				CurrentString += place * 1;
-				
-				CurrentString.Dump();
-				
-				long curStrSum = Question34_FactorialDigitSum(fc, CurrentString);
-				if (curStrSum == Question34_FactorialDigitSum(fc, curStrSum))
-				{
-					curStrSum.Dump("w");
-				}
-			}
-		}
+		en.Current.Dump();
+		if (en.Current > 1000) break;
 	}
 	
-	
-	return outputSum;
+	return long.MaxValue;
 }
 //public static long Question34_recurse(int[] fc, int sum, int largest, long resultSum)
 //{
@@ -299,6 +317,109 @@ public static long Question34_FactorialDigitSum(int[] fc, long num)
 		num /= 10;
 	}
 	return sum;
+}
+public class Question34_enum : IEnumerator<long>
+{
+	long TYPE_MAX_VALUE = 8999999999999999999;
+	int TYPE_MAX_LENGTH = 19;
+
+	long current = 0;  //Reset to placeLength 1's each place enlargement
+	//long digitReset = 0;
+
+	int endMultplier = 1; //Grows by *10 each place enlargement, not reset
+	int placeLength = 1;  //Grows by +1 each place enlargement, not reset
+	int currentMultiplier = 1; //Grows by *10 each place increment, reset on place enlargement
+	int currentDigit = 1;
+
+	public bool PlaceEnlargement()
+	{
+		endMultplier *= 10;
+		placeLength += 1;
+		currentMultiplier = 1;
+		currentDigit += 1;
+
+		if (placeLength > TYPE_MAX_LENGTH)
+		{
+			return false;
+		}
+
+		current = 0;
+//		for (int i = 0; i < placeLength; ++i)
+//		{
+//			current = (current + 1) * 10;
+//		}
+//		digitReset = current;
+		for (int i = 0; i < placeLength; ++i)
+		{
+			current = current * 10 + 1;
+		}
+		currentDigit = 1;
+		return true;
+	}
+
+	#region IEnumerator<long> Members
+
+	public long Current
+	{
+		get { return current; }
+	}
+
+	#endregion
+
+	#region IDisposable Members
+
+	public void Dispose()
+	{
+		return;
+	}
+
+	#endregion
+
+	#region IEnumerator Members
+
+	object System.Collections.IEnumerator.Current
+	{
+		get { return Current; }
+	}
+
+	public bool MoveNext()
+	{
+		if (current / endMultplier % 10 == 9)
+		{
+			PlaceEnlargement();
+			endMultplier.Dump("PlaceEnlargement");
+			return true;
+		}
+		if (current / currentMultiplier % 10 == 9)
+		{
+			//currentMultiplier *= 10;
+			currentDigit += 1;
+			current += currentMultiplier * 10;;
+			current -= 10 - currentDigit;
+			currentMultiplier.Dump("currentMultiplier inc");
+		}
+
+		//limited by long type:
+		if (current == TYPE_MAX_VALUE)
+		{
+			return false;
+		}
+
+		current += currentMultiplier;
+		return true;
+	}
+
+	public void Reset()
+	{
+		current = 0;
+		currentDigit = 1;
+
+		endMultplier = 1;
+		placeLength = 1;
+		currentMultiplier = 1;
+	}
+
+	#endregion
 }
 public static long Question24_TODO()
 {

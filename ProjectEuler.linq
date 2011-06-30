@@ -281,12 +281,52 @@ public static long Question34()
 //	}
 //	}
 	
+//////	//BRUTE FORCE MAKING IDEAL LIST
+//////	Dictionary<long, long> nextIdealList = new Dictionary<long, long>();
+//////	for (int i = 111; i < 1000; ++i)
+//////	{
+//////		long f = Question34_FactorialDigitSum(fc, i);
+//////		if (!nextIdealList.ContainsKey(f))
+//////			nextIdealList.Add(f, i);
+//////	}
+//////	var ideal = nextIdealList.Where(f => (f.Value % 10 != 0) && (f.Value / 10 % 10 != 0)).OrderBy(f => f.Key).Select(f => f.Value).Dump();
+//////	("int[] idealList = new int[] { " + string.Join(", ", ideal.Select(i => i.ToString()).ToArray()) + " };").Dump();
+//////	return -5;
+	
+	int[] idealList = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 
+								  11, 12, 22, 13, 23, 33, 14, 24, 34, 44, 15, 25, 35, 45, 55, 16, 26, 36, 46, 56, 66, 17, 27, 37, 47, 57, 67, 77, 18, 28, 38, 48, 58, 68, 78, 88, 19, 29, 39, 49, 59, 69, 79, 89, 99,
+								  111, 112, 122, 222, 113, 123, 223, 133, 233, 333, 114, 124, 224, 134, 234, 334, 144, 244, 344, 444, 115, 125, 225, 135, 235, 335, 145, 245, 345, 445, 155, 255, 355, 455, 555, 116, 126, 226, 136, 236, 336, 146, 246, 346, 446, 156, 256, 356, 456, 556, 166, 266, 366, 466, 566, 666, 117, 127, 227, 137, 237, 337, 147, 247, 347, 447, 157, 257, 357, 457, 557, 167, 267, 367, 467, 567, 667, 177, 277, 377, 477, 577, 677, 777, 118, 128, 228, 138, 238, 338, 148, 248, 348, 448, 158, 258, 358, 458, 558, 168, 268, 368, 468, 568, 668, 178, 278, 378, 478, 578, 678, 778, 188, 288, 388, 488, 588, 688, 788, 888, 119, 129, 229, 139, 239, 339, 149, 249, 349, 449, 159, 259, 359, 459, 559, 169, 269, 369, 469, 569, 669, 179, 279, 379, 479, 579, 679, 779, 189, 289, 389, 489, 589, 689, 789, 889, 199, 299, 399, 499, 599, 699, 799, 899, 999 };
+	int idealIndex = 0;
+	
+//	Dictionary<long, long> debug = new Dictionary<long, long>();
+	
 	Question34_enum en = new Question34_enum();
 	while (en.MoveNext())
 	{
-		en.Current.Dump();
+		if (idealIndex == 0)
+		{
+			if (idealList[idealIndex] == en.Current) ++idealIndex;
+		}
+		else if (idealIndex < idealList.Length)
+		{
+			if (idealList[idealIndex] != en.Current) ("FAIL ideal: " + en.Current + " != " + idealList[idealIndex]).Dump();
+			++idealIndex;
+		}
+		
+		(en.Current + "\t" + Question34_FactorialDigitSum(fc, en.Current)).Dump();
+//		debug.Add(en.Current, Question34_FactorialDigitSum(fc, en.Current));
 		if (en.Current > 1000) break;
 	}
+	
+//	var idealList = debug.Where(f => f.Key >= 10 && f.Key < 100).OrderBy(f => f.Value).Select(f => f.Key).Dump();
+//	long last = 0;
+//	foreach (long l in idealList)
+//	{
+//		((l - last) + " -- " + l).Dump();
+//		last = l;
+//	}
+//	
+//	("int[] idealList = new int[] { " + string.Join(", ", ideal.Select(i => i.ToString()).ToArray()) + " };").Dump();
 	
 	return long.MaxValue;
 }
@@ -330,6 +370,7 @@ public class Question34_enum : IEnumerator<long>
 	int placeLength = 1;  //Grows by +1 each place enlargement, not reset
 	int currentMultiplier = 1; //Grows by *10 each place increment, reset on place enlargement
 	int currentDigit = 1;
+	int digitResetMultiplier = 1;
 
 	public bool PlaceEnlargement()
 	{
@@ -390,14 +431,29 @@ public class Question34_enum : IEnumerator<long>
 			endMultplier.Dump("PlaceEnlargement");
 			return true;
 		}
-		if (current / currentMultiplier % 10 == 9)
+		if (currentMultiplier < endMultplier
+			&& current / currentMultiplier % 10 == currentDigit)
 		{
-			//currentMultiplier *= 10;
-			currentDigit += 1;
-			current += currentMultiplier * 10;;
-			current -= 10 - currentDigit;
-			currentMultiplier.Dump("currentMultiplier inc");
+			currentMultiplier.Dump("inc currentMultiplier");
+			currentMultiplier *= 10;
 		}
+		if (currentMultiplier >= 10
+			&& current / currentMultiplier % 10 == currentDigit)
+		{
+			//currentDigit.Dump("cur digit");
+			current.Dump("dec current");
+			current -= (currentMultiplier * currentDigit - 1).Dump("minus");
+			++currentDigit;
+			//current.Dump("dec current b");
+		}
+//		if (current / currentMultiplier % 10 == 9)
+//		{
+//			//currentMultiplier *= 10;
+//			currentDigit += 1;
+//			current += currentMultiplier * 10;;
+//			current -= 10 - currentDigit;
+//			currentMultiplier.Dump("currentMultiplier inc");
+//		}
 
 		//limited by long type:
 		if (current == TYPE_MAX_VALUE)

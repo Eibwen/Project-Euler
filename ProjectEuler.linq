@@ -209,6 +209,113 @@ public static Truncatable Question37_CheckTruncatable(int num)
 #endregion Question37
 
 
+public static long Question32()
+{
+	//THIS ALSO WOULD BE RADIX TYPE SHIT SORTA, but easier to brute force probably than others
+	
+	//1-9 pandigital
+	// a * b = c
+	// a < b < c
+	// a MUST be under 100: 99 * 100 = 9900 == 9 total digits, anything more than that will have 10 digits
+	// b depents on a... must be larger than a, and the count of the digits should be less than 9, if not break the b loop
+	//   upper limit would be 9 digits
+	
+	int GoodChecksum = Question32_CheckSumDigits(123, 456, 789).Dump();
+	if (GoodChecksum != Question32_CheckSumDigits(39, 186, 7254).Dump())
+	{
+		throw new ArithmeticException("test checksum should match");
+	}
+	if (GoodChecksum == Question32_CheckSumDigits(27, 186, 7254).Dump())
+	{
+		throw new ArithmeticException("test checksum should NOT match");
+	}
+	if (GoodChecksum == Question32_CheckSumDigits(21, 474, 9954).Dump())
+	{
+		throw new ArithmeticException("test checksum should NOT match");
+	}
+
+	
+	//int loopCount = 0;
+	int countCount = 0;
+	int checksumCount = 0;
+	List<int> cValues = new List<int>();
+	
+	for (int a = 1; a < 100; ++a)
+	{
+		for (int b = a; b <= 987654321; ++b)
+		{
+			//++loopCount;
+			
+			int c = a * b;
+			int count = Question32_countDigits(a, b, c);
+			if (count > 9) break;
+			if (count < 9) continue;
+			
+			++countCount;
+			
+			if (GoodChecksum == Question32_CheckSumDigits(a, b, c))
+			{
+				++checksumCount;
+				Util.HorizontalRun(true, a, b, c).Dump();
+				cValues.Add(c);
+			}
+		}
+	}
+	
+	//loopCount.Dump("Looped");
+	countCount.Dump("Had 9");
+	checksumCount.Dump("Matched Checksum");
+	
+	//Could do it with a checksum of all the digits together...
+	return cValues.Distinct().Sum();
+}
+public static int Question32_countDigits(int a, int b, int c)
+{
+	int sum = 0;
+	while (a > 0)
+	{
+		a /= 10;
+		++sum;
+	}
+	while (b > 0)
+	{
+		b /= 10;
+		++sum;
+	}
+	while (c > 0)
+	{
+		c /= 10;
+		++sum;
+	}
+	return sum;
+}
+public static int Question32_CheckSumDigits(int a, int b, int c)
+{
+	int chkSum = 0;
+	int chkSum2 = 1;
+	while (a > 0)
+	{
+		//chkSum += (a % 10) ^ 23;	// Had 1138 matches
+		chkSum += (a % 10);
+		chkSum2 *= (a % 10) ^ 23;		// + Had  966 matches, * had 55, with ^23 had 9
+		a /= 10;
+	}
+	while (b > 0)
+	{
+		//chkSum += (b % 10) ^ 23;
+		chkSum += (b % 10);
+		chkSum2 *= (b % 10) ^ 23;
+		b /= 10;
+	}
+	while (c > 0)
+	{
+		//chkSum += (c % 10) ^ 23;
+		chkSum += (c % 10);
+		chkSum2 *= (c % 10) ^ 23;
+		c /= 10;
+	}
+	return chkSum + chkSum2;
+}
 public static long Question34()
 {
 	//FactorialCache fc = new FactorialCache(9);
@@ -436,6 +543,7 @@ public class Question34_enum : IEnumerator<long>
 		{
 			currentMultiplier.Dump("inc currentMultiplier");
 			currentMultiplier *= 10;
+			digitResetMultiplier
 		}
 		if (currentMultiplier >= 10
 			&& current / currentMultiplier % 10 == currentDigit)

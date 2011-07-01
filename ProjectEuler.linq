@@ -3,17 +3,7 @@
 void Main()
 {
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
-//	Question29().Dump("Result");
-
-	InfiniteInt prod = new InfiniteInt(99);
-//	for (int i = 1; i < 100; ++i)
-//	{
-//		prod.Multiply(99);
-//	}
-	prod.Multiply(999999);
-	prod.Multiply(999999);
-	prod.ToString().Dump();
-	prod.ToString().Length.Dump();
+	Question29().Dump("Result");
 }
 
 // Define other methods and classes here
@@ -1975,10 +1965,13 @@ public class FactorialCache
 }
 
 #region InfiniteInt
+//TODO if wanted to be more memeory efficent:
+//  do all maths in (long)
+//  use int.MaxValue as the Modular... but then have to convert everything when outputtint to string
 public class InfiniteInt
 {
-	const int TRUNC_SIZE = 100;
-	const int TRUNC_LENGTH = 2;
+	const int TRUNC_SIZE = 100000;
+	const int TRUNC_LENGTH = 5;
 //	const int TRUNC_SIZE = 100000;
 //	const int TRUNC_LENGTH = 5;
 	List<int> array = new List<int>();
@@ -2024,6 +2017,8 @@ public class InfiniteInt
 	}
 	public void Multiply(int factor)
 	{
+		if (factor < 0) Console.Error.WriteLine("InfiniteInt.Multiply is not not tested for negative numbers");
+		
 		int pos = array.Count-1;
 		if (array[pos] * factor >= TRUNC_SIZE)
 		{
@@ -2039,19 +2034,36 @@ public class InfiniteInt
 			{
 				array[j+1] += array[j] / TRUNC_SIZE;
 				array[j] %= TRUNC_SIZE;
+				
+				//Keep pushing the overflow up one
+				for (int o = 1; array[j+o] >= TRUNC_SIZE; ++o)
+				{
+					if (j+o+1 == array.Count) array.Add(0);
+					//Util.HorizontalRun(true, j+o+1, "==", array.Count).Dump();
+					array[j+o+1] += array[j+o] / TRUNC_SIZE;
+					array[j+o] %= TRUNC_SIZE;
+					//Util.HorizontalRun(false, j+o+1, ": ", array[j+o+1]).Dump();
+				}
 			}
-				//I think this thought isn't working because its reverseing through...
-				//FUCK WHEN I ADD IT IT GETS ADDED TO THE END, not where i am
-////			//Keep pushing the overflow up one
-////			for (int o = 0; array[j+o] > TRUNC_SIZE; ++o)
-////			{
-////				if (j+o+1 == array.Count) array.Add(0);
-////				//Util.HorizontalRun(true, j+o+1, "==", array.Count).Dump();
-////				array[j+o+1] += array[j+o] / TRUNC_SIZE;
-////				array[j+o] %= TRUNC_SIZE;
-////				Util.HorizontalRun(false, j+o+1, ": ", array[j+o+1]).Dump();
-////			}
 		}
+
+////THIS IS FAIL:
+//		//Multiply each array element by factor
+//		for (int j = 0; j < array.Count; ++j)
+//		{
+//			array[j] *= factor;
+//			
+//			//Keep pushing the overflow up one
+//			for (int o = 0; array[j+o] > TRUNC_SIZE; ++o)
+//			{
+//				if (j+o+1 == array.Count) array.Add(0);
+//				//Util.HorizontalRun(true, j+o+1, "==", array.Count).Dump();
+//				//FUCK going forward like this, array[j+o+1] has not yet been multiplied, but i'm trying to add something that has been
+//				array[j+o+1] += array[j+o] / TRUNC_SIZE;
+//				array[j+o] %= TRUNC_SIZE;
+//				Util.HorizontalRun(false, j+o+1, ": ", array[j+o+1]).Dump();
+//			}
+//		}
 	}
 	public long Length()
 	{

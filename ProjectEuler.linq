@@ -3,7 +3,7 @@
 void Main()
 {
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
-	Question34().Dump("Result");
+	Question26().Dump("Result");
 }
 
 // Define other methods and classes here
@@ -153,7 +153,7 @@ public static Truncatable Question37_CheckTruncatable(int num)
 	//If it overloads int, just ignore it
 	if (num < 0) return Truncatable.None;
 	
-	if (!Helpers.IsPrime(num)) return Truncatable.None;
+	if (!Helpers.isPrime_Q7PDF(num)) return Truncatable.None;
 	
 	//num.Dump();
 	
@@ -167,7 +167,7 @@ public static Truncatable Question37_CheckTruncatable(int num)
 		++length;
 		numb /= 10;
 		
-		if (!Helpers.IsPrime(numb))
+		if (!Helpers.isPrime_Q7PDF(numb))
 		{
 			isRight = false;
 			break;
@@ -190,7 +190,7 @@ public static Truncatable Question37_CheckTruncatable(int num)
 	for (int i = 0; i < length && Modifier > 1; ++i)
 	{
 		//(Modifier + " -- " + num + " -- " + (numb % Modifier)).Dump("fff");
-		if (!Helpers.IsPrime(numb % Modifier))
+		if (!Helpers.isPrime_Q7PDF(numb % Modifier))
 		{
 			isLeft = false;
 			break;
@@ -209,6 +209,136 @@ public static Truncatable Question37_CheckTruncatable(int num)
 #endregion Question37
 
 
+public static long Question26()
+{
+	Question26_LongDivision(1, 712, 10, 30).Dump();
+	((decimal)1/712).Dump();
+	
+	
+	Decimal dec = 1;
+//	List<int> Canidates = new List<int>();
+	List<int> NoRepeats = new List<int>();
+//	int CanidatesSize = 0;
+	
+	int count = 0;
+	for (int i = 1; i < 1000; ++i)
+	{
+		////STRING PROCESSING
+		//Decimal div = dec / i;
+		string div = (dec / i).ToString();
+		
+		if (div.Length != 30) continue;
+		div = div.TrimStart('0', '.', '1');
+		if (div.Length > 0) div = div.TrimStart(div[0], div[1])
+									.TrimEnd(div[div.Length-1]); //Remove any rounded digits
+		
+		if (div.Length == 0) continue;
+		
+		int recurring = Question26_FindRecurring(div);
+		if (recurring == -3)
+		{
+			NoRepeats.Add(i);
+		}
+//		else if (recurring > CanidatesSize)
+//		{
+//			CanidatesSize = recurring;
+//			Canidates = new List<int>();
+//			Canidates.Add(i);
+//		}
+//		else if (recurring == CanidatesSize)
+//		{
+//			Canidates.Add(i);
+//		}
+		//(i.ToString() + ": " + div + " == " + recurring).Dump();
+		
+		++count;
+	}
+	count.Dump("Number Processed");
+	
+	((Decimal)1/718).Dump();
+	((Decimal)1/788).Dump();
+	
+//	Canidates.Dump("Size: " + CanidatesSize);
+	NoRepeats.Dump("No Repeating Found In This Range");
+	
+//	ulong ulo = 10000000000000000000;
+//	for (ulong i = 1; i < 1000; ++i)
+//	{
+//		(ulo / i).Dump();
+//	}
+	
+	return -3;
+}
+public static string Question26_LongDivision(long X, long D, int skip, int length)
+{
+	StringBuilder sb = new StringBuilder(length);
+	for (int i = 0; i < (skip+length); ++i)
+	{
+		bool shifted = false;
+		while (X < D)
+		{
+			if (X == 0) break;
+			if (shifted && i >= skip) sb.Append(0);
+			X *= 10;
+			shifted = true;
+		}
+		if (i >= skip)
+		{
+			sb.Append(X/D);
+		}
+		//((X/D) + " R" + (X % D)).Dump();
+		X %= D;
+	}
+	return sb.ToString();
+}
+public static int Question26_FindRecurring(string tirmmedNumber)
+{
+	try
+	{
+		if (tirmmedNumber.Length <= 1) return 0;
+		
+		const int NOT_FOUND_RETURN = -3;
+		
+		int[] finds = new int[30];
+		int findsIndex = 0;
+		
+		
+//		int lastPos = 0;
+//		for (int pos = tirmmedNumber.IndexOf(tirmmedNumber[0]);
+//			pos >= 0;
+//			pos = tirmmedNumber.IndexOf(tirmmedNumber[0], pos+1))
+//		{
+//			finds[findsIndex++] = pos - lastPos;
+//			lastPos = pos;
+//		}
+		char find = tirmmedNumber[tirmmedNumber.Length - 1];
+		int lastPos = tirmmedNumber.Length - 1;
+		for (int pos = tirmmedNumber.LastIndexOf(find, lastPos-1);
+			pos > 0;
+			pos = tirmmedNumber.LastIndexOf(find, pos-1))
+		{
+			finds[findsIndex++] = lastPos - pos;
+			lastPos = pos;
+		}
+		
+		//Didn't find anything i assume...
+		if (findsIndex == 1) return NOT_FOUND_RETURN;
+		
+		int last = finds[1];
+		int sum = finds[1];
+		for (int i = 1; i < findsIndex; ++i)
+		{
+			if (finds[i] == last) return sum;
+			sum += finds[i];
+		}
+		return sum;
+	}
+	catch (Exception ex)
+	{
+		ex.ToString().Dump("Exception");
+		return -1;
+	}
+}
 public static long Question32()
 {
 	//THIS ALSO WOULD BE RADIX TYPE SHIT SORTA, but easier to brute force probably than others
@@ -267,7 +397,7 @@ public static long Question32()
 	checksumCount.Dump("Matched Checksum");
 	
 	//Could do it with a checksum of all the digits together...
-	return cValues.Distinct().Sum();
+	return cValues.Distinct().Dump().Sum();
 }
 public static int Question32_countDigits(int a, int b, int c)
 {
@@ -543,7 +673,7 @@ public class Question34_enum : IEnumerator<long>
 		{
 			currentMultiplier.Dump("inc currentMultiplier");
 			currentMultiplier *= 10;
-			digitResetMultiplier
+			////digitResetMultiplier
 		}
 		if (currentMultiplier >= 10
 			&& current / currentMultiplier % 10 == currentDigit)
@@ -584,6 +714,27 @@ public class Question34_enum : IEnumerator<long>
 	}
 
 	#endregion
+}
+//Found a Lexographical Permutation algorithm, implimented it as an Enumerator
+// #2 on: http://www.cut-the-knot.org/do_you_know/AllPerm.shtml
+public static long Question24()
+{
+	var per = new HelperEnumerators.LexicographicPermutations(10);
+	
+	int LOOKING_FOR = 1000000;
+	
+	per.Current.Dump();
+	for (int i = 1; i < LOOKING_FOR; ++i)
+	{
+		per.MoveNext();
+	}
+	int[] output = per.Current.Dump();
+	long outputNum = 0;
+	foreach (int i in output)
+	{
+		outputNum = outputNum * 10 + i;
+	}
+	return outputNum;
 }
 public static long Question24_TODO()
 {
@@ -1024,6 +1175,7 @@ public static long Question125()
 
 
 
+#region Helpers
 public static class Helpers
 {
 	public static List<int> FirstXPrimes(int maxCount)
@@ -1176,6 +1328,8 @@ public static class Helpers
 		return output;
 	}
 }
+#endregion Helpers
+#region BigFib
 public class BigFib
 {
 	const int TRUNC_VALUE = 100000;
@@ -1392,6 +1546,94 @@ public class BigFib
 		}
 	}
 }
+#endregion BigFib
+
+#region Helper Enumerators
+public class HelperEnumerators
+{
+	public class LexicographicPermutations : IEnumerator<int[]>
+	{
+		//Set size
+		int N = -1;
+		int[] Value = null;
+		
+		void swap(int i, int j)
+		{
+			int tmp = Value[i];
+			Value[i] = Value[j];
+			Value[j] = tmp;
+		}
+		
+		public LexicographicPermutations(int length)
+		{
+			N = length;
+			Value = new int[length];
+			for (int i = 0; i < length; ++i)
+			{
+				Value[i] = i;
+			}
+		}
+		
+		#region IEnumerator<long> Members
+	
+		public int[] Current
+		{
+			get { return Value; }
+		}
+	
+		#endregion
+	
+		#region IDisposable Members
+	
+		public void Dispose()
+		{
+			return;
+		}
+	
+		#endregion
+	
+		#region IEnumerator Members
+	
+		object System.Collections.IEnumerator.Current
+		{
+			get { return Current; }
+		}
+	
+		//http://www.cut-the-knot.org/do_you_know/AllPerm.shtml
+		public bool MoveNext()
+		{
+			int i = N - 1;
+			while (i > 0 && Value[i-1] >= Value[i]) 
+				i = i-1;
+		
+			if (i == 0) return false;
+		
+			int j = N;
+			while (Value[j-1] <= Value[i-1]) 
+				j = j-1;
+		
+			swap(i-1, j-1);    // swap values at positions (i-1) and (j-1)
+		
+			i++; j = N;
+			while (i < j)
+			{
+				swap(i-1, j-1);
+				i++;
+				j--;
+			}
+			
+			return true;
+		}
+	
+		public void Reset()
+		{
+			
+		}
+	
+		#endregion
+	}
+}
+#endregion Helper Enumerators
 
 public class FactorialCache
 {

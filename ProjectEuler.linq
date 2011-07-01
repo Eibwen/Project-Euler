@@ -211,8 +211,17 @@ public static Truncatable Question37_CheckTruncatable(int num)
 
 public static long Question26()
 {
-	Question26_LongDivision(1, 712, 10, 30).Dump();
-	((decimal)1/712).Dump();
+	Question26_LongDivisionFindRecurring(1, 902, 10).Dump();
+	Question26_LongDivisionFindRecurring(1, 902, 15.Dump());
+	Question26_LongDivisionFindRecurring(1, 902, 16).Dump();
+	Question26_LongDivisionFindRecurring(1, 902, 17).Dump();
+	Question26_LongDivisionFindRecurring(1, 902, 18).Dump();
+	Question26_LongDivisionFindRecurring(1, 902, 19).Dump();
+	Question26_LongDivisionFindRecurring(1, 902, 30).Dump();
+	return 90;
+//	Question26_LongDivisionFindRecurring(1, 712, 10).Dump();
+//	Question26_LongDivision(1, 712, 10, 30).Dump();
+//	((decimal)1/712).Dump();
 	
 	
 	Decimal dec = 1;
@@ -255,11 +264,43 @@ public static long Question26()
 	}
 	count.Dump("Number Processed");
 	
-	((Decimal)1/718).Dump();
-	((Decimal)1/788).Dump();
+	int max = 0;
+	int num = -1;
+	int failCount = 0;
+	foreach (int i in NoRepeats)
+	{
+		try
+		{
+			int tmp = Question26_LongDivisionFindRecurring(1, i, 30);
+			if (tmp > max)
+			{
+				num = i;
+				max = tmp;
+			}
+			else if (tmp == max)
+			{
+				i.Dump("Equals max");
+			}
+		}
+		catch (Exception)
+		{
+			i.Dump();
+			++failCount;
+		}
+	}
+	failCount.Dump("Fail count");
+	
+	//FUCK not working...
+	// TOTRY: 191, 953
+	// tried: 931, 447, 848, 894, 699, 149, 514, 599, 828, 831, 526, 755, 277, 683
+	// think tried: 867
+	// not tried: 
+	((Decimal)1/828).Dump();
+	
+	num.Dump("Okay: " + max);
 	
 //	Canidates.Dump("Size: " + CanidatesSize);
-	NoRepeats.Dump("No Repeating Found In This Range");
+//	NoRepeats.Dump("No Repeating Found In This Range");
 	
 //	ulong ulo = 10000000000000000000;
 //	for (ulong i = 1; i < 1000; ++i)
@@ -267,7 +308,61 @@ public static long Question26()
 //		(ulo / i).Dump();
 //	}
 	
-	return -3;
+	return num;
+}
+public static int Question26_LongDivisionFindRecurring(long X, long D, int skip)
+{
+	long iX = X;
+	long iD = D;
+	
+	int MAX_LENGTH = 1000;
+	
+	int FIND_LEN = 3;
+	string find = null;
+	
+	StringBuilder sb = new StringBuilder(MAX_LENGTH);
+	for (int i = 0; i < MAX_LENGTH; ++i)
+	{
+		bool shifted = false;
+		while (X < D)
+		{
+			if (X == 0) break;
+			//Insert zeros, only after X has been normally shifted once
+			if (shifted && i >= skip) sb.Append(0);
+			X *= 10;
+			shifted = true;
+		}
+		
+		//Check if we should start outputting digits
+		if (i >= skip)
+		{
+			sb.Append(X/D);
+			if (find == null && sb.Length >= FIND_LEN)
+			{
+				find = sb.ToString();
+				if (find == new string('0', FIND_LEN)) return 0;
+			}
+			else if (find != null
+				&& sb[sb.Length-1] == find[FIND_LEN-1])
+			{
+				bool failed = false;
+				for (int k = 2; k < FIND_LEN; ++k)
+				{
+					//(sb[sb.Length-k] + " != " + find[FIND_LEN-k]).Dump();
+					if (sb[sb.Length-k] != find[FIND_LEN-k]) failed = true;
+				}
+				if (!failed)
+				{
+					return sb.Length - FIND_LEN;
+				}
+			}
+		}
+		//((X/D) + " R" + (X % D)).Dump();
+		//Move on to the remainder
+		X %= D;
+	}
+	Util.HorizontalRun(true, iX, iD, skip).Dump("CAUSED FAIL");
+	throw new NotImplementedException("idk failure");
 }
 public static string Question26_LongDivision(long X, long D, int skip, int length)
 {

@@ -3,7 +3,17 @@
 void Main()
 {
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
-	Question29().Dump("Result");
+//	Question29().Dump("Result");
+
+	InfiniteInt prod = new InfiniteInt(99);
+//	for (int i = 1; i < 100; ++i)
+//	{
+//		prod.Multiply(99);
+//	}
+	prod.Multiply(999999);
+	prod.Multiply(999999);
+	prod.ToString().Dump();
+	prod.ToString().Length.Dump();
 }
 
 // Define other methods and classes here
@@ -216,24 +226,26 @@ public static long Question29()
 	int MAX = 100;
 	
 //	int outputCount = 0;
-	List<long> products = new List<long>();
+	List<string> products = new List<string>();
 	
 	for (int i = 2; i <= MAX; ++i)
 	{
-		long prod = i;
+		InfiniteInt prod = new InfiniteInt(i);
 //		int skipPower = Question29_IsPowerOfLower(i);
 		for (int j = 2; j <= MAX; ++j)
 		{
-			prod *= i;
+			prod.Multiply(i);
 //			if (skipPower > 0 && skipPower == j)
 //			{
 //				("skip: " + skipPower + " == " + j).Dump();
 //			}
-			products.Add(prod);
-			prod.Dump();
+			products.Add(prod.ToString());
+			//prod.Dump();
 //			++outputCount;
 		}
 	}
+	
+	//products.Skip(9000).Dump();
 	
 	return products.Distinct().LongCount();
 }
@@ -1965,8 +1977,8 @@ public class FactorialCache
 #region InfiniteInt
 public class InfiniteInt
 {
-	const int TRUNC_SIZE = 10;
-	const int TRUNC_LENGTH = 1;
+	const int TRUNC_SIZE = 100;
+	const int TRUNC_LENGTH = 2;
 //	const int TRUNC_SIZE = 100000;
 //	const int TRUNC_LENGTH = 5;
 	List<int> array = new List<int>();
@@ -2013,8 +2025,13 @@ public class InfiniteInt
 	public void Multiply(int factor)
 	{
 		int pos = array.Count-1;
-		if (array[pos] * factor >= TRUNC_SIZE) array.Add(0);
+		if (array[pos] * factor >= TRUNC_SIZE)
+		{
+			//TODO idk whats the error: if (array.Count == int.MaxValue) throw new ArgumentOutOfRangeException();
+			array.Add(0);
+		}
 		
+		//Multiply each array element by factor
 		for (int j = pos; j >= 0; --j)
 		{
 			array[j] *= factor;
@@ -2023,6 +2040,17 @@ public class InfiniteInt
 				array[j+1] += array[j] / TRUNC_SIZE;
 				array[j] %= TRUNC_SIZE;
 			}
+				//I think this thought isn't working because its reverseing through...
+				//FUCK WHEN I ADD IT IT GETS ADDED TO THE END, not where i am
+////			//Keep pushing the overflow up one
+////			for (int o = 0; array[j+o] > TRUNC_SIZE; ++o)
+////			{
+////				if (j+o+1 == array.Count) array.Add(0);
+////				//Util.HorizontalRun(true, j+o+1, "==", array.Count).Dump();
+////				array[j+o+1] += array[j+o] / TRUNC_SIZE;
+////				array[j+o] %= TRUNC_SIZE;
+////				Util.HorizontalRun(false, j+o+1, ": ", array[j+o+1]).Dump();
+////			}
 		}
 	}
 	public long Length()
@@ -2046,6 +2074,22 @@ public class InfiniteInt
 			}
 		}
 		return sum;
+	}
+	public override string ToString()
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		string format = "{0:d" + TRUNC_LENGTH + "}";
+		
+		//Add the first number without padding
+		sb.Append(array[array.Count-1]);
+		//Add the rest of the numbers, padding to TRUNC_LENGTH
+		for (int i = array.Count-2; i >= 0 ; --i)
+		{
+			long l = array[i];
+			sb.AppendFormat(format, l);
+		}
+		return sb.ToString();
 	}
 }
 #endregion InfiniteInt

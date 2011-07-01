@@ -211,13 +211,13 @@ public static Truncatable Question37_CheckTruncatable(int num)
 
 public static long Question26()
 {
-	Question26_LongDivisionFindRecurring(1, 902, 10).Dump();
-	Question26_LongDivisionFindRecurring(1, 902, 15.Dump());
-	Question26_LongDivisionFindRecurring(1, 902, 16).Dump();
-	Question26_LongDivisionFindRecurring(1, 902, 17).Dump();
-	Question26_LongDivisionFindRecurring(1, 902, 18).Dump();
-	Question26_LongDivisionFindRecurring(1, 902, 19).Dump();
-	Question26_LongDivisionFindRecurring(1, 902, 30).Dump();
+//	Question26_LongDivisionFindRecurring(1, 902, 10).Dump();
+//	Question26_LongDivisionFindRecurring(1, 902, 15).Dump();
+//	Question26_LongDivisionFindRecurring(1, 902, 16).Dump();
+//	Question26_LongDivisionFindRecurring(1, 902, 17).Dump();
+//	Question26_LongDivisionFindRecurring(1, 902, 18).Dump();
+//	Question26_LongDivisionFindRecurring(1, 902, 19).Dump();
+	Question26_LongDivisionFindRecurring(1, 953, 30).Dump();
 	return 90;
 //	Question26_LongDivisionFindRecurring(1, 712, 10).Dump();
 //	Question26_LongDivision(1, 712, 10, 30).Dump();
@@ -271,7 +271,7 @@ public static long Question26()
 	{
 		try
 		{
-			int tmp = Question26_LongDivisionFindRecurring(1, i, 30);
+			int tmp = Question26_LongDivisionFindRecurring(1, i, 20);
 			if (tmp > max)
 			{
 				num = i;
@@ -279,7 +279,7 @@ public static long Question26()
 			}
 			else if (tmp == max)
 			{
-				i.Dump("Equals max");
+				i.Dump("Equals max: " + max);
 			}
 		}
 		catch (Exception)
@@ -317,7 +317,7 @@ public static int Question26_LongDivisionFindRecurring(long X, long D, int skip)
 	
 	int MAX_LENGTH = 1000;
 	
-	int FIND_LEN = 3;
+	int FIND_LEN = 4;
 	string find = null;
 	
 	StringBuilder sb = new StringBuilder(MAX_LENGTH);
@@ -339,21 +339,27 @@ public static int Question26_LongDivisionFindRecurring(long X, long D, int skip)
 			sb.Append(X/D);
 			if (find == null && sb.Length >= FIND_LEN)
 			{
+				//(sb.Length + " >= " + FIND_LEN).Dump();
 				find = sb.ToString();
+				//If its all zeros, then repeat is zero
 				if (find == new string('0', FIND_LEN)) return 0;
 			}
 			else if (find != null
-				&& sb[sb.Length-1] == find[FIND_LEN-1])
+				&& sb[sb.Length-1] == find[find.Length-1])
 			{
 				bool failed = false;
-				for (int k = 2; k < FIND_LEN; ++k)
+				//find.Length.Dump();
+				for (int k = 2; k < find.Length; ++k)
 				{
 					//(sb[sb.Length-k] + " != " + find[FIND_LEN-k]).Dump();
-					if (sb[sb.Length-k] != find[FIND_LEN-k]) failed = true;
+					if (sb[sb.Length-k] != find[find.Length-k]) failed = true;
 				}
 				if (!failed)
 				{
-					return sb.Length - FIND_LEN;
+					Util.HorizontalRun(true, iX, iD, skip,
+										"Find:", find, "StrLen:", sb.Length).Dump("CAUSED RETURN");
+					sb.ToString().Dump();
+					return sb.Length - find.Length;
 				}
 			}
 		}
@@ -361,7 +367,9 @@ public static int Question26_LongDivisionFindRecurring(long X, long D, int skip)
 		//Move on to the remainder
 		X %= D;
 	}
-	Util.HorizontalRun(true, iX, iD, skip).Dump("CAUSED FAIL");
+	Util.HorizontalRun(true, iX, iD, skip,
+							"Find:", find, "StrLen:", sb.Length).Dump("CAUSED FAIL");
+	sb.ToString().Dump();
 	throw new NotImplementedException("idk failure");
 }
 public static string Question26_LongDivision(long X, long D, int skip, int length)

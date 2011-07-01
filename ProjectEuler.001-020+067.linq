@@ -21,13 +21,38 @@ void Main()
 	Question16().Dump("Problem 16");
 	Question17().Dump("Problem 17");
 	Question18().Dump("Problem 18");
-//	Question19().Dump("Problem 19");
+	Question19().Dump("Problem 19");
 	Question20().Dump("Problem 20");
 	Question67().Dump("Problem 67");
 }
 
 // Define other methods and classes here
 
+public static long Question19()
+{
+//	(1/(1d/7 * 1/30)).Dump("fail estimate?");
+//	((1d/7 * 1d/30) * 12 * 100).Dump("Crude extimate");
+	(1d/7 * 12 * 100).Dump("Crude estimate 2 == THIS IS WIN");
+	
+	
+	//I'd consider this cheating, because C# is doing all the calculations
+	DateTime check = new DateTime(1901, 1, 1);
+	int count = 0;
+	int months = 12*100;
+	//months.Dump("total months");
+	for (int i = 1; i < months; ++i)
+	{
+		if (check.DayOfWeek == DayOfWeek.Sunday)
+		{
+			++count;
+		}
+		check = check.AddMonths(1);
+	}
+//	check.Dump("End date");
+//	count.Dump("DateTime Count");
+	
+	return count;
+}
 public static long Question17()
 {
 //	Question17_GetWordLength(908).Dump("=17");

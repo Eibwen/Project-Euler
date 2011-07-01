@@ -217,8 +217,9 @@ public static long Question26()
 //	Question26_LongDivisionFindRecurring(1, 902, 17).Dump();
 //	Question26_LongDivisionFindRecurring(1, 902, 18).Dump();
 //	Question26_LongDivisionFindRecurring(1, 902, 19).Dump();
-	Question26_LongDivisionFindRecurring(1, 953, 30).Dump();
-	return 90;
+//	Question26_LongDivisionFindRecurring(1, 953, 30).Dump();
+//	Question26_LongDivision(1, 953, 0, 2000).Dump("Def recurring length is 952");
+//	return 90;
 //	Question26_LongDivisionFindRecurring(1, 712, 10).Dump();
 //	Question26_LongDivision(1, 712, 10, 30).Dump();
 //	((decimal)1/712).Dump();
@@ -236,9 +237,9 @@ public static long Question26()
 		//Decimal div = dec / i;
 		string div = (dec / i).ToString();
 		
-		if (div.Length != 30) continue;
+		//if (div.Length != 30) continue;
 		div = div.TrimStart('0', '.', '1');
-		if (div.Length > 0) div = div.TrimStart(div[0], div[1])
+		if (div.Length > 1) div = div.TrimStart(div[0], div[1])
 									.TrimEnd(div[div.Length-1]); //Remove any rounded digits
 		
 		if (div.Length == 0) continue;
@@ -268,6 +269,7 @@ public static long Question26()
 	int num = -1;
 	int failCount = 0;
 	foreach (int i in NoRepeats)
+	//for (int i = 1; i < 1000; ++i)
 	{
 		try
 		{
@@ -295,7 +297,7 @@ public static long Question26()
 	// tried: 931, 447, 848, 894, 699, 149, 514, 599, 828, 831, 526, 755, 277, 683
 	// think tried: 867
 	// not tried: 
-	((Decimal)1/828).Dump();
+	((Decimal)1/983).Dump();
 	
 	num.Dump("Okay: " + max);
 	
@@ -356,9 +358,9 @@ public static int Question26_LongDivisionFindRecurring(long X, long D, int skip)
 				}
 				if (!failed)
 				{
-					Util.HorizontalRun(true, iX, iD, skip,
-										"Find:", find, "StrLen:", sb.Length).Dump("CAUSED RETURN");
-					sb.ToString().Dump();
+//					Util.HorizontalRun(true, iX, iD, skip,
+//										"Find:", find, "StrLen:", sb.Length).Dump("CAUSED RETURN");
+//					sb.ToString().Dump();
 					return sb.Length - find.Length;
 				}
 			}

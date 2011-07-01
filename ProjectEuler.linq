@@ -3,7 +3,7 @@
 void Main()
 {
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
-	Question26().Dump("Result");
+	Question29().Dump("Result");
 }
 
 // Define other methods and classes here
@@ -208,7 +208,207 @@ public static Truncatable Question37_CheckTruncatable(int num)
 }
 #endregion Question37
 
-
+public static long Question29()
+{
+	//Duplicates would happen when i*i = ib, or similar
+	//  So i wrote Question29_IsPowerOfLower()
+	
+	int MAX = 100;
+	
+//	int outputCount = 0;
+	List<long> products = new List<long>();
+	
+	for (int i = 2; i <= MAX; ++i)
+	{
+		long prod = i;
+//		int skipPower = Question29_IsPowerOfLower(i);
+		for (int j = 2; j <= MAX; ++j)
+		{
+			prod *= i;
+//			if (skipPower > 0 && skipPower == j)
+//			{
+//				("skip: " + skipPower + " == " + j).Dump();
+//			}
+			products.Add(prod);
+			prod.Dump();
+//			++outputCount;
+		}
+	}
+	
+	return products.Distinct().LongCount();
+}
+public static int Question29_IsPowerOfLower(int num)
+{
+	//Determine if this number can be represented by a power of a lower number
+//	if (num > 2 && num % 2 == 0)
+//	{
+//		int twos = num;
+//		while (twos > 2)
+//		{
+//			if (twos % 2 != 0) break;
+//			twos /= 2;
+//		}
+//	}
+	
+	for (int i = 2; (i * i) <= num; ++i)
+	{
+		//Since we check it in the loop anyway...
+		if (i * i == num) return i;
+		if (Question29_IsPowerOf(num, i))
+		{
+			("Yes that is a square of " + i).Dump();
+			return i;
+		}
+	}
+	return 0;
+}
+public static bool Question29_IsPowerOf(int num, int intBase)
+{
+	//Determine if this number can be represented by a power of a lower number
+	if (num > intBase)
+	{
+		//if it can't be evenly divided by it in the first place, it never will become so
+		if (num % intBase == 0)
+		{
+			int twos = num;
+			while (twos > intBase)
+			{
+				twos /= intBase;
+				//If it can't be evenly divided, it won't become so
+				if (twos % intBase != 0) return false;
+			}
+			if (twos == intBase)
+			{
+				return true;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		throw new ArgumentException("num must be greater than intBase");
+	}
+	throw new ArgumentException("f");
+}
+public static long Question27()
+{
+	//b has to be prime, since starting at 0
+	//  Can negative numbers be prime??... of not b has to be positive too by same logic lol
+	
+//	Helpers.isPrime_Q7PDF(0).Dump();
+//	Helpers.isPrime_Q7PDF(1).Dump();
+//	Helpers.isPrime_Q7PDF(2).Dump();
+//	Helpers.isPrime_Q7PDF(3).Dump();
+//	Helpers.isPrime_Q7PDF(-1).Dump(); //Bug in this function, all negatives are true
+//	Helpers.isPrime_Q7PDF(-4).Dump();
+//	return -2;
+	
+	int bestN = 0;
+	long bestOutput = -1;
+	
+	for (int b = 2; b < 1000; ++b)
+	{
+		if (!Helpers.isPrime_Q7PDF(b)) continue;
+//	for (int bInc = 0; bInc < 2000; ++bInc)
+//	{
+//		int b = bInc / 2 * (1 - 2*(bInc % 2));
+		
+		for (int aInc = 0; aInc < 2000; ++aInc)
+		{
+			//This switches between positive and negative
+			//There probably is a simpler way to write this.. but this works fine
+			int a = aInc / 2 * (1 - 2*(aInc % 2));
+			
+			int n = 0;
+			for (; Helpers.isPrime_Q7PDF(n*n + a*n + b); ++n)
+			{ }
+			if (n > bestN)
+			{
+				bestN = n;
+				bestOutput = a*b;
+				Util.HorizontalRun(true, bestN, bestOutput, a, b).Dump();
+			}
+		}
+	}
+	bestN.Dump("Best N");
+	return bestOutput;
+}
+public static long Question28()
+{
+//	//Not what i want at all...
+//	int width = 5;
+//	for (; width < 20; ++width)
+//	{
+//		Question28_DiagnalSum(width).Dump();
+//	}
+//	return width;
+	int width = 1001;
+	if (width % 2 == 0) throw new ApplicationException("Width must be odd");
+	//Upper Right:
+	long urSum = 0;
+	long ulSum = 0;
+	long llSum = 0;
+	long lrSum = 0;
+	for (int i = width; i > 1; --i, --i)
+	{
+		long sqr = i * i;
+		urSum += sqr;
+		ulSum += sqr - i + 1;
+		llSum += sqr - 2*(i - 1);
+		lrSum += sqr - 3*(i - 1);
+	}
+	
+	//Add one the center //-being counted twice
+	long outputSum = 1 + urSum + ulSum + llSum + lrSum;
+	return outputSum;
+}
+public static long Question22()
+{
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem22_names.txt");
+	
+	string namesFile = File.ReadAllText(PATH);
+	var lines = namesFile.Trim('"').Split(new string[] { "\",\"" }, StringSplitOptions.None).OrderBy(n => n).ToList();
+	long totalScore = 0;
+	for (int i = 0; i < lines.Count; ++i)
+	{
+		long worth = 0;
+		foreach (char c in lines[i])
+		{
+			worth += (c - 'A' + 1);
+		}
+		long rank = (i+1) * worth;
+		totalScore += rank;
+	}
+	
+	return totalScore;
+}
+public static long Question21()
+{
+	int UNDER = 10000;
+	long outputSum = 0;
+	for (int i = 2; i < UNDER; ++i)
+	{
+		//if (Helpers.isPrime_Q7PDF(i)) continue;
+		int sum = Question21_DivisorsSum(i);
+		if (sum > UNDER || sum == 1
+			|| sum == i) continue;
+		if (Question21_DivisorsSum(sum) == i) outputSum += i;
+	}
+	
+	return outputSum;
+}
+public static int Question21_DivisorsSum(int num)
+{
+	int sum = 1;
+	for (int i = num / 2; i > 1; --i)
+	{
+		if (num % i == 0) sum += i;
+	}
+	return sum;
+}
 public static long Question26()
 {
 //	Question26_LongDivisionFindRecurring(1, 902, 10).Dump();
@@ -1340,6 +1540,7 @@ public static class Helpers
 	
 	public static bool isPrime_Q7PDF(int n)
 	{
+		if (n < 0) return false;
 		if (n == 1) return false;
 		else if (n < 4) return true;	//2 and 3 are prime
 		else if (n % 2 == 0) return false;
@@ -1762,7 +1963,6 @@ public class FactorialCache
 }
 
 #region InfiniteInt
-[Obsolete("Untested", true)]
 public class InfiniteInt
 {
 	const int TRUNC_SIZE = 10;
@@ -1776,10 +1976,12 @@ public class InfiniteInt
 		array.Add(start);
 	}
 	
+	[Obsolete("Untested", true)]
 	public void Add(InfiniteInt num)
 	{
 		
 	}
+	[Obsolete("Untested", true)]
 	public void Add(int num)
 	{
 		for (int j = 0; j < array.Count; ++j)

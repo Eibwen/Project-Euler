@@ -212,47 +212,82 @@ public static long Question12()
 	best.Dump();
 	return -1;
 }
-public static int Question12_CountFactors(long num)
+//public static int Question12_CountFactors(long num)
+//{
+//	if (num == 1) return 1;
+//	
+//	//Itself and 1
+//	int count = 2;
+//	
+//	if (num % 2 == 0) ++count;
+//	if (num % 3 == 0) ++count;
+//	
+//	//long upperLimit = num / 2;
+//	for (long i = num / 2; i > 3; --i)
+//	{
+//		if (num % i == 0)
+//		{
+//			//i.Dump();
+//			++count;
+////			upperLimit /= 2;
+////			i = upperLimit;
+//			//i = (i+3)/2;
+//			//i.Dump();
+//			//("==" + upperLimit).Dump();
+//		}
+//	}
+//	return count;
+//	
+////	int count = 0;
+////	int t = 21;
+////	int f = 2;
+////	while (f > 1)
+////	{
+////		++count;
+////		f = Helpers.GetAFactor_Basedon_Q7PDF(t).Dump();
+////		t /= f;
+////	}
+////	count.Dump("c");
+////	
+////	Helpers.Factorial(count).Dump();
+////	
+////	return -1;
+//}
+public static int Question21_SumOfDivisorsPDF(int n)
 {
-	if (num == 1) return 1;
-	
-	//Itself and 1
-	int count = 2;
-	
-	if (num % 2 == 0) ++count;
-	if (num % 3 == 0) ++count;
-	
-	//long upperLimit = num / 2;
-	for (long i = num / 2; i > 3; --i)
+	//This is using prime factorization
+	int sum = 1;
+	int p = 2;
+	while (p*p <= n && n > 1) //Prevents us from checking prime factors greater than sprt(n)
 	{
-		if (num % i == 0)
+		if (n % p == 0)
 		{
-			//i.Dump();
-			++count;
-//			upperLimit /= 2;
-//			i = upperLimit;
-			//i = (i+3)/2;
-			//i.Dump();
-			//("==" + upperLimit).Dump();
+			int j = p*p;
+			n /= p;
+			while (n % p == 0)
+			{
+				j *= p;
+				n /= p;
+			}
+			sum *= j-1;
+			sum /= p-1;
+		}
+		if (p == 2)
+		{
+			p = 3;
+		}
+		else
+		{
+			p +=2;
 		}
 	}
-	return count;
-	
-//	int count = 0;
-//	int t = 21;
-//	int f = 2;
-//	while (f > 1)
-//	{
-//		++count;
-//		f = Helpers.GetAFactor_Basedon_Q7PDF(t).Dump();
-//		t /= f;
-//	}
-//	count.Dump("c");
-//	
-//	Helpers.Factorial(count).Dump();
-//	
-//	return -1;
+	if (n > 1) //covers the case that one prime factor greater than sqrt(n) remains
+	{
+		sum *= n+1;
+	}
+	return sum;
 }
+
 
 public static long Question67()
 {

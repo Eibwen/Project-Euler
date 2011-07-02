@@ -3,7 +3,7 @@
 void Main()
 {
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
-	Question29().Dump("Result");
+	Question21().Dump("Result");
 }
 
 // Define other methods and classes here
@@ -208,6 +208,148 @@ public static Truncatable Question37_CheckTruncatable(int num)
 }
 #endregion Question37
 
+public static long Question33()
+{
+	int MAX = 100;
+	
+	int numerator = 1;
+	int denominator = 1;
+	
+	for (int i = 10; i < MAX; ++i)
+	{
+		for (int j = i+1; j < MAX; ++j)
+		{
+			if (i / 10 == j % 10)
+			{
+				if ((double)(i % 10) / (j / 10) == ((double)i/j))
+				{
+					numerator *= i % 10;
+					denominator *= j / 10;
+					Util.HorizontalRun(false, i % 10, "/", j / 10).Dump();
+				}
+			}
+			if (i % 10 == j / 10)
+			{
+				if ((double)(i / 10) / (j % 10) == ((double)i/j))
+				{
+					numerator *= i / 10;
+					denominator *= j % 10;
+					Util.HorizontalRun(false, i / 10, "/", j % 10).Dump();
+				}
+			}
+		}
+	}
+	
+	Util.HorizontalRun(false, numerator, "/", denominator).Dump("Product");
+	
+	return denominator / numerator;
+}
+public static long Question50()
+{
+	//TODO Cheating... longer than 1 minute to finish, had it output best matches as it went and took one that didn't change for a while
+	return -23;
+	
+	//Could go backwards, recursive back from MAX, check if that number is prime, then remove primes from x/2 and see what length we get
+	//Or go backwards, recursive fom MAX/2, add primes and see if its still prime, can it be prime -- i think this fails due to having to run down to 2 every time
+	
+	int MAX = 1000000;
+	
+	//TODO should just cache all the primes under MAX
+	//Without that was 2.8 for 10000
+	List<int> Primes = Helpers.PrimesLessThan(MAX);
+	
+	int bestMatch = 0;
+	int bestLength = 0;
+	
+	--MAX; //Make MAX an odd number
+	for (int i = Primes.Count-1; i >= 0; --i)
+	{
+		for (int j = i; j >= 0; --j)  //could reduce i by a factor proportial to... something
+		{
+			int testingPrime = Primes[i];
+			int consecutiveLength = 0;
+			
+			for (int k = j/2; k >= 0; --k)
+			{
+				++consecutiveLength;
+				testingPrime -= Primes[k];
+				//if (Primes[i] == 41) testingPrime.Dump();
+				//k.Dump("Prime:" + testingPrime.ToString());
+				if (testingPrime == 0)
+				{
+					//Hey worked out to 0
+					//Primes[i].Dump("Okay at " + consecutiveLength);
+					if (consecutiveLength > bestLength)
+					{
+						bestMatch = Primes[i];
+						bestLength = consecutiveLength;
+						
+						bestLength.Dump("Length");
+						bestMatch.Dump("Match");
+					}
+					//Move onto the next one
+					break;
+				}
+				if (testingPrime < 0)
+				{
+					//this fails
+					break;
+				}
+			}
+		}
+	}
+	
+	bestLength.Dump("Length");
+	bestMatch.Dump("Match");
+	
+	return -23;
+}
+public static long Question48B()
+{
+	//After reading forum and seeing that you just need to keep track of the lowest 10 digits... which should always be within long
+	int MAX = 1000;
+	long KEEP_DIGITS_UNDER = 10000000000;
+	
+	long outputSum = 1; //Start with 1^1
+	
+	for (int i = 2; i <= MAX; ++i)
+	{
+		long thisResult = 1;
+		for (int j = 0; j < i; ++j)
+		{
+			thisResult *= i;
+			thisResult %= KEEP_DIGITS_UNDER;
+		}
+		outputSum += thisResult;
+		outputSum %= KEEP_DIGITS_UNDER;
+	}
+	//outputSum.ToString().Dump();
+	
+	//"6797271283465789498383642350667978127819110846700".Dump();
+	//"9110846700".Dump();
+	return outputSum;
+}
+public static string Question48()
+{
+	//DONE 7 seconds or so on laptop, could just keep track of the lowest 10 digits... which should always be within long
+	int MAX = 1000;
+	
+	InfiniteInt outputSum = new InfiniteInt(1);
+	
+	for (int i = 2; i <= MAX; ++i)
+	{
+		//long thisResult = 1;
+		InfiniteInt thisResult = new InfiniteInt(1);
+		for (int j = 0; j < i; ++j)
+		{
+			thisResult.Multiply(i);
+		}
+		outputSum.Add(thisResult);
+	}
+	//outputSum.ToString().Dump();
+	
+	return outputSum.ToString(0, 10);
+}
 public static long Question29()
 {
 	//Duplicates would happen when i*i = ib, or similar
@@ -389,6 +531,9 @@ public static long Question22()
 }
 public static long Question21()
 {
+	//Original version on laptop: 0.923s == 31626
+	//The (sum > i) check here has very minor improvement from my original (at most 0.2s)
+	//Using Question21_SumOfProperDivisorsPDF instead of Question21_DivisorsSum takes the time down to 0.010s
 	int UNDER = 10000;
 	long outputSum = 0;
 	for (int i = 2; i < UNDER; ++i)
@@ -397,7 +542,8 @@ public static long Question21()
 		int sum = Question21_DivisorsSum(i);
 		if (sum > UNDER || sum == 1
 			|| sum == i) continue;
-		if (Question21_DivisorsSum(sum) == i) outputSum += i;
+		if (sum > i) continue; //THIS WAS IN THE PDF
+		if (Question21_DivisorsSum(sum) == i) outputSum += i + sum;  //ADD THE SUM HERE TOO, PDF
 	}
 	
 	return outputSum;
@@ -408,6 +554,44 @@ public static int Question21_DivisorsSum(int num)
 	for (int i = num / 2; i > 1; --i)
 	{
 		if (num % i == 0) sum += i;
+	}
+	return sum;
+}
+public static int Question21_SumOfProperDivisorsPDF(int n)
+{
+	return Question21_SumOfDivisorsPDF(n) - n;
+}
+public static int Question21_SumOfDivisorsPDF(int n)
+{
+	//This is using prime factorization
+	int sum = 1;
+	int p = 2;
+	while (p*p <= n && n > 1) //Prevents us from checking prime factors greater than sprt(n)
+	{
+		if (n % p == 0)
+		{
+			int j = p*p;
+			n /= p;
+			while (n % p == 0)
+			{
+				j *= p;
+				n /= p;
+			}
+			sum *= j-1;
+			sum /= p-1;
+		}
+		if (p == 2)
+		{
+			p = 3;
+		}
+		else
+		{
+			p +=2;
+		}
+	}
+	if (n > 1) //covers the case that one prime factor greater than sqrt(n) remains
+	{
+		sum *= n+1;
 	}
 	return sum;
 }
@@ -1512,32 +1696,67 @@ public static class Helpers
 		
 		return output;
 	}
-	public static List<int> PrimesLessThan(int maxValue)
+//	public static List<int> PrimesLessThan(int maxValue)
+//	{
+//		int number = 200;
+//		List<int> output = new List<int>(number);
+//		
+//		output.Add(2);
+//		
+//		for (int i = 3;
+//			i < int.MaxValue
+//			&& i <= maxValue
+//			; ++i, ++i)
+//		{
+////			bool hasFactor = false;
+////			foreach (int j in output)
+////			{
+////				if (i % j == 0)
+////				{
+////					hasFactor = true;
+////					break;
+////				}
+////			}
+////			if (!hasFactor) output.Add(i);
+//			if (isPrime_Q7PDF(i)) output.Add(i);
+//		}
+//		
+//		return output;
+//	}
+	public static bool[] GetPrimeSieve(int limit)
 	{
-		int number = 200;
-		List<int> output = new List<int>(number);
-		
-		output.Add(2);
-		
-		for (int i = 3;
-			i < int.MaxValue
-			&& i <= maxValue
-			; ++i, ++i)
+		int sieveBound = (limit-1) / 2; //last index of sieve
+		bool[] sieve = new bool[sieveBound];
+		int crosslimit = ((int)Math.Sqrt(limit)-1) / 2;
+		for (int i = 1; i < crosslimit; ++i)
 		{
-//			bool hasFactor = false;
-//			foreach (int j in output)
-//			{
-//				if (i % j == 0)
-//				{
-//					hasFactor = true;
-//					break;
-//				}
-//			}
-//			if (!hasFactor) output.Add(i);
-			if (isPrime_Q7PDF(i)) output.Add(i);
+			if (!sieve[i]) // 2*i+1 is prime, mark multiples
+			{
+				for (int j = 2*i*(i+1); j < sieveBound; j += 2*i+1)
+				{
+					sieve[j] = true;
+				}
+			}
 		}
-		
-		return output;
+		return sieve;
+	}
+	public static List<int> PrimesLessThan(int limit)
+	{
+		int sieveBound = (limit-1) / 2; //last index of sieve
+		bool[] sieve = GetPrimeSieve(limit);
+		List<int> primes = new List<int>();
+		primes.Add(2);
+		for (int i = 1; i < sieveBound; ++i)
+		{
+			if (!sieve[i]) primes.Add(2*i+1);
+		}
+		return primes;
+//		int sum = 2; //2 is prime
+//		for (int i = 1; i < sieveBound; ++i)
+//		{
+//			if (!sieve[i]) sum += 2*i+1;
+//		}
+//		return sum;
 	}
 	
 	public static bool isPrime_Q7PDF(int n)
@@ -1981,15 +2200,29 @@ public class InfiniteInt
 		array.Add(start);
 	}
 	
-	[Obsolete("Untested", true)]
 	public void Add(InfiniteInt num)
 	{
-		
+		//TODO could check if num.array has more items, if so copy that array and add this.array into that instead
+		int remainder = 0;
+		for (int j = 0; j < num.array.Count || remainder > 0; ++j)
+		{
+			//Need to add new item
+			if (j == array.Count) array.Add(0);
+			//Add into the current item
+			array[j] += num.array[j] + remainder;
+			remainder = 0;
+			//Check for overflow
+			if (array[j] >= TRUNC_SIZE)
+			{
+				remainder = array[j] / TRUNC_SIZE;
+				array[j] %= TRUNC_SIZE;
+			}
+		}
 	}
-	[Obsolete("Untested", true)]
+	[Obsolete("Untested", false)]
 	public void Add(int num)
 	{
-		for (int j = 0; j < array.Count; ++j)
+		for (int j = 0; j < array.Count && num > 0; ++j)
 		{
 			array[j] += num;
 			if (array[j] >= TRUNC_SIZE)
@@ -2101,6 +2334,26 @@ public class InfiniteInt
 			long l = array[i];
 			sb.AppendFormat(format, l);
 		}
+		return sb.ToString();
+	}
+	public string ToString(int startIndex, int length)
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		string format = "{0:d" + TRUNC_LENGTH + "}";
+		
+		//Add the first number without padding
+		sb.Append(array[array.Count-1]);
+		//Add the rest of the numbers, padding to TRUNC_LENGTH
+		for (int i = array.Count-2; i >= 0 ; --i)
+		{
+			long l = array[i];
+			sb.AppendFormat(format, l);
+		}
+		//Remove anything before the startIndex
+		sb.Remove(0, sb.Length - (startIndex + length));
+		//Trim length to specified
+		sb.Length = length;
 		return sb.ToString();
 	}
 }

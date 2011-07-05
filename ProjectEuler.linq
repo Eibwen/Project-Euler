@@ -3,7 +3,7 @@
 void Main()
 {
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
-	Question42().Dump("Result");
+	Problem45().Dump("Result");
 	InfiniteIntTest();
 }
 
@@ -209,6 +209,133 @@ public static Truncatable Question37_CheckTruncatable(int num)
 }
 #endregion Question37
 
+public static long Problem45()
+{
+	//The problem tells us that T285 = P165 = H143 = 40755.  So start at H144
+	// Hex-to-Pent == 15/13 for given example
+	//		(x*(2*x-1))*6/8 == x*(3*x-1)/2
+	// Hex-to-Tri == 2h-1 == THIS IS PERFECT (FOR INTS ANYWAY)
+	for (int h = 143; h < 1000; ++h)
+	{
+		int hexNum = h*(2*h-1);
+		
+		int estP = h * 8/7 +2;
+		int pentNum = estP*(3*estP-1)/2;
+		int estT = h*2-1;
+		int triNum = estT*(estT+1)/2;
+		//Util.HorizontalRun(true, hexNum, pentNum, triNum).Dump();
+		
+		int x = h;
+		Util.HorizontalRun(true, (x*((2*x)-1))*(double)3/4+((double)x/4),
+								((x*((2*x)-1))*3+x)/4,
+								x*(3*x-1)/2).Dump();
+	}
+	return -45;
+}
+public static long Problem46()
+{
+	//CHEATED due to two bugs that caused false results for runs upto 1,000,000,000 (that ran in like 4 minutes if i remember right)
+	//			(2,000,000,000 caused computer to run out of memory and fail)
+	//  Tho i did find that i*i+p is true at least upto 1 trillion i believe
+	
+	//56927025
+	//int.max = 2147483647
+	int MAX =   10000000;
+	int MAX_SQUARE = 400;
+	
+	//Get cached lists
+	List<int> Primes = Helpers.PrimesLessThan(MAX);
+	bool[] MarkedSieve = Helpers.GetPrimeSieve(MAX); //NOTE: This calls GetPrimeSieve... so we are building that twice
+	"Built Sieves".Dump();
+	//bool[] MarkedSieve = new bool[MAX];
+	List<int> Squares = new List<int>(MAX_SQUARE);
+	for (int i = 1; i <= MAX_SQUARE; ++i)
+	{
+		//BUG2: after cheated, the question is two times the square
+		Squares.Add(i*i*2);
+	}
+	//Squares.Dump();
+	
+	"marking".Dump();
+	//Start marking off primes... brute force
+	for (int i = 0; i < Primes.Count; ++i)
+	{
+		Util.Progress = i * 100 / Primes.Count;
+		foreach (int square in Squares)
+		{
+			//Primes are marked as false, so mark any odd composites back to false
+			//Primes[i].Dump();
+			//BUG1: cheated to find, only process evens here
+			if ((square + Primes[i]) % 2 == 0) continue;
+			int index = (square + Primes[i]-1)/2;
+			if (index >= MarkedSieve.Length) break;
+			//if (MarkedSieve[index]) Util.HorizontalRun(true, (2*index+1), "=", square, "+", Primes[i]).Dump();
+//			if ((2*index+1) == 5777) Util.HorizontalRun(true, (2*index+1), "=", square, "+", Primes[i]).Dump();
+//			if ((2*index+1) == 5993) Util.HorizontalRun(true, (2*index+1), "=", square, "+", Primes[i]).Dump();
+			MarkedSieve[index] = false;
+		}
+	}
+	Util.Progress = null;
+	
+	"Finding unmarked".Dump();
+	//Find first not marked
+	int maxDump = 50;
+	int dumpCount = 0;
+	for (int i = 1; i < MarkedSieve.Length; ++i)
+	{
+		if (MarkedSieve[i])
+		{
+			//return 2*i+1;
+			(2*i+1).Dump();
+			if (++dumpCount > maxDump) return -43;
+		}
+	}
+	
+	return -46;
+}
+public static long Problem47()
+{
+	//ALTERNATIVE WAYS TO DO THIS:
+	// Sieve, have code for that in ProjectEulier.OthersSolutions.linq
+	// use list of primes divide by each upto x, count each time a unique one divides cleanly -- slightly optimized version of the GetPrimeFactors i used... but not needed in C# at least
+	
+	//int lowestPossible = 2*3*5*7;
+	
+//	//Fail match
+//	Helpers.GetPrimeFactors(50138).Dump();
+//	Helpers.GetPrimeFactors(50139).Dump();
+//	Helpers.GetPrimeFactors(50121).Dump();
+//	Helpers.GetPrimeFactors(50122).Dump();
+//	//Success
+//	long test = 134043;
+//	for (int i = 0; i < 4; ++i)
+//	{
+//		Helpers.GetPrimeFactors(test+i).Dump();
+//	}
+	
+	int baseNumber = 0;
+	int consecutiveCount = 0;
+	for (int i = 600; i < 400000; ++i)
+	{
+		List<long> curFactors = Helpers.GetPrimeFactors(i);
+		if (curFactors.Count >= 4 && curFactors.Distinct().Count() >= 4)
+		{
+			if (baseNumber == 0) baseNumber = i;
+			++consecutiveCount;
+			if (consecutiveCount >= 4)
+			{
+				return baseNumber;
+			}
+		}
+		else if (baseNumber > 0) //If next number does not match, throw away this
+		{
+			baseNumber = 0;
+			consecutiveCount = 0;
+		}
+	}
+	
+	return -9999;
+}
 public static long Question42()
 {
 //	int[] TriAlpha = new int[26];
@@ -1890,6 +2017,52 @@ public static class Helpers
 			output *= i;
 		}
 		return output;
+	}
+	public static List<long> GetPrimeFactors(long n)  //Based on Question21_CountDivisorsPDF
+	{
+		List<long> divisors = new List<long>();
+	////	if (Helpers.isPrime_Q7PDF(n)) return 2;
+	////	"not prime".Dump();
+		//This is using prime factorization
+	//	int sum = 1;
+		int count = 0;
+		int p = 2;
+		while (p*p <= n && n > 1) //Prevents us from checking prime factors greater than sprt(n)
+		{
+			if (n % p == 0)
+			{
+				int j = p*p;
+				n /= p;
+				while (n % p == 0)
+				{
+					j *= p;
+					n /= p;
+					++count;
+					divisors.Add(p);
+				}
+	//			sum *= j-1;
+	//			sum /= p-1;
+				++count;
+				divisors.Add(p);
+			}
+			if (p == 2)
+			{
+				p = 3;
+			}
+			else
+			{
+				p +=2;
+			}
+		}
+		if (n > 1) //covers the case that one prime factor greater than sqrt(n) remains
+		{
+	//		sum *= n+1;
+			++count;
+			divisors.Add(n); //Add itself as a divisor
+//			divisors.Dump("WHEN DOES THIS HAPPEN: " + n);
+//			//throw new ApplicationException("WHEN DOES THIS HAPPEN");
+		}
+		return divisors;
 	}
 }
 #endregion Helpers

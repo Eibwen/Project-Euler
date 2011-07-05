@@ -2,13 +2,14 @@
 
 void Main()
 {
-	Question21_CountDivisorsPDF(1).Dump();
-	Question21_CountDivisorsPDF(3).Dump();
-	Question21_CountDivisorsPDF(6).Dump();
-	Question21_CountDivisorsPDF(10).Dump();
-	Question21_CountDivisorsPDF(21).Dump();
-	Question21_CountDivisorsPDF(28).Dump();
-	//Question21_CountDivisorsPDF(69331200*75491328).Dump();
+//	Question21_CountDivisorsPDF(1).Dump();
+//	Question21_CountDivisorsPDF(3).Dump();
+//	Question21_CountDivisorsPDF(6).Dump();
+//	Question21_CountDivisorsPDF(10).Dump();
+//	Question21_CountDivisorsPDF(21).Dump();
+//	Question21_CountDivisorsPDF(28).Dump();
+//	(Question21_CountDivisorsPDF(69331200l*75491328)*2).Dump();
+//	(Question21_CountDivisorsPDF(131328l*2084997600)*2).Dump();
 	Question12().Dump("OMG");
 	return;
 	
@@ -205,6 +206,7 @@ public static long Question12()
 	
 	
 	//return Question12_CountFactors(24);
+	List<long> overTwenty = new List<long>();
 	
 	int loop = 1000000;
 	int skip = 1;
@@ -226,12 +228,45 @@ public static long Question12()
 			best = curFactors;
 			bestNum = triangleNumber;
 		}
-		if (curFactors > 24)
+		if (curFactors >= 20)
 		{
-			triangleNumber.Dump("Factors: " + curFactors);
+			//triangleNumber.Dump("Factors: " + curFactors);
+			overTwenty.Add(triangleNumber);
+			if (overTwenty.Count > 80) break;
 //			return triangleNumber;
 		}
 	}
+	
+	//Check mutiplying overTwenty to each other
+	for (int i = 0; i < overTwenty.Count; ++i)
+	{
+		for (int j = i; j < overTwenty.Count; ++j)
+		{
+			long curNumber = overTwenty[i]*overTwenty[j];
+			int curFactors = Question21_CountDivisorsPDF(curNumber) * 2;
+			if (curFactors >= 50)
+			{
+				Util.HorizontalRun(false, curFactors, ": ", curNumber, " -- ", Question12_IsTriangleNumber(curNumber)).Dump();
+			}
+//			if (curFactors > best)
+//			{
+//				best = curFactors;
+//				bestNum = curNumber;
+//			}
+		}
+	}
+//	//Check making a triangle number from each overTwenty
+//	for (int i = 0; i < overTwenty.Count; ++i)
+//	{
+//		long curNumber = overTwenty[i];
+//		long triNum = (curNumber*curNumber+curNumber)/2;
+//		
+//		int curFactors = Question21_CountDivisorsPDF(curNumber) * 2;
+//		if (curFactors >= 50)
+//		{
+//			Util.HorizontalRun(false, curFactors, ": ", curNumber, " -- ", Question12_IsTriangleNumber(curNumber)).Dump();
+//		}
+//	}
 	
 	bestNum.Dump("Factors: " + best);
 	return -1;
@@ -300,6 +335,8 @@ public static bool Question12_IsTriangleNumber(long num)
 //}
 public static int Question21_CountDivisorsPDF(long n)
 {
+////	if (Helpers.isPrime_Q7PDF(n)) return 2;
+////	"not prime".Dump();
 	//This is using prime factorization
 //	int sum = 1;
 	int count = 0;
@@ -1328,7 +1365,7 @@ public static class Helpers
 //		}
 //		return true;
 //	}
-	public static bool isPrime_Q7PDF(int n)
+	public static bool isPrime_Q7PDF(long n)
 	{
 		if (n == 1) return false;
 		else if (n < 4) return true;	//2 and 3 are prime
@@ -1337,8 +1374,8 @@ public static class Helpers
 		else if (n % 3 == 0) return false;
 		else
 		{
-			int r = (int)Math.Floor(Math.Sqrt(n));	// sqrt(n) rounded to the greatest integer r so that r*r<=n
-			for (int f = 5; f <= r; f = f+6)
+			long r = (long)Math.Floor(Math.Sqrt(n));	// sqrt(n) rounded to the greatest integer r so that r*r<=n
+			for (long f = 5; f <= r; f = f+6)
 			{
 				if (n % f == 0) return false;
 				if (n % (f + 2) == 0) return false;

@@ -3,7 +3,8 @@
 void Main()
 {
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
-	Question21().Dump("Result");
+	Question42().Dump("Result");
+	InfiniteIntTest();
 }
 
 // Define other methods and classes here
@@ -208,6 +209,42 @@ public static Truncatable Question37_CheckTruncatable(int num)
 }
 #endregion Question37
 
+public static long Question42()
+{
+//	int[] TriAlpha = new int[26];
+//	int sum = 0;
+//	for (int i = 0; i < 26; ++i)
+//	{
+//		sum += i + 1;
+//		TriAlpha[i] = sum;
+//	}
+	
+	
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem42_words.txt");
+	
+	string wordsFile = File.ReadAllText(PATH);
+	var lines = wordsFile.Trim('"').Split(new string[] { "\",\"" }, StringSplitOptions.None).ToList();
+	long count = 0;
+	for (int i = 0; i < lines.Count; ++i)
+	{
+		long worth = 0;
+		foreach (char c in lines[i])
+		{
+			worth += (c - 'A' + 1);
+		}
+		//if (lines[i] == "SKY") worth.Dump("SKY");
+		if (Question12_IsTriangleNumber(worth)) ++count;
+	}
+	
+	return count;
+}
+public static bool Question12_IsTriangleNumber(long num)
+{
+	long i = (long)Math.Sqrt(num*2);
+	long triNum = (i*i+i)/2;
+	if (triNum == num) return true;
+	return false;
+}
 public static long Question33()
 {
 	int MAX = 100;
@@ -2298,6 +2335,37 @@ public class InfiniteInt
 //			}
 //		}
 	}
+	public void Divide(int factor)
+	{
+		if (factor < 0) Console.Error.WriteLine("InfiniteInt.Divide is not not tested for negative numbers");
+		
+		int pos = array.Count-1;
+		
+		//Divide each array element by factor
+		for (int j = pos; j >= 0; --j)
+		{
+			int remainder = array[j] % factor;
+			array[j] /= factor;
+			if (remainder > 0 && j == 0)
+			{
+				throw new NotSupportedException("DIVIDE RESULTED IN A DECIMAL");
+			}
+			if (remainder > 0)
+			{
+				array[j-1] += remainder * TRUNC_SIZE;
+				
+//				//Keep pushing the overflow up one
+//				for (int o = 1; array[j+o] >= TRUNC_SIZE; ++o)
+//				{
+//					if (j+o+1 == array.Count) array.Add(0);
+//					//Util.HorizontalRun(true, j+o+1, "==", array.Count).Dump();
+//					array[j+o+1] += array[j+o] / TRUNC_SIZE;
+//					array[j+o] %= TRUNC_SIZE;
+//					//Util.HorizontalRun(false, j+o+1, ": ", array[j+o+1]).Dump();
+//				}
+			}
+		}
+	}
 	public long Length()
 	{
 		long filled = (array.Count-2) * TRUNC_LENGTH;
@@ -2327,9 +2395,12 @@ public class InfiniteInt
 		string format = "{0:d" + TRUNC_LENGTH + "}";
 		
 		//Add the first number without padding
-		sb.Append(array[array.Count-1]);
+		int pos = array.Count-1;
+		//Skip any leading 0's
+		while (array[pos] == 0) --pos;
+		sb.Append(array[pos]);
 		//Add the rest of the numbers, padding to TRUNC_LENGTH
-		for (int i = array.Count-2; i >= 0 ; --i)
+		for (int i = pos-1; i >= 0 ; --i)
 		{
 			long l = array[i];
 			sb.AppendFormat(format, l);
@@ -2343,9 +2414,12 @@ public class InfiniteInt
 		string format = "{0:d" + TRUNC_LENGTH + "}";
 		
 		//Add the first number without padding
-		sb.Append(array[array.Count-1]);
+		int pos = array.Count-1;
+		//Skip any leading 0's
+		while (array[pos] == 0) --pos;
+		sb.Append(array[pos]);
 		//Add the rest of the numbers, padding to TRUNC_LENGTH
-		for (int i = array.Count-2; i >= 0 ; --i)
+		for (int i = pos-1; i >= 0 ; --i)
 		{
 			long l = array[i];
 			sb.AppendFormat(format, l);
@@ -2356,5 +2430,27 @@ public class InfiniteInt
 		sb.Length = length;
 		return sb.ToString();
 	}
+}
+public static void InfiniteIntTest()
+{
+	InfiniteInt iint = new InfiniteInt(1);
+	iint.Multiply(999);
+	iint.Multiply(999);
+	iint.Multiply(999);
+	iint.Multiply(999);
+	iint.Multiply(999);
+	iint.Multiply(999);
+	//"994014980014994001" //InfiniteInt 07/05/2011
+	//"994014980014994001" //Windows calculator
+	Debug.Assert(iint.ToString().Dump() == "994014980014994001", "MULITIPLY FAIL");
+	iint.Divide(999);
+	Debug.Assert(iint.ToString().Dump() == "995009990004999", "DIVIDE FAIL");
+	iint.Divide(9);
+	Debug.Assert(iint.ToString().Dump() == "110556665556111", "DIVIDE2 FAIL");
+	iint.Divide(999);
+	iint.Divide(999);
+	Debug.Assert(iint.ToString().Dump() == "110778111", "DIVIDE3 FAIL");
+//	iint.Divide(2);
+//	Debug.Assert(iint.ToString().Dump() == "55389055.5", "DIVIDE3 FAIL");
 }
 #endregion InfiniteInt

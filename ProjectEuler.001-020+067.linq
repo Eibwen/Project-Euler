@@ -2,6 +2,16 @@
 
 void Main()
 {
+	Question21_CountDivisorsPDF(1).Dump();
+	Question21_CountDivisorsPDF(3).Dump();
+	Question21_CountDivisorsPDF(6).Dump();
+	Question21_CountDivisorsPDF(10).Dump();
+	Question21_CountDivisorsPDF(21).Dump();
+	Question21_CountDivisorsPDF(28).Dump();
+	//Question21_CountDivisorsPDF(69331200*75491328).Dump();
+	Question12().Dump("OMG");
+	return;
+	
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
 	Question1().Dump("Problem 1");
 	Question2().Dump("Problem 2");
@@ -187,30 +197,65 @@ public static long Question17_GetWordLength(int num)
 }
 public static long Question12()
 {
+	//This had the forum comment about multiplying something with 25 multiples by something with 25 would be that...
+	
+	//491270934528 36multiples
+	//405085954560 28
+	//320000400000 32
+	
+	
 	//return Question12_CountFactors(24);
 	
-	int loop = 10000;
-	int skip = 9900;
+	int loop = 1000000;
+	int skip = 1;
 	
 	int best = 0;
+	long bestNum = 0;
 	
 	long triangleNumber = 0;
 	for (int i = 1; i < loop; ++i)
 	{
 		triangleNumber += i;
+		if (!Question12_IsTriangleNumber(triangleNumber)) ("FAIL: " + triangleNumber).Dump();
 		
 		if (i < skip) continue;
 		
-		int curFactors = Question12_CountFactors(triangleNumber);
-		if (curFactors > best) best = curFactors;
-		if (curFactors > 500)
+		int curFactors = Question21_CountDivisorsPDF(triangleNumber) * 2;
+		if (curFactors > best)
 		{
-			return triangleNumber;
+			best = curFactors;
+			bestNum = triangleNumber;
+		}
+		if (curFactors > 24)
+		{
+			triangleNumber.Dump("Factors: " + curFactors);
+//			return triangleNumber;
 		}
 	}
 	
-	best.Dump();
+	bestNum.Dump("Factors: " + best);
 	return -1;
+}
+public static bool Question12_IsTriangleNumber(long num)
+{
+	long i = (long)Math.Sqrt(num*2);
+	long triNum = (i*i+i)/2;
+	if (triNum == num) return true;
+	return false;
+	
+//	int loop = 200;
+//	
+//	long triangleNumber = 0;
+//	for (int i = 1; i < loop; ++i)
+//	{
+//		triangleNumber += i;
+//		
+//		long triNum = (i*i+i)/2;
+//		
+//		(i + ": " + triangleNumber + " -- " + triNum).Dump();//((double)triangleNumber / (i * ((double)i/2 + 0.5)))).Dump();
+//	}
+//	
+//	return -3;
 }
 //public static int Question12_CountFactors(long num)
 //{
@@ -253,10 +298,11 @@ public static long Question12()
 ////	
 ////	return -1;
 //}
-public static int Question21_SumOfDivisorsPDF(int n)
+public static int Question21_CountDivisorsPDF(long n)
 {
 	//This is using prime factorization
-	int sum = 1;
+//	int sum = 1;
+	int count = 0;
 	int p = 2;
 	while (p*p <= n && n > 1) //Prevents us from checking prime factors greater than sprt(n)
 	{
@@ -268,9 +314,11 @@ public static int Question21_SumOfDivisorsPDF(int n)
 			{
 				j *= p;
 				n /= p;
+				++count;
 			}
-			sum *= j-1;
-			sum /= p-1;
+//			sum *= j-1;
+//			sum /= p-1;
+			++count;
 		}
 		if (p == 2)
 		{
@@ -283,9 +331,10 @@ public static int Question21_SumOfDivisorsPDF(int n)
 	}
 	if (n > 1) //covers the case that one prime factor greater than sqrt(n) remains
 	{
-		sum *= n+1;
+//		sum *= n+1;
+		++count;
 	}
-	return sum;
+	return count;
 }
 
 

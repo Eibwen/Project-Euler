@@ -3,7 +3,7 @@
 void Main()
 {
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
-	Problem45().Dump("Result");
+	Problem38().Dump("Result");
 	InfiniteIntTest();
 }
 
@@ -209,26 +209,310 @@ public static Truncatable Question37_CheckTruncatable(int num)
 }
 #endregion Question37
 
+public static long Problem38()
+{
+	bool zeroOffset = false;
+	int offset = zeroOffset ? 0 : 1;
+	
+	int length = 9;
+	
+	int correct = 0;
+	for (int i = 0; i < length; ++i)
+	{
+		correct |= 1 << (i+offset);
+	}
+	
+	int bestN = 0;
+	int bestToM = 0;
+	long bestConcat = 0;
+	
+	for (int n = 1; n < 100000; ++n)
+	{
+		int checkMask = 0;
+		
+		long concatNum = 0;
+		
+		bool breakN = false;
+		for (int m = 1; m <= 9; ++m)
+		{
+			int num = n * m;
+			int numOffset = 1;
+			while (num > 0)
+			{
+				int digit = num % 10;
+				if ((checkMask & 1 << digit) > 0 || digit == 0) breakN = true;
+				checkMask |= 1 << digit;
+				num /= 10;
+				numOffset *= 10;
+			}
+			if (breakN) break;
+			concatNum = concatNum * numOffset + n * m;
+			//checkMask.Dump();
+			
+			if (correct == checkMask)
+			{
+				if (concatNum > bestConcat)
+				{
+					bestConcat = concatNum;
+					bestN = n;
+					bestToM = m;
+				}
+			}
+		}
+		if (breakN) continue;
+	}
+	
+	Util.HorizontalRun(true, bestN, bestToM, bestConcat).Dump();
+	
+	return bestConcat;
+}
+public static bool Problem38_IsPandigital(int num, int length, bool zeroOffset)
+{
+	int offset = zeroOffset ? 0 : 1;
+	
+	//bool[] checkMask = new bool[length+offset];
+	int correct = 0;
+	for (int i = 0; i < length; ++i)
+	{
+		correct |= 1 << (i+offset);
+	}
+	//correct.Dump();
+	int checkMask = 0;
+	
+	for (int i = 0; i < length; ++i)
+	{
+		if ((checkMask & 1 << (num % 10)) > 0) return false;
+		checkMask |= 1 << (num % 10);
+		num /= 10;
+	}
+	//checkMask.Dump();
+	
+	return correct == checkMask;
+}
+public static int Problem39()
+{
+	// a < b < c
+	// x - a + b = c
+	
+	int bestI = 0;
+	int bestCount = 0;
+	
+	for (int i = 1; i <= 1000; ++i)
+	{
+		int curCount = 0;
+		for (int a = 1; a < (i/3); ++a)
+		{
+			for (int b = a+1; b < (i/2); ++b)
+			{
+				int c = i - (a + b);
+				if (c < 0)
+				{
+					//Testing my limits
+					Util.HorizontalRun(true, "i:", i, "a:", a, "b:", b, "c:", c).Dump();
+					break;
+				}
+				if (a*a + b*b == c*c)
+				{
+					++curCount;
+				}
+			}
+		}
+		
+		if (curCount > bestCount)
+		{
+			bestCount = curCount;
+			bestI = i;
+		}
+	}
+	
+	return bestI;
+}
+public static long Problem40()
+{
+	int outputProduct = 1;
+	
+	int length = 0;
+	int lenMask = 1;
+	int getMask = 1;
+	int pos = 0;
+	for (int i = 1; i < 1000000; ++i)
+	{
+		if (i == lenMask)
+		{
+			lenMask *= 10;
+			length += 1;
+		}
+		pos += length;
+		//pos.Dump();
+		if (pos >= getMask)
+		{
+			int p = pos;
+			int ii = i;
+			while (p > getMask)
+			{
+				--p;
+				ii.Dump();
+				ii /= 10;
+			}
+			outputProduct *= ii % 10;
+			(ii % 10).Dump(p.ToString());
+			
+			getMask *= 10;
+		}
+	}
+	
+	return outputProduct;
+}
+public static long Problem41()
+{
+	long outputPrime = 0;
+	int LENGTH = 9;
+	
+	for (int i = LENGTH; i > 0; --i)
+	{
+		HelperEnumerators.LexicographicPermutations per = new HelperEnumerators.LexicographicPermutations(i, false);
+		
+		do
+		{
+			long d = per.CurrentLong;
+			
+			if (Helpers.isPrime_Q7PDF(d))
+			{
+				//d.Dump();
+				outputPrime = d;
+				//Don't break, want the largest one
+			}
+		}
+		while (per.MoveNext());
+		
+		if (outputPrime > 0) return outputPrime;
+	}
+	
+	return -41;
+}
+public static long Problem43()
+{
+	HelperEnumerators.LexicographicPermutations per = new HelperEnumerators.LexicographicPermutations(10);
+	
+	long outputSum = 0;
+	do
+	{
+		long d = per.CurrentLong;
+		
+		if (d % 1000 % 17 == 0
+			&& d / 10 % 1000 % 13 == 0
+			&& d / 100 % 1000 % 11 == 0
+			&& d / 1000 % 1000 % 7 == 0
+			&& d / 10000 % 1000 % 5 == 0
+			&& d / 100000 % 1000 % 3 == 0
+			&& d / 1000000 % 1000 % 2 == 0)
+		{
+			outputSum += d;
+		}
+	}
+	while (per.MoveNext());
+	
+	return outputSum;
+}
+public static long Problem44()
+{
+//	int n = 117;
+//	double pent = n*(3*n-1)/2;
+//	pent.Dump();
+	
+//	int n = 26756;
+//	double pent = (double)n*(3*n-1)/2;
+//	double sn = Math.Sqrt((2*pent+1)/3) + 0.5;
+//	Util.HorizontalRun(true, n, ":", pent, ":", sn).Dump();
+//	return -3;
+	
+//	for (int n = 1; n < 1000000; ++n)
+//	{
+//		long pent = (long)n*(3*n-1)/2;
+////		//if (double.IsNaN(pent)) break;
+////		double sn = Math.Sqrt((2*pent+1)/3) + 0.5;
+////		//if (double.IsNaN(sn)) break;
+////		if (n != (int)sn) Util.HorizontalRun(true, n, ":", sn).Dump();
+//		if (!Problem44_IsPentagonal(pent))
+//		{
+//			Util.HorizontalRun(true, n, ":", pent).Dump("FAIL");
+//		}
+//	}
+	int MAX = 10000;
+	
+	long minD = long.MaxValue;
+	int highN = 0;
+	for (int n = 1; n < MAX; ++n)
+	{
+		long pentN = (long)n*(3*n-1)/2;
+		for (int i = n+1; i < MAX; ++i)
+		{
+			long pentI = (long)i*(3*i-1)/2;
+			long D = pentI - pentN;
+			
+			//This check cut it from 12.6 seconds to 3.6 on laptop for MAX = 10000
+			if (D > minD) break;
+			
+			if (Problem44_IsPentagonal(D)
+				&& Problem44_IsPentagonal(pentI + pentN))
+			{
+				if (D < minD)
+				{
+					minD = D;
+					highN = n;
+				}
+			}
+		}
+	}
+	//highN.Dump();
+	return minD;
+}
+public static bool Problem44_IsPentagonal(long pent)
+{
+	double sn = Math.Sqrt((2d*pent+1)/3) + 0.5;
+	long n = (long)sn;
+	if (pent == (n*(3*n-1)/2))
+	{
+		return true;
+	}
+	return false;
+}
 public static long Problem45()
 {
 	//The problem tells us that T285 = P165 = H143 = 40755.  So start at H144
 	// Hex-to-Pent == 15/13 for given example
-	//		(x*(2*x-1))*6/8 == x*(3*x-1)/2
+	//		fail: (x*(2*x-1))*6/8 == x*(3*x-1)/2
+	//		((x*((2*x)-1))*3+x)/4 == x*(3*x-1)/2
 	// Hex-to-Tri == 2h-1 == THIS IS PERFECT (FOR INTS ANYWAY)
-	for (int h = 143; h < 1000; ++h)
+	int MAX = 100000;
+	for (int h = 143; h < MAX; ++h)
 	{
-		int hexNum = h*(2*h-1);
+		Util.Progress = h * 100 / MAX;
+		long hexNum = h*(2*h-1);
 		
-		int estP = h * 8/7 +2;
-		int pentNum = estP*(3*estP-1)/2;
-		int estT = h*2-1;
-		int triNum = estT*(estT+1)/2;
+		long estP = h*15/13;
+		//double estP = (3*h-1)/2-((h+4)/3);
+		long pentNum = estP*(3*estP-1)/2;
+		//if (pentNum >= hexNum) "FAIL".Dump();
+		for (; pentNum < hexNum; ++estP)
+		{
+			pentNum = estP*(3*estP-1)/2;
+		}
+		
+		long estT = h*2-1;
+		long triNum = estT*(estT+1)/2;
 		//Util.HorizontalRun(true, hexNum, pentNum, triNum).Dump();
+		if (hexNum != triNum) "TRI FAIL".Dump();
+		if (pentNum == hexNum)
+		{
+			Util.HorizontalRun(true, hexNum, pentNum, triNum).Dump("SUCCESS");
+			if (hexNum != 40755) return hexNum;
+		}
 		
-		int x = h;
-		Util.HorizontalRun(true, (x*((2*x)-1))*(double)3/4+((double)x/4),
-								((x*((2*x)-1))*3+x)/4,
-								x*(3*x-1)/2).Dump();
+//		int x = h;
+//		Util.HorizontalRun(true, (x*((2*x)-1))*(double)3/4+((double)x/4),
+//								((x*((2*x)-1))*3+x)/4,
+//								x*(3*x-1)/2).Dump();
 	}
 	return -45;
 }
@@ -1923,7 +2207,7 @@ public static class Helpers
 //		return sum;
 	}
 	
-	public static bool isPrime_Q7PDF(int n)
+	public static bool isPrime_Q7PDF(long n)
 	{
 		if (n < 0) return false;
 		if (n == 1) return false;
@@ -1933,8 +2217,8 @@ public static class Helpers
 		else if (n % 3 == 0) return false;
 		else
 		{
-			int r = (int)Math.Floor(Math.Sqrt(n));	// sqrt(n) rounded to the greatest integer r so that r*r<=n
-			for (int f = 5; f <= r; f = f+6)
+			long r = (long)Math.Floor(Math.Sqrt(n));	// sqrt(n) rounded to the greatest integer r so that r*r<=n
+			for (long f = 5; f <= r; f = f+6)
 			{
 				if (n % f == 0) return false;
 				if (n % (f + 2) == 0) return false;
@@ -2301,13 +2585,21 @@ public class HelperEnumerators
 			Value[j] = tmp;
 		}
 		
-		public LexicographicPermutations(int length)
+		public LexicographicPermutations(int length) :
+			this(length, true)
+		{ }
+		public LexicographicPermutations(int length, bool zeroOffset)
 		{
+			if ((!zeroOffset && length > 9) || length > 10)
+			{
+				throw new ArgumentException("Cannot go past 9");
+			}
+			
 			N = length;
 			Value = new int[length];
 			for (int i = 0; i < length; ++i)
 			{
-				Value[i] = i;
+				Value[i] = i + (zeroOffset ? 0 : 1);
 			}
 		}
 		
@@ -2316,6 +2608,19 @@ public class HelperEnumerators
 		public int[] Current
 		{
 			get { return Value; }
+		}
+		
+		public long CurrentLong
+		{
+			get
+			{
+				long l = 0;
+				for (int i = 0; i < N; ++i)
+				{
+					l = l * 10 + Value[i];
+				}
+				return l;
+			}
 		}
 	
 		#endregion

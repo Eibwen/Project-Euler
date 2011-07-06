@@ -3,8 +3,8 @@
 void Main()
 {
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
-	Problem59().Dump("Result");
-	InfiniteIntTest();
+	Problem36().Dump("Result");
+	//InfiniteIntTest();
 }
 
 // Define other methods and classes here
@@ -209,6 +209,72 @@ public static Truncatable Question37_CheckTruncatable(int num)
 }
 #endregion Question37
 
+
+public static long Problem36()
+{
+	long outputSum = 0;
+	char[] base2 = new char[] { '0', '1' };
+	//Can skip even numbers since it cannot include leading zeros (so base2 has to begin/end with 1 == odd)
+	for (int i = 1; i < 1000000; ++i, ++i)
+	{
+		if (Helpers.IsPalindrome(i) && Helpers.IsPalindrome(Problem36_IntToStringFast(i, base2)))
+		{
+			Util.HorizontalRun(true, i, Problem36_IntToStringFast(i, base2)).Dump();
+			outputSum += i;
+		}
+	}
+	return outputSum;
+}
+//GOT THIS FROM: http://stackoverflow.com/questions/923771/quickest-way-to-convert-a-base-10-number-to-any-base-in-net/923814#923814
+/// <summary>
+/// An optimized method using an array as buffer instead of 
+/// string concatenation. This is faster for return values having 
+/// a length > 1.
+/// </summary>
+public static string Problem36_IntToStringFast(int value, char[] baseChars)
+{
+	// 32 is the worst cast buffer size for base 2 and int.MaxValue
+	int i = 32;
+	char[] buffer = new char[i];
+	int targetBase = baseChars.Length;
+
+	do
+	{
+		buffer[--i] = baseChars[value % targetBase];
+		value = value / targetBase;
+	}
+	while (value > 0);
+
+	char[] result = new char[32 - i];
+	Array.Copy(buffer, i, result, 0, 32 - i);
+
+	return new string(result);
+}
+public static long Problem56()
+{
+	long maxSum = 0;
+	
+	for (int a = 1; a < 100; ++a)
+	{
+		for (int b = 1; b < 100; ++b)
+		{
+			InfiniteInt ii = new InfiniteInt(a);
+			for (int i = 1; i < b; ++i)
+			{
+				ii.Multiply(a);
+			}
+			long sum = ii.SumDigits();
+			if (sum > maxSum)
+			{
+				maxSum = sum;
+			}
+		}
+	}
+	
+	return maxSum;
+}
+
+#region Problem59
 public static int Problem59() //After reading forum, used common stragiety but all coded by me, correct solution
 {
 	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem59_cipher1.txt");
@@ -475,6 +541,8 @@ public static string Problem59_Test(int k1, int k2, int k3)
 	}
 	return sb.ToString();
 }
+#endregion Problem59
+
 public static long Problem52()
 {
 	int MAX = 1000000;
@@ -2627,6 +2695,14 @@ public static class Helpers
 			temp /= 10;
 		}
 		
+		return true;
+	}
+	public static bool IsPalindrome(string num)
+	{
+		for (int i = 0; i < num.Length - i -1; ++i)
+		{
+			if (num[i] != num[num.Length - i -1]) return false;
+		}
 		return true;
 	}
 	public static long GetDigit(long num, int digit)

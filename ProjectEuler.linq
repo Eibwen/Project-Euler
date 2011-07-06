@@ -209,7 +209,75 @@ public static Truncatable Question37_CheckTruncatable(int num)
 }
 #endregion Question37
 
-public static long Problem59()
+public static int Problem59() //After reading forum, used common stragiety but all coded by me, correct solution
+{
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem59_cipher1.txt");
+	var chars = from c in File.ReadAllText(PATH).Split(',')
+				select Int32.Parse(c);
+	
+	List<int> encrypted = chars.ToList();
+	
+	int MAX = 95;
+	
+	int[] set1 = new int[MAX];
+	int[] set2 = new int[MAX];
+	int[] set3 = new int[MAX];
+	
+//	int highest = 0;
+	
+	for (int i = 0; i < encrypted.Count; ++i)
+	{
+		switch (i % 3)
+		{
+			case 0:
+				set1[encrypted[i]]++;
+				break;
+			case 1:
+				set2[encrypted[i]]++;
+				break;
+			case 2:
+				set3[encrypted[i]]++;
+				break;
+		}
+//		if (highest < encrypted[i])
+//		{
+//			highest = encrypted[i];
+//		}
+	}
+	
+//	highest.Dump();
+//	set1.Dump();
+//	set2.Dump();
+//	set3.Dump();
+	
+	int BestChar = ' ';
+	
+	int k1 = Problem59_MostCommonIndex(set1) ^ BestChar;
+	int k2 = Problem59_MostCommonIndex(set2) ^ BestChar;
+	int k3 = Problem59_MostCommonIndex(set3) ^ BestChar;
+	
+	int decodedSum = Problem59_Test(k1, k2, k3).Select(s => (int)s).Sum();
+	
+	Util.HorizontalRun(false, (char)k1, (char)k2, (char)k3, " -- ",
+								decodedSum).Dump();
+	
+	return decodedSum;
+}
+public static int Problem59_MostCommonIndex(int[] intArray)
+{
+	int maxVal = intArray[0];
+	int maxIndex = 0;
+	for (int i = 1; i < intArray.Length; ++i)
+	{
+		if (intArray[i] > maxVal)
+		{
+			maxVal = intArray[i];
+			maxIndex = i;
+		}
+	}
+	return maxIndex;
+}
+public static long Problem59_MySolution()
 {
 	//Sorta cheated, in that i used my human brain to select possible matches
 	// Output each decoded character, selected what characters might possibly start a text, did this with the first 3 chars (thats what testChar#.Dump() are for)
@@ -217,6 +285,18 @@ public static long Problem59()
 	// Glanced through those, found 2 decent matches
 	//  Filtered out any with odd characters anywhere within those 12, then increased it to 15, first characters
 	//  Finally now it is outputting 16 possible keys, with only one being actual text, but code does not determine that -- sorta cheating
+	
+	
+	//Forum Strageties
+	// 20040723 rayfil:  I must admit that I "cheated" a bit on this one. The first part of my algo was to separate the text into three arrays where the frequency of each character was accumulated. Using my debugger showed me those frequencies and XORing those most frequent characters with 20h (space character) was a giveaway to the key. I then completed the program without writing any code to find the key. 
+	// 20040723 bishwa:  My approach was to genearte frequencies of repeating 3 letter patterns. Then code word "the" with a candidate key (including cycles of the key) an compare to 10 most frequent patterns and see if it matched. If it did then decoded first 20 characters of supplied text to see if any made sense. 
+	// 20040726 bitRAKE:  I wrote the three character decode algorithm and an ASCII text filter to weed out uncommon bytes in x86. I let the key increment until the decoded text passed the filter. There were only a couple of false decodes - which could plainly be seen with the naked eye, and the key was incremented further. 
+	// 20040726 md2perpe:  I looped through all possible keys, summing the number of E:s, A:s, N:s and T:s (the four most common letters in English, I think) to a score. The key giving the highest score was the used encryption key.
+	// 20041024 Xaphiosis [has code]:  More hacking ... I looked through all lowercase password possibilities for the three password letters: a,b,c
+	//								   Where an application of XOR generated an unwanted character, I removed it from the possibilities. I was expecting to have a few possible passwords left from this, and imagine my surprise when this script printed: 
+	// 20050314 bartmeijer [has code]: 
+	
+	
 	
 	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem59_cipher1.txt");
 	var chars = from c in File.ReadAllText(PATH).Split(',')

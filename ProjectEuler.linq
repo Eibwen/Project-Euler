@@ -3,7 +3,7 @@
 void Main()
 {
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
-	Problem23().Dump("Result");
+	Problem59().Dump("Result");
 	InfiniteIntTest();
 }
 
@@ -209,6 +209,238 @@ public static Truncatable Question37_CheckTruncatable(int num)
 }
 #endregion Question37
 
+public static long Problem59()
+{
+	//Sorta cheated, in that i used my human brain to select possible matches
+	// Output each decoded character, selected what characters might possibly start a text, did this with the first 3 chars (thats what testChar#.Dump() are for)
+	// Output decoded first 12 bytes for every possible group
+	// Glanced through those, found 2 decent matches
+	//  Filtered out any with odd characters anywhere within those 12, then increased it to 15, first characters
+	//  Finally now it is outputting 16 possible keys, with only one being actual text, but code does not determine that -- sorta cheating
+	
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem59_cipher1.txt");
+	var chars = from c in File.ReadAllText(PATH).Split(',')
+				select Int32.Parse(c);
+	
+	int a = 'a';
+	int z = 'z';
+	
+////	//Trying to limit the char sets needed to be checked
+////	string validChars = "abcdefghijklmnopqrstuvxyz.!? -()";
+////	int CHARLEN = 26;
+////	bool[] key1Mask = new bool[CHARLEN];
+////	bool[] key2Mask = new bool[CHARLEN];
+////	bool[] key3Mask = new bool[CHARLEN];
+////	foreach (int letter in chars)
+////	{
+////		for (int k1 = a; k1 <= z; ++k1)
+////		{
+////			char c = (char)(letter ^ k1);
+////			if (!validChars.Contains(c))
+////			{
+////				switch (k1 % 3)
+////				{
+////					case 0:
+////						key1Mask[k1 - a] = true;
+////						break;
+////					case 1:
+////						key2Mask[k1 - a] = true;
+////						break;
+////					case 2:
+////						key3Mask[k1 - a] = true;
+////						break;
+////				}
+////			}
+////		}
+////	}
+////	
+////	string k1charset = "";
+////	for (int i = 0; i < CHARLEN; ++i)
+////		if (!key1Mask[i]) k1charset += (char)(i+a);
+////	string k2charset = "";
+////	for (int i = 0; i < CHARLEN; ++i)
+////		if (!key2Mask[i]) k2charset += (char)(i+a);
+////	string k3charset = "";
+////	for (int i = 0; i < CHARLEN; ++i)
+////		if (!key3Mask[i]) k3charset += (char)(i+a);
+////	k1charset.Dump();
+////	k2charset.Dump();
+////	k3charset.Dump();
+////	string.Format("From {0} down to {1}", CHARLEN*CHARLEN*CHARLEN, k1charset.Length * k2charset.Length * k3charset.Length).Dump();
+////	//== From 17576 down to 5202
+	
+	
+	
+//	char testChar = '.';
+//	if (!(('A' <= testChar && 'Z' >= testChar)
+//		|| ('a' <= testChar && 'z' >= testChar)))
+//	{
+//		"SKIP".Dump();
+//	}
+	
+	//string validK1 = "-('\"! ?=:98765";
+	string validK1 = "(\"";
+	
+	int dumpCount = 0;
+	
+	List<int> checkChars = chars.Take(15).ToList();
+	for (int k1 = a; k1 <= z; ++k1)
+	{
+		char testChar1 = (char)(k1 ^ checkChars[0]);
+//		testChar1.Dump();
+//		continue;
+		if (!validK1.Contains(testChar1)) continue;
+		
+		for (int k2 = a; k2 <= z; ++k2)
+		{
+			char testChar2 = (char)(k2 ^ checkChars[1]);
+//			testChar2.Dump();
+//			continue;
+			if (!('A' <= testChar2 && 'Z' >= testChar2)) continue;
+			
+			for (int k3 = a; k3 <= z; ++k3)
+			{
+				char testChar3 = (char)(k3 ^ checkChars[2]);
+//				testChar3.Dump();
+//				continue;
+				if (!(('a' <= testChar3 && 'z' >= testChar3) || testChar3 == ' ')) continue;
+				
+				string testStr = "";
+				for (int i = 0; i < checkChars.Count; ++i)
+				{
+					switch (i % 3)
+					{
+						case 0:
+							testStr += (char)(k1 ^ checkChars[i]);
+							break;
+						case 1:
+							testStr += (char)(k2 ^ checkChars[i]);
+							break;
+						case 2:
+							testStr += (char)(k3 ^ checkChars[i]);
+							break;
+					}
+				}
+				if (!testStr.Contains("&")
+					&& !testStr.Contains("#")
+					&& !testStr.Contains("~")
+					&& !testStr.Contains("@")
+					&& !testStr.Contains("}")
+					&& !testStr.Contains("{")
+					&& !testStr.Contains("%")
+					&& !testStr.Contains("`")
+					&& !testStr.Contains("$")
+					&& !testStr.Contains("*")
+					&& !testStr.Contains("+")
+					&& !testStr.Contains("=")
+					&& !testStr.Contains("|")
+					&& !testStr.Contains("<")
+					&& !testStr.Contains(">")
+					&& !testStr.Contains(":")
+					&& !testStr.Contains(";")
+					&& !testStr.Contains("/")
+					
+					&& !testStr.Contains("'")
+					&& !testStr.Contains("\"")
+					&& !testStr.Contains("!")
+					&& !testStr.Contains("?"))
+//				if (testStr.ToLower().Contains("the")
+//					|| testStr.ToLower().Contains("of")
+//					|| testStr.ToLower().Contains("it"))
+				{
+					//testStr.Dump();
+					Util.HorizontalRun(false, (char)k1, (char)k2, (char)k3, " : '", testStr, "'", " -- ",
+												Problem59_Test(k1, k2, k3).Select(s => (int)s).Sum()).Dump();
+					++dumpCount;
+				}
+//				//if (testStr == "\"Tho Gespol ")
+//				if (testStr == " (The Gospel  ")
+//				{
+//					Util.HorizontalRun(false, (char)k1, (char)k2, (char)k3).Dump("This maybe");
+//					Problem59_Test(k1, k2, k3).Dump();
+//				}
+			}
+		}
+	}
+	
+	dumpCount.Dump("DUMPED");
+	
+	string solved = Problem59_Test('g', 'o', 'd').Dump();
+	
+	return solved.Select(s => (int)s).Sum();
+}
+public static string Problem59_Test(int k1, int k2, int k3)
+{
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem59_cipher1.txt");
+	var chars = from c in File.ReadAllText(PATH).Split(',')
+				select Int32.Parse(c);
+	
+	List<int> encrypted = chars.ToList();
+	
+	StringBuilder sb = new StringBuilder();
+	for (int i = 0; i < encrypted.Count; ++i)
+	{
+		switch (i % 3)
+		{
+			case 0:
+				sb.Append((char)(encrypted[i] ^ k1));
+				break;
+			case 1:
+				sb.Append((char)(encrypted[i] ^ k2));
+				break;
+			case 2:
+				sb.Append((char)(encrypted[i] ^ k3));
+				break;
+		}
+	}
+	return sb.ToString();
+}
+public static long Problem52()
+{
+	int MAX = 1000000;
+	
+	for (int i = 10; i <= MAX; ++i)
+	{
+		int goodCheckSum = Problem52_CheckSumDigits(i);
+		if (goodCheckSum == Problem52_CheckSumDigits(2*i)
+			&& goodCheckSum == Problem52_CheckSumDigits(3*i)
+			&& goodCheckSum == Problem52_CheckSumDigits(4*i)
+			&& goodCheckSum == Problem52_CheckSumDigits(5*i)
+			&& goodCheckSum == Problem52_CheckSumDigits(6*i))
+		{
+			return i;
+		}
+	}
+	
+	return -52;
+}
+public static int Problem52_CheckSumDigits(int a) //Based on Question32_CheckSumDigits(int a, int b, int c)
+{
+	int chkSum = 0;
+	int chkSum2 = 1;
+	while (a > 0)
+	{
+		//chkSum += (a % 10) ^ 23;	// Had 1138 matches
+		chkSum += (a % 10);
+		chkSum2 *= (a % 10) ^ 23;		// + Had  966 matches, * had 55, with ^23 had 9
+		a /= 10;
+	}
+//	while (b > 0)
+//	{
+//		//chkSum += (b % 10) ^ 23;
+//		chkSum += (b % 10);
+//		chkSum2 *= (b % 10) ^ 23;
+//		b /= 10;
+//	}
+//	while (c > 0)
+//	{
+//		//chkSum += (c % 10) ^ 23;
+//		chkSum += (c % 10);
+//		chkSum2 *= (c % 10) ^ 23;
+//		c /= 10;
+//	}
+	return chkSum + chkSum2;
+}
 public static long Problem23()
 {
 	//Runtime: 10.5 seconds on laptop

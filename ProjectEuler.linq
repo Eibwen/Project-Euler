@@ -3,7 +3,7 @@
 void Main()
 {
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
-	Problem36().Dump("Result");
+	Problem34().Dump("Result");
 	//InfiniteIntTest();
 }
 
@@ -1808,7 +1808,118 @@ public static int Question32_CheckSumDigits(int a, int b, int c)
 	}
 	return chkSum + chkSum2;
 }
-public static long Question34()
+//NOTE: wrote this AFTER all the other Problem 34 stuff, checking if brute forcing it would be eaiser... turns out if fails, only finding 145
+public static long Problem34_BruteForce_Fail() //NOTE: non-brute force solution started at: Question34_Elegant_NotDone()
+{
+	int[] fc = new int[] { 0, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
+	
+	long outputSUm = 0;
+	
+	//BRUTE FORCE
+	for (long i = 3; i < 100000000; ++i)
+	{
+		long ti = i;
+		int iSum = 0;
+		while (ti > 0)
+		{
+			iSum += fc[ti % 10];
+			ti /= 10;
+		}
+		if (i == iSum)
+		{
+			i.Dump();
+			outputSUm += i;
+		}
+	}
+	
+	return -34;
+}
+public static long Problem34()
+{
+	int[] idealList = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 
+								  11, 12, 22, 13, 23, 33, 14, 24, 34, 44, 15, 25, 35, 45, 55, 16, 26, 36, 46, 56, 66, 17, 27, 37, 47, 57, 67, 77, 18, 28, 38, 48, 58, 68, 78, 88, 19, 29, 39, 49, 59, 69, 79, 89, 99,
+								  111, 112, 122, 222, 113, 123, 223, 133, 233, 333, 114, 124, 224, 134, 234, 334, 144, 244, 344, 444, 115, 125, 225, 135, 235, 335, 145, 245, 345, 445, 155, 255, 355, 455, 555, 116, 126, 226, 136, 236, 336, 146, 246, 346, 446, 156, 256, 356, 456, 556, 166, 266, 366, 466, 566, 666, 117, 127, 227, 137, 237, 337, 147, 247, 347, 447, 157, 257, 357, 457, 557, 167, 267, 367, 467, 567, 667, 177, 277, 377, 477, 577, 677, 777, 118, 128, 228, 138, 238, 338, 148, 248, 348, 448, 158, 258, 358, 458, 558, 168, 268, 368, 468, 568, 668, 178, 278, 378, 478, 578, 678, 778, 188, 288, 388, 488, 588, 688, 788, 888, 119, 129, 229, 139, 239, 339, 149, 249, 349, 449, 159, 259, 359, 459, 559, 169, 269, 369, 469, 569, 669, 179, 279, 379, 479, 579, 679, 779, 189, 289, 389, 489, 589, 689, 789, 889, 199, 299, 399, 499, 599, 699, 799, 899, 999 };
+	
+	
+	
+	
+	int[] array = new int[9];
+	
+	int index = 0;
+	int topIndex = 0;
+	for (int i = 0; i < 1000; ++i)
+	{
+		if (array[index] == 9)
+		{
+			array[index + 1] = 1;
+			++topIndex;
+			//Reset index back to 1
+			int resetCount = 0;
+			for (; index >= 0; --index){
+				array[index] = 1;
+				++resetCount;
+			}
+			++index;
+			++index;
+//			index += resetCount;
+		}
+		else if (index > 0 && array[index] == array[index - 1])
+		{
+			index.Dump("i");
+			topIndex.Dump("t");
+			
+			if (index == topIndex)
+			{
+				//Go to the furthest one back that is not equal to previous
+				for (int j = index; j > 0 && array[j] == array[j - 1]; --j)
+				{
+					array[j - 1]++;
+					array[j] = 1;
+				}
+			}
+			else
+			{
+				array[index - 1]++;
+				++index;
+				index.Dump("i2");
+			}
+		}
+		else
+		{
+			array[index]++;
+		}
+		//string.Join("", array.Select(x => x.ToString()).Reverse().ToArray()).Dump();
+		
+		if (i < idealList.Length)
+		{
+			//Util.HorizontalRun(true, Problem34(array), idealList[i], Problem34(array) == idealList[i]).Dump();
+			string fail = Problem34(array) == idealList[i] ? "" : " -- FAIL";
+			(Problem34(array) + " " + idealList[i] + fail).Dump();
+		}
+		else
+		{
+			Problem34(array).Dump();
+		}
+	}
+	return -34;
+}
+public static long Problem34(int[] array)
+{
+	long output = 0;
+	bool skip = true;
+	for (int i = array.Length-1; i >= 0; --i)
+	{
+		if (skip && array[i] == 0)
+			continue;
+		else
+		{
+			skip = false;
+			output = output * 10 + array[i];
+		}
+	}
+	return output;
+}
+public static long Problem34_Elegant_InProgress()
 {
 	//FactorialCache fc = new FactorialCache(9);
 	int[] fc = new int[] { 0, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };

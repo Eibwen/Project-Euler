@@ -3,7 +3,7 @@
 void Main()
 {
 	//TODO test List<int> PrimesLessThan(int maxValue) on laptop vs work, switch it to long?
-	Problem38().Dump("Result");
+	Problem23().Dump("Result");
 	InfiniteIntTest();
 }
 
@@ -209,6 +209,49 @@ public static Truncatable Question37_CheckTruncatable(int num)
 }
 #endregion Question37
 
+public static long Problem23()
+{
+	//Runtime: 10.5 seconds on laptop
+	// Now using Helpers.sum_of_divisors(i) it runs in 0.15 seconds
+	
+	int MAX = 28123;
+	
+	//"Build Number List".Dump();
+	//Build Abundant number list
+	List<int> abundantNums = new List<int>();
+	for (int i = 1; i <= MAX; ++i)
+	{
+//		if (i < Helpers.GetProperDivisorSum(i))
+//			abundantNums.Add(i);
+		if (2*i < Helpers.sum_of_divisors(i))
+			abundantNums.Add(i);
+	}
+	
+	//"Build Sieve".Dump();
+	//Setup Sieve
+	bool[] sieve = new bool[MAX];
+	for (int i = 0; i < abundantNums.Count; ++i)
+	{
+		int iNum = abundantNums[i];
+		for (int j = i; j < abundantNums.Count; ++j)
+		{
+			int index = iNum + abundantNums[j];
+			if (index >= sieve.Length) break;
+			
+			sieve[index] = true;
+		}
+	}
+	
+	//"Sum Numbers".Dump();
+	//Sum numbers
+	long outputSum = 0;
+	for (int i = 0; i < sieve.Length; ++i)
+	{
+		if (!sieve[i]) outputSum += i;
+	}
+	
+	return outputSum;
+}
 public static long Problem38()
 {
 	bool zeroOffset = false;
@@ -2347,6 +2390,48 @@ public static class Helpers
 //			//throw new ApplicationException("WHEN DOES THIS HAPPEN");
 		}
 		return divisors;
+	}
+//	public static List<long> GetProperDivisors(long n)
+//	{
+//		List<long> divisors = new List<long>();
+//		divisors.Add(1);
+//		for (int i = 2; i <= n/2; ++i)
+//		{
+//			if (n % i == 0)
+//			{
+//				divisors.Add(i);
+//			}
+//		}
+//		return divisors;
+//	}
+//	public static long GetProperDivisorSum(long n)
+//	{
+//		long outputSum = 1;
+//		for (int i = 2; i <= n/2; ++i)
+//		{
+//			if (n % i == 0)
+//			{
+//				outputSum += i;
+//			}
+//		}
+//		return outputSum;
+//	}
+	public static int sum_of_divisors(int n)  //Forum023_20041024_Alvaro
+	{
+		int prod=1;
+		for (int k=2; k*k <= n; ++k)
+		{
+			int p=1;
+			while(n % k == 0)
+			{
+				p=p*k+1;
+				n/=k;
+			}
+			prod*=p;
+		}
+		if(n>1)
+			prod*=1+n;
+		return prod;
 	}
 }
 #endregion Helpers

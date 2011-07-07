@@ -1918,6 +1918,37 @@ public static long Problem34_ArrayToLong(int[] array)
 }
 public static long Problem34()
 {
+	int[] fc = new int[] { 0, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
+	
+	long outputSum = 0;
+	
+	//Question34_enum_array en = new Question34_enum_array(20);
+	Question34_enum en = new Question34_enum();
+	while (en.MoveNext())
+	{
+		//(en.Current + "\t" + Question34_FactorialDigitSum(fc, en.Current)).Dump();
+		
+		//en.Current.Dump();
+		
+		//long sum = en.FactorialDigitSum;
+		long sum = Question34_FactorialDigitSum(fc, en.Current);
+		if (Helpers.CheckSumDigits(sum) == Helpers.CheckSumDigits(en.Current))
+		{
+			(sum + " -- " + en.Current).Dump();
+			outputSum += en.Current;
+		}
+//		else if (sum > en.Current*2)
+//		{
+//			en.MoveToNextLength();
+//		}
+		//if (en.Current > 10000) break;
+	}
+	en.Current.Dump("End");
+	
+	return outputSum;
+}
+public static long Problem34_OriginalTrying()
+{
 	//FactorialCache fc = new FactorialCache(9);
 	int[] fc = new int[] { 0, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
 	
@@ -2002,7 +2033,8 @@ public static long Problem34()
 	
 	int[] idealList = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 
 								  11, 12, 22, 13, 23, 33, 14, 24, 34, 44, 15, 25, 35, 45, 55, 16, 26, 36, 46, 56, 66, 17, 27, 37, 47, 57, 67, 77, 18, 28, 38, 48, 58, 68, 78, 88, 19, 29, 39, 49, 59, 69, 79, 89, 99,
-								  111, 112, 122, 222, 113, 123, 223, 133, 233, 333, 114, 124, 224, 134, 234, 334, 144, 244, 344, 444, 115, 125, 225, 135, 235, 335, 145, 245, 345, 445, 155, 255, 355, 455, 555, 116, 126, 226, 136, 236, 336, 146, 246, 346, 446, 156, 256, 356, 456, 556, 166, 266, 366, 466, 566, 666, 117, 127, 227, 137, 237, 337, 147, 247, 347, 447, 157, 257, 357, 457, 557, 167, 267, 367, 467, 567, 667, 177, 277, 377, 477, 577, 677, 777, 118, 128, 228, 138, 238, 338, 148, 248, 348, 448, 158, 258, 358, 458, 558, 168, 268, 368, 468, 568, 668, 178, 278, 378, 478, 578, 678, 778, 188, 288, 388, 488, 588, 688, 788, 888, 119, 129, 229, 139, 239, 339, 149, 249, 349, 449, 159, 259, 359, 459, 559, 169, 269, 369, 469, 569, 669, 179, 279, 379, 479, 579, 679, 779, 189, 289, 389, 489, 589, 689, 789, 889, 199, 299, 399, 499, 599, 699, 799, 899, 999 };
+								  111, 112, 122, 222, 113, 123, 223, 133, 233, 333, 114, 124, 224, 134, 234, 334, 144, 244, 344, 444, 115, 125, 225, 135, 235, 335, 145, 245, 345, 445, 155, 255, 355, 455, 555, 116, 126, 226, 136, 236, 336, 146, 246, 346, 446, 156, 256, 356, 456, 556, 166, 266, 366, 466, 566, 666, 117, 127, 227, 137, 237, 337, 147, 247, 347, 447, 157, 257, 357, 457, 557, 167, 267, 367, 467, 567, 667, 177, 277, 377, 477, 577, 677, 777, 118, 128, 228, 138, 238, 338, 148, 248, 348, 448, 158, 258, 358, 458, 558, 168, 268, 368, 468, 568, 668, 178, 278, 378, 478, 578, 678, 778, 188, 288, 388, 488, 588, 688, 788, 888, 119, 129, 229, 139, 239, 339, 149, 249, 349, 449, 159, 259, 359, 459, 559, 169, 269, 369, 469, 569, 669, 179, 279, 379, 479, 579, 679, 779, 189, 289, 389, 489, 589, 689, 789, 889, 199, 299, 399, 499, 599, 699, 799, 899, 999,
+								  1111 };
 	int idealIndex = 0;
 	
 //	Dictionary<long, long> debug = new Dictionary<long, long>();
@@ -2099,6 +2131,22 @@ public class Question34_enum : IEnumerator<long>
 		long place = PLACES[pos];
 		return (int)(current / place % 10);
 	}
+	
+	[Obsolete("Does not detect where to just return false correctly")]
+	public bool MoveToNextLength()
+	{
+		if (index + 1 > TYPE_MAX_LENGTH) return false;
+		
+		//Reached limit, need to add another place
+		SetPos(index + 1, 1);
+		++topIndex;
+		for (; index >= 0; --index){
+			SetPos(index, 1);
+		}
+		++index;
+		++index;
+		return true;
+	}
 
 	#region IEnumerator<long> Members
 
@@ -2186,6 +2234,8 @@ public class Question34_enum : IEnumerator<long>
 }
 public class Question34_enum_array : IEnumerator<long>
 {
+	int[] fc = new int[] { 0, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
+	
 	int[] array = null;
 	
 	int index = 0;
@@ -2217,6 +2267,43 @@ public class Question34_enum_array : IEnumerator<long>
 			return output;
 		}
 	}
+	
+	public int CurrentLength
+	{
+		get
+		{
+			return topIndex;
+		}
+	}
+	
+	public long FactorialDigitSum
+	{
+		get
+		{
+			long output = 0;
+			for (int i = array.Length-1; i >= 0; --i)
+			{
+				output += fc[array[i]];
+			}
+			return output;
+		}
+	}
+	
+	[Obsolete("Does not detect where to just return false correctly")]
+	public bool MoveToNextLength()
+	{
+		if (index + 1 >= array.Length) return false;
+		
+		//Reached limit, need to add another place
+		array[index + 1] = 1;
+		++topIndex;
+		for (; index >= 0; --index){
+			array[index] = 1;
+		}
+		++index;
+		++index;
+		return true;
+	}
 
 	#endregion
 
@@ -2238,7 +2325,7 @@ public class Question34_enum_array : IEnumerator<long>
 
 	public bool MoveNext()
 	{
-		if (index == array.Length) return false;
+		if (index+1 >= array.Length) return false;
 		
 		
 		if (array[index] == 9)
@@ -3033,6 +3120,19 @@ public static class Helpers
 		if(n>1)
 			prod*=1+n;
 		return prod;
+	}
+	public static long CheckSumDigits(long a) //Based on Problem52_CheckSumDigits //Based on Question32_CheckSumDigits(int a, int b, int c)
+	{
+		long chkSum = 0;
+		long chkSum2 = 1;
+		while (a > 0)
+		{
+			//chkSum += (a % 10) ^ 23;	// Had 1138 matches
+			chkSum += (a % 10);
+			chkSum2 *= (a % 10) ^ 23;		// + Had  966 matches, * had 55, with ^23 had 9
+			a /= 10;
+		}
+		return chkSum + chkSum2;
 	}
 }
 #endregion Helpers

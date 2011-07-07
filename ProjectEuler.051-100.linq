@@ -12,11 +12,15 @@ public static long Problem87()
 {
 	int MAX = 50000000;
 	
+	BitArray MASK = new BitArray(MAX);
+	
 	int SquareLimit = (int)Math.Sqrt(MAX);
 	int ForthLimit = (int)Math.Sqrt(Math.Sqrt(MAX));
 	int CubeLimit = (SquareLimit + ForthLimit + 1) / 2;
 	
-	List<int> Primes = Helpers.PrimesLessThan(SquareLimit+1);
+	SquareLimit.Dump();
+	int highest = 0;
+	List<int> Primes = Helpers.PrimesLessThan(SquareLimit+500);  //TODO: WHAT THE SHIT, adding 500 gives a smaller number that is correct
 	
 	int count = 0;
 	
@@ -28,22 +32,33 @@ public static long Problem87()
 		{
 			int jN = Primes[j];
 			int cube = jN*jN*jN;
+			
+			//Since cube limit is not accurate, this is required
+			if (cube > MAX) break;
+			
 			for (int k = 0; k < Primes.Count && Primes[k] <= ForthLimit; ++k)
 			{
 				int kN = Primes[k];
 				int forth = kN*kN*kN*kN;
 				
+				if (forth > MAX) break;
+				
 				int sum = square + cube + forth;
 				if (sum < MAX)
 				{
-					//sum.Dump();
+					if (iN > highest) highest = iN;
 					//Util.HorizontalRun(true, sum, iN, jN, kN).Dump();
-					++count;
+					if (!MASK[sum])
+					{
+						MASK[sum] = true;
+						++count;
+					}
 				}
 			}
 		}
 	}
 	
+	highest.Dump();
 	return count;
 }
 public static long Problem91()

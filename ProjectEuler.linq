@@ -1851,70 +1851,47 @@ public static long Problem34()
 	{
 		if (array[index] == 9)
 		{
+			//Reached limit, need to add another place
 			array[index + 1] = 1;
 			++topIndex;
-			//Reset index back to 1
-			int resetCount = 0;
 			for (; index >= 0; --index){
 				array[index] = 1;
-				++resetCount;
 			}
 			++index;
 			++index;
-//			index += resetCount;
 		}
 		else if (index > 0 && array[index] == array[index - 1])
 		{
-			//index.Dump("i");
-			//topIndex.Dump("t");
-			
 			if (index == topIndex)
 			{
-				//array.Dump("it");
 				//Go to the furthest one back that is not equal to previous
+				//  setting each step over back to 1
 				int j = index;
 				for (; j > 0 && array[j] == array[j - 1]; --j)
 				{
-					//(j + " > 0 && " + array[j] + " == " + array[j - 1]).Dump();
-					
-					//("Setting " + (j-1) + " to " + (array[j - 1]+1)).Dump();
-					//array[j - 1]++;
-					//("Setting " + (j) + " to " + 1).Dump();
 					array[j] = 1;
 				}
 				array[j]++;
-//				(0 + " < " + index + " && " + array[0] + " == " + array[1]).Dump();
-//				if (array[index] == array[index - 1])
-//				{
-//					for (int j = 0; j < index; ++j)
-//					{
-//						(j + " > 0 && " + array[j] + " == " + array[j + 1]).Dump();
-//						
-//						("Setting " + (j-1) + " to " + (array[j + 1]+1)).Dump();
-//						array[j]++;
-//						("Setting " + (j) + " to " + 1).Dump();
-//						array[j + 1] = 1;
-//					}
-//				}
 			}
 			else
 			{
+				//Start incrementing the next position over
 				array[index - 1]++;
 				++index;
-				//index.Dump("i2");
 			}
 		}
 		else
 		{
+			//Normal increment
 			array[index]++;
 		}
 		//string.Join("", array.Select(x => x.ToString()).Reverse().ToArray()).Dump();
 		
 		if (i < idealList.Length)
 		{
-			//Util.HorizontalRun(true, Problem34(array), idealList[i], Problem34(array) == idealList[i]).Dump();
-			string fail = Problem34(array) == idealList[i] ? "" : " -- FAIL";
-			(Problem34(array) + " " + idealList[i] + fail).Dump();
+			Util.HorizontalRun(true, Problem34(array), idealList[i], Problem34(array) == idealList[i]).Dump();
+//			string fail = Problem34(array) == idealList[i] ? "" : " -- FAIL";
+//			(Problem34(array) + " " + idealList[i] + fail).Dump();
 		}
 		else
 		{

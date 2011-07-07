@@ -1811,7 +1811,7 @@ public static int Question32_CheckSumDigits(int a, int b, int c)
 //NOTE: wrote this AFTER all the other Problem 34 stuff, checking if brute forcing it would be eaiser... turns out if fails, only finding 145
 public static long Problem34_BruteForce_Fail() //NOTE: non-brute force solution started at: Question34_Elegant_NotDone()
 {
-	int[] fc = new int[] { 0, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
+	int[] fc = new int[] { 1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
 	
 	long outputSUm = 0;
 	
@@ -1918,7 +1918,7 @@ public static long Problem34_ArrayToLong(int[] array)
 }
 public static long Problem34()
 {
-	int[] fc = new int[] { 0, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
+	int[] fc = new int[] { 1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
 	
 	long outputSum = 0;
 	
@@ -1950,7 +1950,7 @@ public static long Problem34()
 public static long Problem34_OriginalTrying()
 {
 	//FactorialCache fc = new FactorialCache(9);
-	int[] fc = new int[] { 0, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
+	int[] fc = new int[] { 1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
 	
 	//Question34_FactorialDigitSum(fc, 145).Dump();
 	
@@ -2234,7 +2234,7 @@ public class Question34_enum : IEnumerator<long>
 }
 public class Question34_enum_array : IEnumerator<long>
 {
-	int[] fc = new int[] { 0, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
+	int[] fc = new int[] { 1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
 	
 	int[] array = null;
 	

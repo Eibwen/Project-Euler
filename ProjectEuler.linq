@@ -1865,23 +1865,43 @@ public static long Problem34()
 		}
 		else if (index > 0 && array[index] == array[index - 1])
 		{
-			index.Dump("i");
-			topIndex.Dump("t");
+			//index.Dump("i");
+			//topIndex.Dump("t");
 			
 			if (index == topIndex)
 			{
+				//array.Dump("it");
 				//Go to the furthest one back that is not equal to previous
-				for (int j = index; j > 0 && array[j] == array[j - 1]; --j)
+				int j = index;
+				for (; j > 0 && array[j] == array[j - 1]; --j)
 				{
-					array[j - 1]++;
+					//(j + " > 0 && " + array[j] + " == " + array[j - 1]).Dump();
+					
+					//("Setting " + (j-1) + " to " + (array[j - 1]+1)).Dump();
+					//array[j - 1]++;
+					//("Setting " + (j) + " to " + 1).Dump();
 					array[j] = 1;
 				}
+				array[j]++;
+//				(0 + " < " + index + " && " + array[0] + " == " + array[1]).Dump();
+//				if (array[index] == array[index - 1])
+//				{
+//					for (int j = 0; j < index; ++j)
+//					{
+//						(j + " > 0 && " + array[j] + " == " + array[j + 1]).Dump();
+//						
+//						("Setting " + (j-1) + " to " + (array[j + 1]+1)).Dump();
+//						array[j]++;
+//						("Setting " + (j) + " to " + 1).Dump();
+//						array[j + 1] = 1;
+//					}
+//				}
 			}
 			else
 			{
 				array[index - 1]++;
 				++index;
-				index.Dump("i2");
+				//index.Dump("i2");
 			}
 		}
 		else

@@ -2,11 +2,37 @@
 
 void Main()
 {
-	Problem47.kevingong_20060204().Dump();
+	//Problem47.kevingong_20060204().Dump();
+	Problem91.grimbal_20050218().Dump();
 }
 
 // Define other methods and classes here
 
+public static class Problem91
+{
+	//Here is my code.
+	//- MAX*MAX counts the triangles with a right angle at (0,0).
+	//- "x0*y1 - x1*y0 != 0" tests that the surface is non-zero
+	//- "x0*(x1-x0) + y0*(y1-y0) == 0" checks for a right angle at (x0,y0).
+	//There is no duplication problem since (x0,y0) and (x1,y1) don't have the same role. 
+	public static int grimbal_20050218()
+	{
+		int MAX = 50;
+		
+		int x0, y0, x1, y1;
+		int count = MAX*MAX;
+		
+		for( x0=0 ; x0<=MAX ; x0++ )
+		for( y0=0 ; y0<=MAX ; y0++ )
+		for( x1=0 ; x1<=MAX ; x1++ )
+		for( y1=0 ; y1<=MAX ; y1++ )
+		{
+			if( x0*y1 - x1*y0 != 0 && x0*(x1-x0) + y0*(y1-y0) == 0 )
+				count++;
+		}
+		return count;
+	}
+}
 public static class Problem47
 {
 	//Hui's description of similar method:

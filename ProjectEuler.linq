@@ -1834,7 +1834,7 @@ public static long Problem34_BruteForce_Fail() //NOTE: non-brute force solution 
 	
 	return -34;
 }
-public static long Problem34()
+public static long Problem34_LoopOutput()
 {
 	int[] idealList = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 
 								  11, 12, 22, 13, 23, 33, 14, 24, 34, 44, 15, 25, 35, 45, 55, 16, 26, 36, 46, 56, 66, 17, 27, 37, 47, 57, 67, 77, 18, 28, 38, 48, 58, 68, 78, 88, 19, 29, 39, 49, 59, 69, 79, 89, 99,
@@ -1889,18 +1889,18 @@ public static long Problem34()
 		
 		if (i < idealList.Length)
 		{
-			Util.HorizontalRun(true, Problem34(array), idealList[i], Problem34(array) == idealList[i]).Dump();
+			Util.HorizontalRun(true, Problem34_ArrayToLong(array), idealList[i], Problem34_ArrayToLong(array) == idealList[i]).Dump();
 //			string fail = Problem34(array) == idealList[i] ? "" : " -- FAIL";
 //			(Problem34(array) + " " + idealList[i] + fail).Dump();
 		}
 		else
 		{
-			Problem34(array).Dump();
+			Problem34_ArrayToLong(array).Dump();
 		}
 	}
 	return -34;
 }
-public static long Problem34(int[] array)
+public static long Problem34_ArrayToLong(int[] array)
 {
 	long output = 0;
 	bool skip = true;
@@ -1916,7 +1916,7 @@ public static long Problem34(int[] array)
 	}
 	return output;
 }
-public static long Problem34_Elegant_InProgress()
+public static long Problem34()
 {
 	//FactorialCache fc = new FactorialCache(9);
 	int[] fc = new int[] { 0, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
@@ -2035,7 +2035,7 @@ public static long Problem34_Elegant_InProgress()
 //	
 //	("int[] idealList = new int[] { " + string.Join(", ", ideal.Select(i => i.ToString()).ToArray()) + " };").Dump();
 	
-	return long.MaxValue;
+	return -34;
 }
 //public static long Question34_recurse(int[] fc, int sum, int largest, long resultSum)
 //{
@@ -2069,40 +2069,35 @@ public class Question34_enum : IEnumerator<long>
 {
 	long TYPE_MAX_VALUE = 8999999999999999999;
 	int TYPE_MAX_LENGTH = 19;
+	
+	long[] PLACES = new long[]
+		{
+			1, 10, 100, 1000, 10000, 100000, 1000000, 10000000,
+			100000000, 1000000000, 10000000000, 100000000000,
+			1000000000000, 10000000000000, 100000000000000,
+			1000000000000000, 10000000000000000,
+			100000000000000000, 1000000000000000000
+		};
 
 	long current = 0;  //Reset to placeLength 1's each place enlargement
-	//long digitReset = 0;
-
-	int endMultplier = 1; //Grows by *10 each place enlargement, not reset
-	int placeLength = 1;  //Grows by +1 each place enlargement, not reset
-	int currentMultiplier = 1; //Grows by *10 each place increment, reset on place enlargement
-	int currentDigit = 1;
-	int digitResetMultiplier = 1;
-
-	public bool PlaceEnlargement()
+	
+	int index = 0;
+	int topIndex = 0;
+	
+	void IncPos(int pos)
 	{
-		endMultplier *= 10;
-		placeLength += 1;
-		currentMultiplier = 1;
-		currentDigit += 1;
-
-		if (placeLength > TYPE_MAX_LENGTH)
-		{
-			return false;
-		}
-
-		current = 0;
-//		for (int i = 0; i < placeLength; ++i)
-//		{
-//			current = (current + 1) * 10;
-//		}
-//		digitReset = current;
-		for (int i = 0; i < placeLength; ++i)
-		{
-			current = current * 10 + 1;
-		}
-		currentDigit = 1;
-		return true;
+		long place = PLACES[pos];
+		current += place;
+	}
+	void SetPos(int pos, int value)
+	{
+		long place = PLACES[pos];
+		current -= ((current / place % 10) - value) * place;
+	}
+	int GetPos(int pos)
+	{
+		long place = PLACES[pos];
+		return (int)(current / place % 10);
 	}
 
 	#region IEnumerator<long> Members
@@ -2132,55 +2127,165 @@ public class Question34_enum : IEnumerator<long>
 
 	public bool MoveNext()
 	{
-		if (current / endMultplier % 10 == 9)
-		{
-			PlaceEnlargement();
-			endMultplier.Dump("PlaceEnlargement");
-			return true;
-		}
-		if (currentMultiplier < endMultplier
-			&& current / currentMultiplier % 10 == currentDigit)
-		{
-			currentMultiplier.Dump("inc currentMultiplier");
-			currentMultiplier *= 10;
-			////digitResetMultiplier
-		}
-		if (currentMultiplier >= 10
-			&& current / currentMultiplier % 10 == currentDigit)
-		{
-			//currentDigit.Dump("cur digit");
-			current.Dump("dec current");
-			current -= (currentMultiplier * currentDigit - 1).Dump("minus");
-			++currentDigit;
-			//current.Dump("dec current b");
-		}
-//		if (current / currentMultiplier % 10 == 9)
-//		{
-//			//currentMultiplier *= 10;
-//			currentDigit += 1;
-//			current += currentMultiplier * 10;;
-//			current -= 10 - currentDigit;
-//			currentMultiplier.Dump("currentMultiplier inc");
-//		}
-
 		//limited by long type:
 		if (current == TYPE_MAX_VALUE)
 		{
 			return false;
 		}
+		
+		
+		if (GetPos(index) == 9)
+		{
+			//Reached limit, need to add another place
+			SetPos(index + 1, 1);
+			++topIndex;
+			for (; index >= 0; --index){
+				SetPos(index, 1);
+			}
+			++index;
+			++index;
+		}
+		else if (index > 0 && GetPos(index) == GetPos(index - 1))
+		{
+			if (index == topIndex)
+			{
+				//Go to the furthest one back that is not equal to previous
+				//  setting each step over back to 1
+				int j = index;
+				for (; j > 0 && GetPos(j) == GetPos(j - 1); --j)
+				{
+					SetPos(j, 1);
+				}
+				IncPos(j);
+			}
+			else
+			{
+				//Start incrementing the next position over
+				IncPos(index - 1);
+				++index;
+			}
+		}
+		else
+		{
+			//Normal increment
+			IncPos(index);
+		}
 
-		current += currentMultiplier;
 		return true;
 	}
 
 	public void Reset()
 	{
 		current = 0;
-		currentDigit = 1;
+		
+		index = 0;
+		topIndex = 0;
+	}
 
-		endMultplier = 1;
-		placeLength = 1;
-		currentMultiplier = 1;
+	#endregion
+}
+public class Question34_enum_array : IEnumerator<long>
+{
+	int[] array = null;
+	
+	int index = 0;
+	int topIndex = 0;
+	
+	public Question34_enum_array(int length)
+	{
+		array = new int[length];
+	}
+
+	#region IEnumerator<long> Members
+
+	public long Current
+	{
+		get
+		{
+			long output = 0;
+			bool skip = true;
+			for (int i = array.Length-1; i >= 0; --i)
+			{
+				if (skip && array[i] == 0)
+					continue;
+				else
+				{
+					skip = false;
+					output = output * 10 + array[i];
+				}
+			}
+			return output;
+		}
+	}
+
+	#endregion
+
+	#region IDisposable Members
+
+	public void Dispose()
+	{
+		return;
+	}
+
+	#endregion
+
+	#region IEnumerator Members
+
+	object System.Collections.IEnumerator.Current
+	{
+		get { return Current; }
+	}
+
+	public bool MoveNext()
+	{
+		if (index == array.Length) return false;
+		
+		
+		if (array[index] == 9)
+		{
+			//Reached limit, need to add another place
+			array[index + 1] = 1;
+			++topIndex;
+			for (; index >= 0; --index){
+				array[index] = 1;
+			}
+			++index;
+			++index;
+		}
+		else if (index > 0 && array[index] == array[index - 1])
+		{
+			if (index == topIndex)
+			{
+				//Go to the furthest one back that is not equal to previous
+				//  setting each step over back to 1
+				int j = index;
+				for (; j > 0 && array[j] == array[j - 1]; --j)
+				{
+					array[j] = 1;
+				}
+				array[j]++;
+			}
+			else
+			{
+				//Start incrementing the next position over
+				array[index - 1]++;
+				++index;
+			}
+		}
+		else
+		{
+			//Normal increment
+			array[index]++;
+		}
+		return true;
+	}
+
+	public void Reset()
+	{
+		array = new int[array.Length];
+		
+		index = 0;
+		topIndex = 0;
 	}
 
 	#endregion

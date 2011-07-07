@@ -1813,10 +1813,10 @@ public static long Problem34_BruteForce_Fail() //NOTE: non-brute force solution 
 {
 	int[] fc = new int[] { 1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880 };
 	
-	long outputSUm = 0;
+	long outputSum = 0;
 	
 	//BRUTE FORCE
-	for (long i = 3; i < 100000000; ++i)
+	for (long i = 3; i < 1000000; ++i)
 	{
 		long ti = i;
 		int iSum = 0;
@@ -1828,11 +1828,11 @@ public static long Problem34_BruteForce_Fail() //NOTE: non-brute force solution 
 		if (i == iSum)
 		{
 			i.Dump();
-			outputSUm += i;
+			outputSum += i;
 		}
 	}
 	
-	return -34;
+	return outputSum;
 }
 public static long Problem34_LoopOutput()
 {
@@ -1932,18 +1932,23 @@ public static long Problem34()
 		
 		//long sum = en.FactorialDigitSum;
 		long sum = Question34_FactorialDigitSum(fc, en.Current);
-		if (Helpers.CheckSumDigits(sum) == Helpers.CheckSumDigits(en.Current))
+		if (sum <= 2) continue;
+		//if (Helpers.CheckSumDigits(sum) == Helpers.CheckSumDigits(en.Current))
+		if (sum == Question34_FactorialDigitSum(fc, sum))
 		{
 			(sum + " -- " + en.Current).Dump();
-			outputSum += en.Current;
+			outputSum += sum;
 		}
 //		else if (sum > en.Current*2)
 //		{
 //			en.MoveToNextLength();
 //		}
 		//if (en.Current > 10000) break;
+		
+		//Found limit after running through everything... which only took 30 seconds anyway hah
+		if (en.Current > 80000) break;
 	}
-	en.Current.Dump("End");
+	//en.Current.Dump("End");
 	
 	return outputSum;
 }

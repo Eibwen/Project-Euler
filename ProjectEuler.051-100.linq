@@ -4,10 +4,61 @@
 
 void Main()
 {
-	Problem87().Dump("Result");
+	Problem54().Dump("Result");
 }
 
 // Define other methods and classes here
+public static long Problem54()
+{
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem54_poker.txt");
+	
+	
+	return -54;
+}
+public class Problem54_PokerHand
+{
+	public Problem54_PokerHand()
+	{
+	}
+	public Problem54_PokerHand(string hand)
+	{
+		SetCards(hand);
+	}
+	
+	public void SetCards(string hand)
+	{
+		cards = new List<PokerCard>(5);
+		
+		string[] cardStrings = hand.Split(' ');
+		foreach (string s in cardStrings)
+		{
+			cards.Add(new PokerCard(s));
+		}
+	}
+	
+	List<PokerCard> cards = null;
+	
+	
+	public class PokerCard
+	{
+		public PokerCard(string card)
+		{
+			card = card.Trim();
+			if (card.Length > 2) throw new ApplicationException();
+			
+			if (card[0] == 'T') Value = 10;
+			else if (card[0] == 'J') Value = 11;
+			else if (card[0] == 'Q') Value = 12;
+			else if (card[0] == 'K') Value = 13;
+			else if (card[0] == 'A') Value = 14;
+			else Value = Int32.Parse(card.Substring(0, 1));
+			
+			Suit = card[1];
+		}
+		public int Value { get; set; }
+		public char Suit { get; set; }
+	}
+}
 public static long Problem87()
 {
 	int MAX = 50000000;

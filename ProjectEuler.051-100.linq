@@ -10,6 +10,9 @@ void Main()
 // Define other methods and classes here
 public static long Problem96()
 {
+	//Speed: 0.5 on work computer
+	//		0.6 with Problem96_sudokuCheck(grid, cell)
+	
 	//Thinking about the minimal storage for it
 	//Minimal bits: 324 (4 * 81) (4bits required to store 0-9 in an array)
 	// 11uints, 41bytes
@@ -27,12 +30,13 @@ public static long Problem96()
 	
 	int loadedLines = 0;
 	StringBuilder gridBuilder = new StringBuilder();
+	long outputSum = 0;
 	for (int l = 0; l < lines.Length; ++l)
 	{
 		string line = lines[l];
 		if (line.StartsWith("Grid"))
 		{
-			if (gridBuilder.Length > 0) return -999;
+			//if (gridBuilder.Length > 0) return outputSum;
 			gridBuilder.Length = 0;
 			loadedLines = 0;
 		}
@@ -59,11 +63,15 @@ public static long Problem96()
 					}
 				}
 				
-				//Problem96_OutputGrid(grid, possibilities);
+				//Problem96_OutputGrid(grid, possibilities).Dump();
 				
 				//Now start solving
-				Problem96_recurse(grid, possibilities, 0).Dump("SOLVED");
-				//Problem96_OutputGrid(grid, possibilities);
+				if (!Problem96_recurse(grid, possibilities, 0))
+				{
+					"".Dump("FAILURE line: " + l);
+				}
+				outputSum += grid[0]*100 + grid[1]*10 + grid[2];
+				//Problem96_OutputGrid(grid, possibilities).Dump();
 			}
 		}
 	
@@ -85,9 +93,19 @@ public static long Problem96()
 ////3 7 2 6 8 9 5 1 4
 ////8 1 4 2 5 3 7 6 9
 ////6 9 5 4 1 7 3 8 2";
-////	grid = gridStr.Split(' ', '\n').Select(c => Int32.Parse(c)).ToArray();
+////	int[] grid = gridStr.Split(' ', '\n').Select(c => Int32.Parse(c)).ToArray();
 ////	
 ////	Problem96_sudokuCheck(grid).Dump("Check Test");
+////	for (int i = 0; i < 9; ++i)
+////	{
+////		for (int j = 0; j < 9; ++j)
+////		{
+////			int cell = 9 * i + j;
+////			
+////			(cell + ": " + Problem96_sudokuCheck(grid, cell)).Dump();
+////		}
+////	}
+	
 	
 //	BitArray ba;
 //	byte[] sup = new byte[1];
@@ -95,9 +113,9 @@ public static long Problem96()
 //	int Cell1 = sup % 0x1111;
 //	int Cell2 = (sup >> 4) % 0x1111;
 	
-	return -96;
+	return outputSum;
 }
-public static void Problem96_OutputGrid(int[] grid, BitArray possibilities)
+public static string Problem96_OutputGrid(int[] grid, BitArray possibilities)
 {
 	StringBuilder sb = new StringBuilder(90);
 	for (int i = 0; i < 9; ++i)
@@ -110,53 +128,56 @@ public static void Problem96_OutputGrid(int[] grid, BitArray possibilities)
 		}
 		sb.AppendLine();
 	}
-	sb.ToString().Dump();
+	
+	
+	if (possibilities == null) return sb.ToString();
 	
 	//possibilities.Dump();
-	StringBuilder psb = new StringBuilder();
-	psb.AppendLine("== Rows ==");
+	sb.AppendLine();
+	sb.AppendLine("== Rows ==");
 	for (int i = 0; i < 9; ++i)
 	{
-		psb.AppendFormat("{0}: ", i);
+		sb.AppendFormat("{0}: ", i);
 		for (int j = 0; j < 9; ++j)
 		{
 			//Rows
 			if (possibilities[i*9 + j])
-				psb.Append(j+1);
+				sb.Append(j+1);
 		}
-		psb.AppendLine();
+		sb.AppendLine();
 	}
-	psb.AppendLine("== Columns ==");
+	sb.AppendLine("== Columns ==");
 	for (int i = 0; i < 9; ++i)
 	{
-		psb.AppendFormat("{0}: ", i);
+		sb.AppendFormat("{0}: ", i);
 		for (int j = 0; j < 9; ++j)
 		{
 			//Rows
 			if (possibilities[i*9 + 9*9 + j])
-				psb.Append(j+1);
+				sb.Append(j+1);
 		}
-		psb.AppendLine();
+		sb.AppendLine();
 	}
-	psb.AppendLine("== Grids ==");
+	sb.AppendLine("== Grids ==");
 	for (int i = 0; i < 9; ++i)
 	{
-		psb.AppendFormat("{0}: ", i);
+		sb.AppendFormat("{0}: ", i);
 		for (int j = 0; j < 9; ++j)
 		{
 			//Rows
 			if (possibilities[i*9 + 2*9*9 + j])
-				psb.Append(j+1);
+				sb.Append(j+1);
 		}
-		psb.AppendLine();
+		sb.AppendLine();
 	}
-	psb.ToString().Dump();
+	return sb.ToString();
 }
 public static bool Problem96_recurse(int[] grid, BitArray possibles, int lastCellPlusOne)
 {
+	int jStart = lastCellPlusOne % 9;
 	for (int i = lastCellPlusOne / 9; i < 9; ++i)
 	{
-		for (int j = lastCellPlusOne % 9; j < 9; ++j)
+		for (int j = jStart; j < 9; ++j)
 		{
 			int cell = 9 * i + j;
 			//Find first cell that is zero
@@ -178,10 +199,17 @@ public static bool Problem96_recurse(int[] grid, BitArray possibles, int lastCel
 					grid[cell] = value;
 					MarkBitArray(possibles, cell, value, false);
 					//("Trying: " + i + "" + j + " val: " + value).Dump();
-					if (Problem96_sudokuCheck(grid, cell)
-						&& Problem96_recurse(grid, possibles, cell+1))
+					
+//					string test = Problem96_OutputGrid(grid, null);
+//					if (test.StartsWith("483921657"))
+//					{
+//						test.Dump();
+//						Problem96_sudokuCheck(grid, cell).Dump("Check to cell: " + cell);
+//					}
+					
+					if (Problem96_recurse(grid, possibles, cell+1))
 					{
-						"WIN!!!!!!!!!!!!!!!!!".Dump();
+						//"WIN!!!!!!!!!!!!!!!!!".Dump();
 						return true;
 					}
 					//Unmark cell and bit array
@@ -189,11 +217,16 @@ public static bool Problem96_recurse(int[] grid, BitArray possibles, int lastCel
 					MarkBitArray(possibles, cell, value, true);
 					//Continue loop
 				}
+				
+				//"Checking".Dump();
+				return Problem96_sudokuCheck(grid);
 			}
 		}
+		jStart = 0;
 	}
-	//"Checking".Dump();
+	//Found no zero cells, so just check it
 	return Problem96_sudokuCheck(grid);
+	//throw new ApplicationException("Found no zero cells?: " + lastCellPlusOne);
 }
 public static void MarkBitArray(BitArray possibilities, int cell, int value, bool state)
 {

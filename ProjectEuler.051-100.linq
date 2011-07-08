@@ -10,7 +10,7 @@ void Main()
 // Define other methods and classes here
 public static long Problem54()
 {
-	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem54_pokerTest.txt");
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem54_poker.txt");
 	
 	int player1Wins = 0;
 	
@@ -20,11 +20,14 @@ public static long Problem54()
 		var p1 = new Problem54_PokerHand(s.Substring(0, 14));
 		var p2 = new Problem54_PokerHand(s.Substring(15, 14));
 		
-		s.Dump();
+//		s.Dump();
+//		p1.Dump();
+//		p2.Dump();
 		if (p1.CompareTo(p2) == 0) throw new ApplicationException("No winner, FAIL");
 		
 		if (p1.CompareTo(p2) > 0)
 		{
+			//"won".Dump();
 			++player1Wins;
 		}
 	}
@@ -52,6 +55,8 @@ public class Problem54_PokerHand : IComparable<Problem54_PokerHand>
 			cards.Add(new PokerCard(s));
 		}
 		
+		HandTypeRank = LoadHandType();
+		
 		if (cards.Count != HAND_SIZE) throw new ArgumentException("Hand size is not correct");
 	}
 	
@@ -70,7 +75,15 @@ public class Problem54_PokerHand : IComparable<Problem54_PokerHand>
 		StraightFlush = 9,
 		RoyalFlush = 10
 	}
-	KeyValuePair<HandType, PokerCard> GetHandType()
+	public string HandTypeRankStr
+	{
+		get
+		{
+			return HandTypeRank.Key.ToString() + " = " + HandTypeRank.Value.Value + " Suit:" + HandTypeRank.Value.Suit;
+		}
+	}
+	KeyValuePair<HandType, PokerCard> HandTypeRank { get; set; }
+	KeyValuePair<HandType, PokerCard> LoadHandType()
 	{
 		//Check Flush -- This uses all cards
 		if (IsFlush())
@@ -166,15 +179,25 @@ public class Problem54_PokerHand : IComparable<Problem54_PokerHand>
 	
 	public int CompareTo(Problem54_PokerHand other)
 	{
-		var thisHand = this.GetHandType();
-		var otherHand = other.GetHandType();
+		var thisHand = this.HandTypeRank;
+		var otherHand = other.HandTypeRank;
 		
 		if (thisHand.Key == otherHand.Key)
 		{
 			if (thisHand.Value.Value == otherHand.Value.Value)
 			{
-				//Compare the high card
-				return this.GetHighCard().Value.CompareTo(other.GetHighCard().Value);
+				//Compare the highest cards
+				var thisHandCards = this.cards.OrderByDescending(c => c.Value).ToList();
+				var otherHandCards = other.cards.OrderByDescending(c => c.Value).ToList();
+				
+				for (int i = 0; i < thisHandCards.Count; ++i)
+				{
+					if (thisHandCards[i].Value.CompareTo(otherHandCards[i].Value) != 0)
+					{
+						return thisHandCards[i].Value.CompareTo(otherHandCards[i].Value);
+					}
+				}
+				return 0;
 			}
 			else
 			{
@@ -182,7 +205,7 @@ public class Problem54_PokerHand : IComparable<Problem54_PokerHand>
 				return thisHand.Value.Value.CompareTo(otherHand.Value.Value);
 			}
 		}
-		return otherHand.Key - thisHand.Key;
+		return thisHand.Key - otherHand.Key;
 	}
 	
 	public class PokerCard

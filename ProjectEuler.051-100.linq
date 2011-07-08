@@ -18,9 +18,57 @@ public static long Problem96()
 	//Or 987654321 would take up 30 bits... so 9ints
 	//  Then use a byte and the top bit to store the needed/used digits
 	//I think the best would be 9 ints, one for each row, then what is used/not somewhere else... 81bits for each row/column/grid (81*3), then could and those groups of 9
+	//BUT: I'm not going to bother with any of this for this problem
 	
 	
-	int[] grid = new int[81];
+	
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem96_sudoku.txt");
+	string[] lines = File.ReadAllLines(PATH);
+	
+	int loadedLines = 0;
+	StringBuilder gridBuilder = new StringBuilder();
+	for (int l = 0; l < lines.Length; ++l)
+	{
+		string line = lines[l];
+		if (line.StartsWith("Grid"))
+		{
+			if (gridBuilder.Length > 0) return -999;
+			gridBuilder.Length = 0;
+			loadedLines = 0;
+		}
+		else
+		{
+			++loadedLines;
+			gridBuilder.Append(line);
+			
+			if (loadedLines == 9)
+			{
+				//Grid ready to process
+				int[] grid = gridBuilder.ToString().Select(c => Int32.Parse(c.ToString())).ToArray();
+				BitArray possibilities = new BitArray(81*3, true);
+				//Mark already used numbers
+				for (int i = 0; i < 9; ++i)
+				{
+					for (int j = 0; j < 9; ++j)
+					{
+						int cell = 9 * i + j;
+						if (grid[cell] != 0)
+						{
+							MarkBitArray(possibilities, cell, grid[cell], false);
+						}
+					}
+				}
+				
+				//Problem96_OutputGrid(grid, possibilities);
+				
+				//Now start solving
+				Problem96_recurse(grid, possibilities, 0).Dump("SOLVED");
+				//Problem96_OutputGrid(grid, possibilities);
+			}
+		}
+	
+	}
+	
 //	Dictionary<int, BitArray> possibles = new Dictionary<int, BitArray>();
 //	Problem96_recurse(grid, possibles);
 	
@@ -49,11 +97,141 @@ public static long Problem96()
 	
 	return -96;
 }
-public static long Problem96_recurse(int[] grid, Dictionary<int, BitArray> possibles)
+public static void Problem96_OutputGrid(int[] grid, BitArray possibilities)
 {
-	grid[1+9*1] = 8;
-	possibles.Add(2, new BitArray(9, true));
-	return -1;
+	StringBuilder sb = new StringBuilder(90);
+	for (int i = 0; i < 9; ++i)
+	{
+		for (int j = 0; j < 9; ++j)
+		{
+			int cell = 9 * i + j;
+			
+			sb.Append(grid[cell]);
+		}
+		sb.AppendLine();
+	}
+	sb.ToString().Dump();
+	
+	//possibilities.Dump();
+	StringBuilder psb = new StringBuilder();
+	psb.AppendLine("== Rows ==");
+	for (int i = 0; i < 9; ++i)
+	{
+		psb.AppendFormat("{0}: ", i);
+		for (int j = 0; j < 9; ++j)
+		{
+			//Rows
+			if (possibilities[i*9 + j])
+				psb.Append(j+1);
+		}
+		psb.AppendLine();
+	}
+	psb.AppendLine("== Columns ==");
+	for (int i = 0; i < 9; ++i)
+	{
+		psb.AppendFormat("{0}: ", i);
+		for (int j = 0; j < 9; ++j)
+		{
+			//Rows
+			if (possibilities[i*9 + 9*9 + j])
+				psb.Append(j+1);
+		}
+		psb.AppendLine();
+	}
+	psb.AppendLine("== Grids ==");
+	for (int i = 0; i < 9; ++i)
+	{
+		psb.AppendFormat("{0}: ", i);
+		for (int j = 0; j < 9; ++j)
+		{
+			//Rows
+			if (possibilities[i*9 + 2*9*9 + j])
+				psb.Append(j+1);
+		}
+		psb.AppendLine();
+	}
+	psb.ToString().Dump();
+}
+public static bool Problem96_recurse(int[] grid, BitArray possibles, int lastCellPlusOne)
+{
+	for (int i = lastCellPlusOne / 9; i < 9; ++i)
+	{
+		for (int j = lastCellPlusOne % 9; j < 9; ++j)
+		{
+			int cell = 9 * i + j;
+			//Find first cell that is zero
+			if (grid[cell] == 0)
+			{
+				Util.Progress = cell *100/81;
+				
+				List<int> possibleValues = GetPossibles(possibles, cell);
+				//possibleValues.Dump(cell.ToString());
+				if (possibleValues.Count == 0)
+				{
+					//INVALID STATE
+					//"InvalidState".Dump();
+					return false;
+				}
+				
+				foreach (int value in possibleValues)
+				{
+					grid[cell] = value;
+					MarkBitArray(possibles, cell, value, false);
+					//("Trying: " + i + "" + j + " val: " + value).Dump();
+					if (Problem96_sudokuCheck(grid, cell)
+						&& Problem96_recurse(grid, possibles, cell+1))
+					{
+						"WIN!!!!!!!!!!!!!!!!!".Dump();
+						return true;
+					}
+					//Unmark cell and bit array
+					grid[cell] = 0;
+					MarkBitArray(possibles, cell, value, true);
+					//Continue loop
+				}
+			}
+		}
+	}
+	//"Checking".Dump();
+	return Problem96_sudokuCheck(grid);
+}
+public static void MarkBitArray(BitArray possibilities, int cell, int value, bool state)
+{
+	if (cell < 0 || cell > 81) throw new ArgumentException();
+	//Rows will be 0-80
+	//Columns will be 81-161
+	//Grids will be 162-242
+	int row = cell / 9;
+	int col = cell % 9;
+	int grid = (col/3) + ((row/3)*3);
+	
+	possibilities.Set(row*9 + value-1, state);
+	possibilities.Set(col*9 + 9*9 + value-1, state);
+	possibilities.Set(grid*9 + 2*9*9 + value-1, state);
+	
+	//Util.HorizontalRun(true, row, col, grid).Dump();
+}
+public static List<int> GetPossibles(BitArray possibilities, int cell)
+{
+	if (cell < 0 || cell > 81) throw new ArgumentException();
+	
+	int row = cell / 9;
+	int col = cell % 9;
+	int grid = (col/3) + ((row/3)*3);
+	
+	List<int> outputList = new List<int>();
+	
+	for (int value = 0; value < 9; ++value)
+	{
+		if (possibilities[row*9 + value]
+			&& possibilities[col*9 + 9*9 + value]
+			&& possibilities[grid*9 + 2*9*9 + value])
+		{
+			outputList.Add(value+1);
+		}
+	}
+	
+	return outputList;
 }
 public const int SudokuTotal = 1+2+3+4+5+6+7+8+9;
 public static bool Problem96_sudokuCheck(int[] grid)
@@ -75,6 +253,38 @@ public static bool Problem96_sudokuCheck(int[] grid)
 		{
 			return false;
 		}
+	}
+	return true;
+}
+public static bool Problem96_sudokuCheck(int[] grid, int uptoCell)
+{
+	//If under 9, can't check anything, so just say its alright
+	if (uptoCell < 8) return true;
+	
+	for (int i = 0; i < 9; ++i)
+	{
+		int hLineCheck = SudokuTotal;
+//		int vLineCheck = SudokuTotal;
+//		int gridCheck = SudokuTotal;
+//		
+//		//hLine will simply be the if (cell > uptoCell) check
+//		bool vLineValid = true;
+//		bool gridValid = true;
+		
+		for (int j = 0; j < 9; ++j)
+		{
+			int cell = i*9+j;
+			if (cell > uptoCell) return true;
+			
+			hLineCheck -= grid[9*i+j];
+//			vLineCheck -= grid[9*j+i];
+//			if (9*j+i > uptoCell) vLineValid = false;
+//			gridCheck -= grid[9*((i/3)*3 + j/3) + ((i%3)*3 + j%3)];
+//			if (9*((i/3)*3 + j/3) + ((i%3)*3 + j%3) > uptoCell) gridValid = false;
+		}
+		if (hLineCheck != 0) return false;
+//		if (vLineCheck != 0 && vLineValid) return false;
+//		if (gridCheck != 0 && gridValid) return false;
 	}
 	return true;
 }

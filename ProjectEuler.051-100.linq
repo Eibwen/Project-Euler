@@ -10,12 +10,28 @@ void Main()
 // Define other methods and classes here
 public static long Problem54()
 {
-	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem54_poker.txt");
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem54_pokerTest.txt");
 	
+	int player1Wins = 0;
 	
-	return -54;
+	string[] hands = File.ReadAllLines(PATH);
+	foreach (string s in hands)
+	{
+		var p1 = new Problem54_PokerHand(s.Substring(0, 14));
+		var p2 = new Problem54_PokerHand(s.Substring(15, 14));
+		
+		s.Dump();
+		if (p1.CompareTo(p2) == 0) throw new ApplicationException("No winner, FAIL");
+		
+		if (p1.CompareTo(p2) > 0)
+		{
+			++player1Wins;
+		}
+	}
+	
+	return player1Wins;
 }
-public class Problem54_PokerHand
+public class Problem54_PokerHand : IComparable<Problem54_PokerHand>
 {
 	public Problem54_PokerHand()
 	{
@@ -25,32 +41,168 @@ public class Problem54_PokerHand
 		SetCards(hand);
 	}
 	
+	int HAND_SIZE = 5;
 	public void SetCards(string hand)
 	{
-		cards = new List<PokerCard>(5);
+		cards = new List<PokerCard>(HAND_SIZE);
 		
 		string[] cardStrings = hand.Split(' ');
 		foreach (string s in cardStrings)
 		{
 			cards.Add(new PokerCard(s));
 		}
+		
+		if (cards.Count != HAND_SIZE) throw new ArgumentException("Hand size is not correct");
 	}
 	
 	List<PokerCard> cards = null;
 	
+	enum HandType
+	{
+		HighCard = 1,
+		OnePair = 2,
+		TwoPair = 3,
+		ThreeOfKind = 4,
+		Straight = 5,
+		Flush = 6,
+		FullHouse = 7,
+		FourOfKind = 8,
+		StraightFlush = 9,
+		RoyalFlush = 10
+	}
+	KeyValuePair<HandType, PokerCard> GetHandType()
+	{
+		//Check Flush -- This uses all cards
+		if (IsFlush())
+		{
+			//Check Royal/Straight Flush
+			if (IsStraight())
+			{
+				PokerCard highCard = GetHighCard();
+				if (highCard.Value == PokerCard.Ace)
+					return new KeyValuePair<HandType, PokerCard>(HandType.RoyalFlush, highCard);
+				else
+					return new KeyValuePair<HandType, PokerCard>(HandType.StraightFlush, highCard);
+			}
+			else
+			{
+				return new KeyValuePair<HandType, PokerCard>(HandType.Flush, GetHighCard());
+			}
+		}
+		else if (IsStraight())
+		{
+			return new KeyValuePair<HandType, PokerCard>(HandType.Straight, GetHighCard());
+		}
+		else
+		{
+			var groups = cards.GroupBy(g => g.Value);
+			int maxCount = groups.Max(g => g.Count());
+			if (maxCount >= 2)
+			{
+				//At least a pair
+				//Can only have up to 4 with a single valid deck
+				if (maxCount == 4)
+				{
+					PokerCard highCard = groups.Where(g => g.Count() == 4).First().First();
+					return new KeyValuePair<HandType, PokerCard>(HandType.FourOfKind, highCard);
+				}
+				else if (maxCount == 3)
+				{
+					PokerCard highCard = groups.Where(g => g.Count() == 3).First().First();
+					if (groups.Any(g => g.Count() == 2))
+					{
+						return new KeyValuePair<HandType, PokerCard>(HandType.FullHouse, highCard);
+					}
+					else
+					{
+						return new KeyValuePair<HandType, PokerCard>(HandType.ThreeOfKind, highCard);
+					}
+				}
+				else //if (maxCount == 2)
+				{
+					PokerCard highCard = groups.OrderByDescending(g => g.Key)
+												.Where(g => g.Count() == 2).First().First();
+					if (groups.Count(g => g.Count() == 2) > 1)
+					{
+						return new KeyValuePair<HandType, PokerCard>(HandType.TwoPair, highCard);
+					}
+					else
+					{
+						return new KeyValuePair<HandType, PokerCard>(HandType.OnePair, highCard);
+					}
+				}
+			}
+			else
+			{
+				return new KeyValuePair<HandType, PokerCard>(HandType.HighCard, GetHighCard());
+			}
+		}
+	}
+	bool IsFlush()
+	{
+		char firstSuit = cards[0].Suit;
+		foreach (PokerCard card in cards)
+		{
+			if (card.Suit != firstSuit)
+				return false;
+		}
+		return true;
+	}
+	bool IsStraight()
+	{
+		var straightTest = cards.OrderBy(c => c.Value).ToList();
+		
+		for (int i = 1; i < straightTest.Count; ++i)
+		{
+			if (straightTest[i].Value - 1 != straightTest[i-1].Value)
+				return false;
+		}
+		return true;
+	}
+	PokerCard GetHighCard()
+	{
+		return cards.OrderByDescending(c => c.Value).First();
+	}
+	
+	public int CompareTo(Problem54_PokerHand other)
+	{
+		var thisHand = this.GetHandType();
+		var otherHand = other.GetHandType();
+		
+		if (thisHand.Key == otherHand.Key)
+		{
+			if (thisHand.Value.Value == otherHand.Value.Value)
+			{
+				//Compare the high card
+				return this.GetHighCard().Value.CompareTo(other.GetHighCard().Value);
+			}
+			else
+			{
+				//Compare the high card of the hand
+				return thisHand.Value.Value.CompareTo(otherHand.Value.Value);
+			}
+		}
+		return otherHand.Key - thisHand.Key;
+	}
 	
 	public class PokerCard
 	{
+		public const int Ace = 14;
+		public const int King = 13;
+		public const int Queen = 12;
+		public const int Jack = 11;
+		public const int Ten = 10;
+		
 		public PokerCard(string card)
 		{
 			card = card.Trim();
 			if (card.Length > 2) throw new ApplicationException();
 			
-			if (card[0] == 'T') Value = 10;
-			else if (card[0] == 'J') Value = 11;
-			else if (card[0] == 'Q') Value = 12;
-			else if (card[0] == 'K') Value = 13;
-			else if (card[0] == 'A') Value = 14;
+			if (card[0] == 'T') Value = Ten;
+			else if (card[0] == 'J') Value = Jack;
+			else if (card[0] == 'Q') Value = Queen;
+			else if (card[0] == 'K') Value = King;
+			else if (card[0] == 'A') Value = Ace;
 			else Value = Int32.Parse(card.Substring(0, 1));
 			
 			Suit = card[1];

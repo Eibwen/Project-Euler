@@ -25,7 +25,7 @@ public static long Problem96()
 	
 	
 	
-	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem96_sudoku.txt");
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem96_sodoku17sOnForum.txt");
 	string[] lines = File.ReadAllLines(PATH);
 	
 	int loadedLines = 0;
@@ -71,6 +71,7 @@ public static long Problem96()
 					"".Dump("FAILURE line: " + l);
 				}
 				outputSum += grid[0]*100 + grid[1]*10 + grid[2];
+				outputSum.Dump();
 				//Problem96_OutputGrid(grid, possibilities).Dump();
 			}
 		}

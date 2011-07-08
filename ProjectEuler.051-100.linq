@@ -10,8 +10,14 @@ void Main()
 // Define other methods and classes here
 public static long Problem96()
 {
+	//Thinking about the minimal storage for it
 	//Minimal bits: 324 (4 * 81) (4bits required to store 0-9 in an array)
 	// 11uints, 41bytes
+	//Another way would be 2 ints for each row
+	//  [64 total:](36: 4 4 4  4 4 4  4 4 4) (9: flags) (19: extra)
+	//Or 987654321 would take up 30 bits... so 9ints
+	//  Then use a byte and the top bit to store the needed/used digits
+	//I think the best would be 9 ints, one for each row, then what is used/not somewhere else... 81bits for each row/column/grid (81*3), then could and those groups of 9
 	
 	
 	int[] grid = new int[81];
@@ -34,6 +40,12 @@ public static long Problem96()
 ////	grid = gridStr.Split(' ', '\n').Select(c => Int32.Parse(c)).ToArray();
 ////	
 ////	Problem96_sudokuCheck(grid).Dump("Check Test");
+	
+//	BitArray ba;
+//	byte[] sup = new byte[1];
+//	ba.CopyTo(sup, 0);
+//	int Cell1 = sup % 0x1111;
+//	int Cell2 = (sup >> 4) % 0x1111;
 	
 	return -96;
 }
@@ -191,22 +203,6 @@ public static long Problem53()
 	
 	return count;
 }
-//public static long Problem53_C(int n, int r)
-//{
-//	if (r > n) return -1;
-//	
-//	long numer = 1;
-//	long denom1 = 1;
-//	long denom2 = 1;
-//	for (int i = 1; i <= n; ++i)
-//	{
-//		numer *= i;
-//		if (i <= r) denom1 *= i;
-//		if (i <= n-r) denom2 *= i;
-//	}
-//	
-//	return numer / (denom1 * denom2);
-//}
 public static long Problem53_C(int n, int r)
 {
 	if (r > n) return -1;
@@ -225,23 +221,6 @@ public static long Problem53_C(int n, int r)
 	}
 	return numer / denom;
 }
-//public static long Problem53_C(int n, int r)
-//{
-//	if (r > n) return -1;
-//	
-//	List<int> toDivide = new List<int>();
-//	for (int i = 1; i <= (n-r); ++i)
-//	{
-//		toDivide.Add(i);
-//	}
-//	
-//	long numer = 1;
-//	for (int i = r+1; i <= n; ++i)
-//	{
-//		numer *= i;
-//	}
-//	return numer / denom;
-//}
 public static long Problem54()
 {
 	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem54_poker.txt");

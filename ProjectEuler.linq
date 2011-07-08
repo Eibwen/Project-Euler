@@ -609,7 +609,7 @@ public static long Problem23()
 	
 	//"Build Sieve".Dump();
 	//Setup Sieve
-	bool[] sieve = new bool[MAX];
+	BitArray sieve = new BitArray(MAX);
 	for (int i = 0; i < abundantNums.Count; ++i)
 	{
 		int iNum = abundantNums[i];
@@ -952,7 +952,7 @@ public static long Problem46()
 	
 	//Get cached lists
 	List<int> Primes = Helpers.PrimesLessThan(MAX);
-	bool[] MarkedSieve = Helpers.GetPrimeSieve(MAX); //NOTE: This calls GetPrimeSieve... so we are building that twice
+	BitArray MarkedSieve = Helpers.GetPrimeSieve(MAX); //NOTE: This calls GetPrimeSieve... so we are building that twice
 	"Built Sieves".Dump();
 	//bool[] MarkedSieve = new bool[MAX];
 	List<int> Squares = new List<int>(MAX_SQUARE);
@@ -2899,10 +2899,10 @@ public static class Helpers
 //		
 //		return output;
 //	}
-	public static bool[] GetPrimeSieve(int limit)
+	public static BitArray GetPrimeSieve(int limit)
 	{
 		int sieveBound = (limit-1) / 2; //last index of sieve
-		bool[] sieve = new bool[sieveBound];
+		BitArray sieve = new BitArray(sieveBound);
 		int crosslimit = ((int)Math.Sqrt(limit)-1) / 2;
 		for (int i = 1; i < crosslimit; ++i)
 		{
@@ -2919,7 +2919,7 @@ public static class Helpers
 	public static List<int> PrimesLessThan(int limit)
 	{
 		int sieveBound = (limit-1) / 2; //last index of sieve
-		bool[] sieve = GetPrimeSieve(limit);
+		BitArray sieve = GetPrimeSieve(limit);
 		List<int> primes = new List<int>();
 		primes.Add(2);
 		for (int i = 1; i < sieveBound; ++i)

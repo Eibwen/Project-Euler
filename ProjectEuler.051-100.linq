@@ -4,10 +4,244 @@
 
 void Main()
 {
-	Problem54().Dump("Result");
+	Problem96().Dump("Result");
 }
 
 // Define other methods and classes here
+public static long Problem96()
+{
+	//Minimal bits: 324 (4 * 81) (4bits required to store 0-9 in an array)
+	// 11uints, 41bytes
+	
+	
+	int[] grid = new int[81];
+//	Dictionary<int, BitArray> possibles = new Dictionary<int, BitArray>();
+//	Problem96_recurse(grid, possibles);
+	
+//	grid.Dump();
+//	possibles.Dump();
+
+////	//Test the check method
+////	string gridStr = @"4 8 3 9 2 1 6 5 7
+////9 6 7 3 4 5 8 2 1
+////2 5 1 8 7 6 4 9 3
+////5 4 8 1 3 2 9 7 6
+////7 2 9 5 6 4 1 3 8
+////1 3 6 7 9 8 2 4 5
+////3 7 2 6 8 9 5 1 4
+////8 1 4 2 5 3 7 6 9
+////6 9 5 4 1 7 3 8 2";
+////	grid = gridStr.Split(' ', '\n').Select(c => Int32.Parse(c)).ToArray();
+////	
+////	Problem96_sudokuCheck(grid).Dump("Check Test");
+	
+	return -96;
+}
+public static long Problem96_recurse(int[] grid, Dictionary<int, BitArray> possibles)
+{
+	grid[1+9*1] = 8;
+	possibles.Add(2, new BitArray(9, true));
+	return -1;
+}
+public const int SudokuTotal = 1+2+3+4+5+6+7+8+9;
+public static bool Problem96_sudokuCheck(int[] grid)
+{
+	for (int i = 0; i < 9; ++i)
+	{
+		int hLineCheck = SudokuTotal;
+		int vLineCheck = SudokuTotal;
+		int gridCheck = SudokuTotal;
+		for (int j = 0; j < 9; ++j)
+		{
+			hLineCheck -= grid[9*i+j];
+			vLineCheck -= grid[9*j+i];
+			gridCheck -= grid[9*((i/3)*3 + j/3) + ((i%3)*3 + j%3)];
+		}
+		if (hLineCheck != 0
+			|| vLineCheck != 0
+			|| gridCheck != 0)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+public static long Problem89()
+{
+	//Option 1:
+	//  First write a parser which takes in all valid forms, converting them to decimal
+	//  Then write a roman numeral converter
+	//Option 2:
+	//  Or find replacements (semi-manually) and code each to make the roman numerals minimal
+	
+	
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem79_keylog.txt");
+	
+	string[] lines = File.ReadAllLines(PATH);
+	
+	
+	
+	return -89;
+}
+public static long Problem79()
+{
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem79_keylog.txt");
+	
+	string[] lines = File.ReadAllLines(PATH);
+	
+	var first = from c in lines
+				select c[0];
+	var secon = from c in lines
+				select c[1];
+	var third = from c in lines
+				select c[2];
+	
+	List<char> allChars = new List<char>();
+	allChars.AddRange(first);
+	allChars.AddRange(secon);
+	allChars.AddRange(third);
+	int MinLength = allChars.Distinct().Count();
+	MinLength.Dump("Min Length");
+	
+	var firstOut = from c in first
+					group c by c into g
+					orderby g.Count() descending
+					select new { g.Key, Count = g.Count() };
+	firstOut.Dump();
+	var seconOut = from c in secon
+					group c by c into g
+					orderby g.Count() descending
+					select new { g.Key, Count = g.Count() };
+	seconOut.Dump();
+	var thirdOut = from c in third
+					group c by c into g
+					orderby g.Count()
+					select new { g.Key, Count = g.Count() };
+	thirdOut.Dump();
+	
+	
+	
+	//Frequency analysis:
+	//Start Char: 7
+	//First: 736128**
+	//Mid  : *361289*
+	//End  : **162809
+	//End Char: 0
+	//string freqAnaPasscode = "73612890";
+	
+	//After testing:
+	string freqAnaPasscode = "73162890";
+	
+	
+	//Testing
+	Problem79_IsValidPasscode(freqAnaPasscode);
+	
+	
+	return -79;
+}
+public static bool Problem79_IsValidPasscode(string passcode)
+{
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem79_keylog.txt");
+	
+	string[] lines = File.ReadAllLines(PATH);
+	
+	
+	bool failed = false;
+	foreach (string log in lines)
+	{
+		int logIndex = 0;
+		for (int i = 0; i < passcode.Length; ++i)
+		{
+			if (log[logIndex] == passcode[i]) ++logIndex;
+			if (logIndex == log.Length) break;
+		}
+		if (logIndex != log.Length)
+		{
+			("Fail: " + log).Dump();
+			failed = true;
+		}
+	}
+	return !failed;
+}
+public static long Problem53()
+{
+	int count = 0;
+	
+//	int n = 24;
+//	for (int i = 0; i <= n; ++i)
+//	{
+//		long value = Problem53_C(n, i).Dump();
+//		if (value > 1000000)
+//		{
+//			++count;
+//		}
+//	}
+	for (int n = 1; n <= 100; ++n)
+	{
+		for (int i = n; i > 0; --i)
+		{
+			long value = Problem53_C(n, i);
+			if (value > 1000000)
+			{
+				count += i * 2 - n + 1;
+				break;
+			}
+		}
+	}
+	
+	return count;
+}
+//public static long Problem53_C(int n, int r)
+//{
+//	if (r > n) return -1;
+//	
+//	long numer = 1;
+//	long denom1 = 1;
+//	long denom2 = 1;
+//	for (int i = 1; i <= n; ++i)
+//	{
+//		numer *= i;
+//		if (i <= r) denom1 *= i;
+//		if (i <= n-r) denom2 *= i;
+//	}
+//	
+//	return numer / (denom1 * denom2);
+//}
+public static long Problem53_C(int n, int r)
+{
+	if (r > n) return -1;
+	
+	//if (r < n/2) r = n-r;
+	
+	long numer = 1;
+	for (int i = r+1; i <= n; ++i)
+	{
+		numer *= i;
+	}
+	long denom = 1;
+	for (int i = 1; i <= (n-r); ++i)
+	{
+		denom *= i;
+	}
+	return numer / denom;
+}
+//public static long Problem53_C(int n, int r)
+//{
+//	if (r > n) return -1;
+//	
+//	List<int> toDivide = new List<int>();
+//	for (int i = 1; i <= (n-r); ++i)
+//	{
+//		toDivide.Add(i);
+//	}
+//	
+//	long numer = 1;
+//	for (int i = r+1; i <= n; ++i)
+//	{
+//		numer *= i;
+//	}
+//	return numer / denom;
+//}
 public static long Problem54()
 {
 	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem54_poker.txt");
@@ -513,10 +747,10 @@ public static List<Helpers.tuple_double<List<int>, List<int>>> Problem90_Recurse
 
 public static class Helpers
 {
-	public static bool[] GetPrimeSieve(int limit)
+	public static BitArray GetPrimeSieve(int limit)
 	{
 		int sieveBound = (limit-1) / 2; //last index of sieve
-		bool[] sieve = new bool[sieveBound];
+		BitArray sieve = new BitArray(sieveBound);
 		int crosslimit = ((int)Math.Sqrt(limit)-1) / 2;
 		for (int i = 1; i < crosslimit; ++i)
 		{
@@ -533,7 +767,7 @@ public static class Helpers
 	public static List<int> PrimesLessThan(int limit)
 	{
 		int sieveBound = (limit-1) / 2; //last index of sieve
-		bool[] sieve = GetPrimeSieve(limit);
+		BitArray sieve = GetPrimeSieve(limit);
 		List<int> primes = new List<int>();
 		primes.Add(2);
 		for (int i = 1; i < sieveBound; ++i)

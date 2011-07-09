@@ -4,14 +4,275 @@
 
 void Main()
 {
-	Problem96().Dump("Result");
+	Problem89().Dump("Result");
 }
 
 // Define other methods and classes here
+public static long Problem89()
+{
+	//Option 1:
+	//  First write a parser which takes in all valid forms, converting them to decimal
+	//  Then write a roman numeral converter
+	//Option 2:
+	//  Or find replacements (semi-manually) and code each to make the roman numerals minimal
+	
+	
+//	//Cheating because i'm not sure which part is broken, so cheating to test my methods instead of building test cases manually or whatever
+//	// --Well cheating didn't help at fuck all...
+//	for (int i = 1; i < 4000; ++i)
+//	{
+////		//ZERO FAILURES HERE, WIN
+////		string roman = Problem89_Cheating_ToRoman(i);
+////		long parsed = Problem89_RomanParse(roman);
+////		if (i != parsed)
+////		{
+////			i.Dump("Failed");
+////		}
+//		//ZERO FAILURES (When length for 8 is 4 which i had)
+//		string roman = Problem89_Cheating_ToRoman(i);
+//		int length = Problem89_RomanLength(i);
+//		if (roman.Length != length)
+//		{
+//			i.Dump("Failed");
+//		}
+//	}
+	
+	
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem89_roman.txt");
+	
+	string[] lines = File.ReadAllLines(PATH);
+	
+	Problem89_RomanLength(16).Dump();
+//	"MMMCCLXIX".Length.Dump();
+	
+	long inputSum = 0;
+	long outputSum = 0;
+	foreach (string line in lines)
+	{
+		long current = Problem89_RomanParse(line);
+		
+		inputSum += line.Length;
+		outputSum += Problem89_RomanLength(current);
+		
+//		Util.HorizontalRun(true, line, current,
+//			"Len:", Problem89_RomanLength(current),
+//			"Savings:", line.Length - Problem89_RomanLength(current)).Dump();
+	}
+	
+	inputSum.Dump();
+	outputSum.Dump();
+	return inputSum - outputSum;
+}
+public static long Problem89_RomanParse(string line)
+{
+	long outputSum = 0;
+	int lastDenomination = 9;
+	long currentSum = 0;
+	bool subtracting = false;
+	
+	int THIS_DENOM = -1;
+	int THIS_VALUE = -1;
+	
+	foreach (char c in line)
+	{
+		switch (c)
+		{
+			case 'M':
+				THIS_DENOM = 7;
+				THIS_VALUE = 1000;
+				if (lastDenomination > THIS_DENOM)
+				{
+					outputSum += currentSum; 
+					currentSum = 0;
+				}
+				if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
+				else currentSum += THIS_VALUE;
+				lastDenomination = THIS_DENOM;
+				break;
+			case 'D':
+				THIS_DENOM = 6;
+				THIS_VALUE = 500;
+				if (lastDenomination > THIS_DENOM)
+				{
+					outputSum += currentSum; 
+					currentSum = 0;
+				}
+				if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
+				else currentSum += THIS_VALUE;
+				lastDenomination = THIS_DENOM;
+				break;
+			case 'C':
+				THIS_DENOM = 5;
+				THIS_VALUE = 100;
+				if (lastDenomination > THIS_DENOM)
+				{
+					outputSum += currentSum; 
+					currentSum = 0;
+				}
+				if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
+				else currentSum += THIS_VALUE;
+				lastDenomination = THIS_DENOM;
+				break;
+			case 'L':
+				THIS_DENOM = 4;
+				THIS_VALUE = 50;
+				if (lastDenomination > THIS_DENOM)
+				{
+					outputSum += currentSum; 
+					currentSum = 0;
+				}
+				if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
+				else currentSum += THIS_VALUE;
+				lastDenomination = THIS_DENOM;
+				break;
+			case 'X':
+				THIS_DENOM = 3;
+				THIS_VALUE = 10;
+				if (lastDenomination > THIS_DENOM)
+				{
+					outputSum += currentSum; 
+					currentSum = 0;
+				}
+				if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
+				else currentSum += THIS_VALUE;
+				lastDenomination = THIS_DENOM;
+				break;
+			case 'V':
+				THIS_DENOM = 2;
+				THIS_VALUE = 5;
+				if (lastDenomination > THIS_DENOM)
+				{
+					outputSum += currentSum; 
+					currentSum = 0;
+				}
+				if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
+				else currentSum += THIS_VALUE;
+				lastDenomination = THIS_DENOM;
+				break;
+			case 'I':
+				THIS_DENOM = 1;
+				THIS_VALUE = 1;
+				if (lastDenomination > THIS_DENOM)
+				{
+					outputSum += currentSum; 
+					currentSum = 0;
+				}
+				if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
+				else currentSum += THIS_VALUE;
+				lastDenomination = THIS_DENOM;
+				break;
+			default:
+				throw new ArgumentException("Unknown character");
+		}
+//		c.Dump();
+//		outputSum.Dump();
+//		currentSum.Dump();
+	}
+	return outputSum + currentSum;
+}
+public static int Problem89_RomanLength2(long num)
+{
+	//string[] romanArraySingles = new string[] { "", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX" };
+	int[] romanLengths = new int[] { 0, 1, 2, 3, 2, 1, 2, 3, 4, 2 };
+	
+	int outLength = 0;
+	while (num > 0)
+	{
+		outLength += romanLengths[num % 10];
+		num /= 10;
+	}
+	return outLength;
+}
+public static int Problem89_RomanLength(long num)
+{
+	string outputStr = "";
+	
+	//I know the max will be 4 chars...
+	
+	string numStr = num.ToString("0000");
+	if (numStr.Length > 4) throw new NotSupportedException("This only supports 4 digit numbers");
+	
+	int charCount = 0;
+	
+	//All these are 2 chars
+	//4, 40, 400, 9, 90, 900
+	
+	//4000 would be MMMM, not M?
+	if (numStr[0] == '4')
+		charCount += 2;
+	
+	foreach (char c in numStr)
+	{
+		switch (c)
+		{
+			case '1':
+			case '5':
+				charCount += 1;
+				break;
+			case '2':
+			case '4':
+			case '6':
+			case '9':
+				charCount += 2;
+				break;
+			case '3':
+			case '7':
+				charCount += 3;
+				break;
+			case '8':
+				charCount += 4;
+				break;
+		}
+	}
+	
+	return charCount;
+}
+//http://www.mgbrown.com/PermaLink88.aspx
+public static string Problem89_Cheating_ToRoman(int number)
+{
+	if (-9999 >= number || number >= 9999)
+	{
+		throw new ArgumentOutOfRangeException("number");
+	}
+
+	if (number == 0)
+	{
+		return "NUL";
+	}
+
+	StringBuilder sb = new StringBuilder(10);
+
+	if (number < 0)
+	{
+		sb.Append('-');
+		number *= -1;
+	}
+
+	string[,] table = new string[,] { 
+		{ "", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX" }, 
+		{ "", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC" }, 
+		{ "", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM" },
+		{ "", "M", "MM", "MMM", "M(V)", "(V)", "(V)M", 
+										  "(V)MM", "(V)MMM", "M(X)" } 
+	};
+
+	for (int i = 1000, j = 3; i > 0; i /= 10, j--)
+	{
+		int digit = number / i;
+		sb.Append(table[j, digit]);
+		number -= digit * i;
+	}
+
+	return sb.ToString();
+}
 public static long Problem96()
 {
 	//Speed: 0.5 on work computer
 	//		0.6 with Problem96_sudokuCheck(grid, cell)
+	//		1 minute for the 11 in ProjectEuler_Problem96_sudoku17sOnForum.txt
+	//  laptop: 2 seconds for the 50 problem puzzles
+	//		4:20 minutes on ProjectEuler_Problem96_sudoku17sOnForum.txt
+	//		4:55 with Problem96_sudokuCheck(grid, cell) on those
 	
 	//Thinking about the minimal storage for it
 	//Minimal bits: 324 (4 * 81) (4bits required to store 0-9 in an array)
@@ -25,12 +286,13 @@ public static long Problem96()
 	
 	
 	
-	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem96_sodoku17sOnForum.txt");
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem96_sudoku17sOnForum.txt");
 	string[] lines = File.ReadAllLines(PATH);
 	
 	int loadedLines = 0;
 	StringBuilder gridBuilder = new StringBuilder();
 	long outputSum = 0;
+	int gridCount = 0;
 	for (int l = 0; l < lines.Length; ++l)
 	{
 		string line = lines[l];
@@ -71,6 +333,7 @@ public static long Problem96()
 					"".Dump("FAILURE line: " + l);
 				}
 				outputSum += grid[0]*100 + grid[1]*10 + grid[2];
+				++gridCount;
 				outputSum.Dump();
 				//Problem96_OutputGrid(grid, possibilities).Dump();
 			}
@@ -209,6 +472,8 @@ public static bool Problem96_recurse(int[] grid, BitArray possibles, int lastCel
 //					}
 					
 					if (Problem96_recurse(grid, possibles, cell+1))
+//					if (Problem96_sudokuCheck(grid, cell)
+//						&& Problem96_recurse(grid, possibles, cell+1))
 					{
 						//"WIN!!!!!!!!!!!!!!!!!".Dump();
 						return true;
@@ -294,6 +559,8 @@ public static bool Problem96_sudokuCheck(int[] grid, int uptoCell)
 {
 	//If under 9, can't check anything, so just say its alright
 	if (uptoCell < 8) return true;
+	//If over 3 on a row, just return true, assume the previous rows have been checked already
+	if (uptoCell % 9 > 3) return true;
 	
 	for (int i = 0; i < 9; ++i)
 	{
@@ -321,23 +588,6 @@ public static bool Problem96_sudokuCheck(int[] grid, int uptoCell)
 //		if (gridCheck != 0 && gridValid) return false;
 	}
 	return true;
-}
-public static long Problem89()
-{
-	//Option 1:
-	//  First write a parser which takes in all valid forms, converting them to decimal
-	//  Then write a roman numeral converter
-	//Option 2:
-	//  Or find replacements (semi-manually) and code each to make the roman numerals minimal
-	
-	
-	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem79_keylog.txt");
-	
-	string[] lines = File.ReadAllLines(PATH);
-	
-	
-	
-	return -89;
 }
 public static long Problem79()
 {

@@ -4,7 +4,7 @@
 
 void Main()
 {
-	Problem96().Dump("Result");
+	Problem98().Dump("Result");
 }
 
 // Define other methods and classes here
@@ -62,13 +62,124 @@ public static long Problem98()
 	var anagrams = FullList.GroupBy(g => g.checkSum).Where(g => g.Count() > 1)
 						.SelectMany(g => g);
 	
-	anagrams.Dump();
+	//anagrams.Dump();
 	
 	//Then group by lengths
-	//Build all squares that are that length
-	//Compare them all brute force style... somehow
+	var lengths = anagrams.GroupBy(g => g.word.Length).OrderBy(g => g.Key);
+	long[] LowLimit =  new long[] { 0, 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000 };
+	long[] HighLimit = new long[] { 0, 9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999, 9999999999 };
+	long lastUsedSquare = 1;
+	
+	List<long> fullAnagramSquaresList = new List<long>();
+	
+	foreach (var lengthGroup in lengths)
+	{
+		//Build all squares that are that length
+		long currentLowLimit = LowLimit[lengthGroup.Key];
+		long currentHighLimit = HighLimit[lengthGroup.Key];
+//		List<long> SQUARES = new List<long>();
+//		while (lastUsedSquare*lastUsedSquare < currentHighLimit)
+//		{
+//			SQUARES.Add(lastUsedSquare*lastUsedSquare);
+//			++lastUsedSquare;
+//		}
+		List<string> SQUARES = new List<string>();
+		while (lastUsedSquare*lastUsedSquare < currentHighLimit)
+		{
+			if (lastUsedSquare*lastUsedSquare > currentLowLimit)
+			{
+				SQUARES.Add((lastUsedSquare*lastUsedSquare).ToString());
+			}
+			++lastUsedSquare;
+		}
+		SQUARES.Count.Dump("Found Squares for Length: " + lengthGroup.Key);
+		
+		//Compare them all brute force style... somehow
+		var anagramGroup = lengthGroup.GroupBy(g => g.checkSum);
+		foreach (var anagramPairs in anagramGroup)
+		{
+			//Build mappings between char and place
+			List<Dictionary<char, int>> places = new List<Dictionary<char, int>>();
+			foreach (var ffff in anagramPairs)
+			{
+				Dictionary<char, int> anagramPlaces = new Dictionary<char, int>();
+				for (int i = 0; i < ffff.word.Length; ++i)
+				{
+					char c = ffff.word[i];
+					if (!anagramPlaces.ContainsKey(c))
+						anagramPlaces.Add(c, i);
+					//TODO when a letter occurs twice, have a check for those two places being the same digit
+				}
+				places.Add(anagramPlaces);
+				//anagramPlaces.Dump();
+			}
+			
+			var anagramPairsList = anagramPairs.ToList();
+			for (int f = 0; f < anagramPairsList.Count; ++f)
+			{
+				for (int g = f; g < places.Count; ++g)
+				{
+					if (f == g) continue;
+					
+					//Use places from a differnet word with this word
+					//  And build a number from a square
+					fullAnagramSquaresList.AddRange(
+						Problem98_ConvertPlaces(anagramPairsList[f].word, places[g], SQUARES));
+				}
+			}
+		}
+	}
+	
+	//Currently finding 496, many false it seems
+	fullAnagramSquaresList.OrderByDescending(a => a).Dump();
 	
 	return -9;
+}
+///This will return numbers that are squares AND anagrams, given the correct input
+public static List<long> Problem98_ConvertPlaces(string word, Dictionary<char, int> places, List<string> SQUARES)
+{
+	List<long> outputList = new List<long>();
+	StringBuilder sb = new StringBuilder(word.Length);
+	int loop = 0;
+	foreach (string sqr in SQUARES)
+	{
+		Util.Progress = loop * 100 / SQUARES.Count;
+		sb.Length = 0;
+		try
+		{
+			for (int i = 0; i < word.Length; ++i)
+			{
+				//word[i].Dump();
+				sb.Append(sqr[places[word[i]]]);
+			}
+			
+			//Util.HorizontalRun(true, "InputSquare:", sqr, "Word:", word, "output:", sb.ToString()).Dump();
+			
+			//sb.ToString().Dump();
+			long outputSquare = long.Parse(sb.ToString());
+			if (Problem98_IsSquare(outputSquare) && !outputList.Contains(outputSquare))
+			{
+				outputList.Add(outputSquare);
+				long thisSquare = long.Parse(sqr);
+				if (outputSquare != thisSquare) outputList.Add(thisSquare);
+				
+//				outputSquare.Dump();
+//				long.Parse(sqr).Dump();
+			}
+		}
+		catch (Exception ex)
+		{
+			ex.ToString().Dump();
+			throw;
+		}
+	}
+	//outputList.Dump();
+	Util.Progress = null;
+	return outputList;
+}
+public static bool Problem98_IsSquare(long num)
+{
+	return ((Math.Sqrt(num) % 1) == 0);
 }
 public static long Problem89()
 {
@@ -633,11 +744,11 @@ public static bool Problem96_sudokuCheck(int[] grid)
 	}
 	return true;
 }
-public static bool Problem96_sudokuCheckPossible(int[] grid)
+[Obsolete("NOT TESTED", true)]
+public static bool Problem96_sudokuCheckPossible(int[] grid, BitArray possibles)
 {
 	//TODO: This too would be better with the flag data being in seperate objects...
 	
-	//FAIL: using this on every recursion made 1:30 into 3minutes
 	
 	//Check each row
 	for (int i = 0; i < 9; ++i)
@@ -645,14 +756,13 @@ public static bool Problem96_sudokuCheckPossible(int[] grid)
 		int check = SudokuTotal;
 		for (int j = 0; j < 9; ++j)
 		{
-			int value = grid[9*i+j];
-			if (value == 0)
+			if (!possibles[i*9 + j])
 			{
 				//Means this section is not complete
 				check = 0;
 				break;
 			}
-			check -= value;
+			check -= grid[9*i+j];
 		}
 		if (check != 0) return false;
 	}
@@ -662,14 +772,13 @@ public static bool Problem96_sudokuCheckPossible(int[] grid)
 		int check = SudokuTotal;
 		for (int j = 0; j < 9; ++j)
 		{
-			int value = grid[9*j+i];
-			if (value == 0)
+			if (!possibles[i*9 + 9*9 + j])
 			{
 				//Means this section is not complete
 				check = 0;
 				break;
 			}
-			check -= value;
+			check -= grid[9*j+i];
 		}
 		if (check != 0) return false;
 	}
@@ -679,14 +788,15 @@ public static bool Problem96_sudokuCheckPossible(int[] grid)
 		int check = SudokuTotal;
 		for (int j = 0; j < 9; ++j)
 		{
-			int value = grid[9*((i/3)*3 + j/3) + ((i%3)*3 + j%3)];
-			if (value == 0)
+			int gridCell = (j/3) + ((i/3)*3);
+			int value = ((i%3)*3 + j%3);
+			if (!possibles[gridCell*9 + 2*9*9 + value])
 			{
 				//Means this section is not complete
 				check = 0;
 				break;
 			}
-			check -= value;
+			check -= grid[9*((i/3)*3 + j/3) + ((i%3)*3 + j%3)];
 		}
 		if (check != 0) return false;
 	}

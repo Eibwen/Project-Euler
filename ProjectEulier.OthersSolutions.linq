@@ -7,7 +7,48 @@ void Main()
 }
 
 // Define other methods and classes here
-
+public static class Problem96
+{
+	//DeX_20061031
+	private static boolean solveSudoku(int s) {
+		int x = s % 9;
+		int y = s / 9;
+		if (s == 81) return true;	//reached max depth
+		if (sudoku[y][x] == 0) {
+			for (int n = 1; n <= 9; n++) {
+				if (testPlace(x, y, n)) {
+					sudoku[y][x] = n;
+					if (solveSudoku(s+1)) return true;
+				}
+			}
+			//if we reach here then we've tried all numbers 1-9 without success
+			sudoku[y][x] = 0;
+			return false;
+		}
+		return solveSudoku(s+1);
+	}
+	
+	//Checks whether the given number fits in the sudoku
+	private static boolean testPlace(int nx, int ny, int n) {
+		//Check the box
+		int bx = (int)(nx / 3) * 3;
+		int by = (int)(ny / 3) * 3;
+		for (int y = by; y < by + 3; y++) {
+			for (int x = bx; x < bx + 3; x++) {
+				if (sudoku[y][x] == n) return false;
+			}
+		}
+		//Check the row
+		for (int x = 0; x < 9; x++) {
+			if (sudoku[ny][x] == n) return false;
+		}
+		//Check the column
+		for (int y = 0; y < 9; y++) {
+			if (sudoku[y][nx] == n) return false;
+		}
+		return true;
+	}
+}
 public static class Problem91
 {
 	//Here is my code.

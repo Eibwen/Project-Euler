@@ -276,7 +276,9 @@ public static long Problem96()
 {
 	//Speed: 0.5 on work computer
 	//		0.6 with Problem96_sudokuCheck(grid, cell)
+	//		0.065 with Problem96_FindCell
 	//		1 minute for the 11 in ProjectEuler_Problem96_sudoku17sOnForum.txt
+	//		32 seconds with Problem96_FindCell (30 for just the last one...)
 	//  laptop: 2 seconds for the 50 problem puzzles
 	//			1.3 seconds with FindNakedSingles
 	//			0.15 seconds with Problem96_FindCell

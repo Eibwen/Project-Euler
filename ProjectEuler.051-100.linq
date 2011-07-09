@@ -164,6 +164,7 @@ public static List<long> Problem98_ConvertPlaces(
 		try
 		{
 			//Check dupe places
+			// This will check if all occurances of the same letter are equal in this square
 			bool invalid = false;
 			foreach (List<int> checkplaces in dupes.Values)
 			{
@@ -175,18 +176,44 @@ public static List<long> Problem98_ConvertPlaces(
 					}
 				}
 			}
-			if (invalid)
-			{
-				//"found invalid".Dump();
-				continue;
-			}
+//			for (int i = 0; i < sqr.Length; ++i)
+//			{
+//				for (int j = i+1; j < sqr.Length; ++j)
+//				{
+//					if (sqr[i] == sqr[j])
+//					{
+//						//Duplicate numbers in the square
+//						
+//					}
+//				}
+//			}
+			if (invalid) continue;
+			
+			//TODO, is having zero be with N and E invalid??
+			Dictionary<char, char> usedDigits = new Dictionary<char, char>();
 			
 			//Build the anagram of the square
 			for (int i = 0; i < word.Length; ++i)
 			{
 				//word[i].Dump();
-				sb.Append(sqr[places[word[i]]]);
+				char c = sqr[places[word[i]]];
+				if (i == 0 && c == '0')
+				{
+					invalid = true;
+					break;
+				}
+				if (usedDigits.ContainsKey(c))
+				{
+					if (usedDigits[c] != word[i])
+					{
+						invalid = true;
+						break;
+					}
+				}
+				else { usedDigits.Add(c, word[i]); }
+				sb.Append(c);
 			}
+			if (invalid) continue;
 			
 			//sb.ToString().Dump();
 			long outputSquare = long.Parse(sb.ToString());
@@ -196,7 +223,7 @@ public static List<long> Problem98_ConvertPlaces(
 				long thisSquare = long.Parse(sqr);
 				if (outputSquare != thisSquare) outputList.Add(thisSquare);
 				
-				Util.HorizontalRun(true, sqr, ":", sb.ToString(), " as ", word, ":", fromWord).Dump();
+				Util.HorizontalRun(false, sqr, ":", sb.ToString(), " as ", word, ":", fromWord).Dump();
 				
 //				outputSquare.Dump();
 //				long.Parse(sqr).Dump();

@@ -3,3 +3,13 @@ If there are others, I'd work on solving those because it would be assured i wou
 
 A rating system on the solved forums, so i could choose to sort by rating rather than just oldest first always.  Ideally i could sort by the language as well.  So then I could see only C-type languages if i wanted, and therefore easily compare what i have with those, and i would be able to submit mine if it is unique.
 
+
+COMMENTS:
+Problem 098:
+I'd like to mention that in addition to not using a letter in a mapping more than once, you cannot use a digit mapping more than once.
+For example:
+2025:2025 as CARE:RACE does NOT work because R and C map to 2.
+Seperate letters must map to seperate numbers, and neither can repeat in the mapping.
+[This might go beyond this forum]
+Anagrams which result in a number that is a sqare, but with a leading zero do not count either
+

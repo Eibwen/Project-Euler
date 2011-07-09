@@ -4,10 +4,71 @@
 
 void Main()
 {
-	Problem89().Dump("Result");
+	Problem98().Dump("Result");
 }
 
 // Define other methods and classes here
+public static long Problem98()
+{
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Question98_words.txt");
+	
+//	int LONGEST_WORD = 14;
+//	
+//	long highestNum = 0;
+//	for (int i = 0; i < LONGEST_WORD; ++i)
+//	{
+//		highestNum = highestNum * 10 + 9;
+//	}
+//	List<long> SQUARES = new List<long>();
+//	long lastSquare = 0;
+//	for (long i = 1; lastSquare < highestNum; ++i)
+//	{
+//		lastSquare = i*i;
+//		SQUARES.Add(lastSquare);
+//	}
+//	//SQUARES.Count.Dump();
+	
+	string wordsFile = File.ReadAllText(PATH);
+	var lines = wordsFile.Trim('"').Split(new string[] { "\",\"" }, StringSplitOptions.None).ToList();
+	
+//	int maxLength = 0;
+//	foreach (string line in lines)
+//	{
+//		if (line.Length > maxLength) maxLength = line.Length;
+//	}
+//	maxLength.Dump();
+	
+	var item = new { word = "", checkSum = 99L, square = 9L };
+	var FullList = new[] { item }.ToList();
+	FullList.Remove(item);
+	
+	foreach (string line in lines)
+	{
+		long checkSum1 = 0;
+		long checkSum2 = 1;
+		//long lineNumber = 0;
+		for (int i = 0; i < line.Length; ++i)
+		{
+			long charVal = (line[i] - 'A') + 1;
+			//lineNumber = lineNumber * 10 + charVal;
+			
+			checkSum1 += charVal * 23;
+			checkSum2 *= charVal + 13;
+		}
+		
+		FullList.Add(new { word = line, checkSum = checkSum1+checkSum2, square = lineNumber });
+	}
+	
+	//FullList.Dump();
+	
+	Math.Sqrt(18135).Dump();
+	
+	var anagrams = FullList.GroupBy(g => g.checkSum).Where(g => g.Count() > 1)
+						.SelectMany(g => g);
+						//.Where(s => (Math.Sqrt(s.square) % 1) == 0);
+	anagrams.Dump();
+	return -9;
+}
 public static long Problem89()
 {
 	//Option 1:
@@ -42,7 +103,7 @@ public static long Problem89()
 	
 	string[] lines = File.ReadAllLines(PATH);
 	
-	Problem89_RomanLength(16).Dump();
+//	Problem89_RomanLength(16).Dump();
 //	"MMMCCLXIX".Length.Dump();
 	
 	long inputSum = 0;
@@ -59,8 +120,8 @@ public static long Problem89()
 //			"Savings:", line.Length - Problem89_RomanLength(current)).Dump();
 	}
 	
-	inputSum.Dump();
-	outputSum.Dump();
+//	inputSum.Dump();
+//	outputSum.Dump();
 	return inputSum - outputSum;
 }
 public static long Problem89_RomanParse(string line)

@@ -1,0 +1,5 @@
+A little icon that would show which unsolved problems have a PDF... or is it only the first few ones?
+If there are others, I'd work on solving those because it would be assured i would learn something from the PDF.  Rather than reading 4 pages of forums that only have solutions in various langages.
+
+A rating system on the solved forums, so i could choose to sort by rating rather than just oldest first always.  Ideally i could sort by the language as well.  So then I could see only C-type languages if i wanted, and therefore easily compare what i have with those, and i would be able to submit mine if it is unique.
+

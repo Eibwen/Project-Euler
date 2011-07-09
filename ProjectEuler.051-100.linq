@@ -100,17 +100,24 @@ public static long Problem98()
 		{
 			//Build mappings between char and place
 			List<Dictionary<char, int>> places = new List<Dictionary<char, int>>();
+			List<Dictionary<char, List<int>>> placesDupeCheck = new List<Dictionary<char, List<int>>>();
 			foreach (var ffff in anagramPairs)
 			{
 				Dictionary<char, int> anagramPlaces = new Dictionary<char, int>();
+				Dictionary<char, List<int>> dupePlaces = new Dictionary<char, List<int>>();
 				for (int i = 0; i < ffff.word.Length; ++i)
 				{
 					char c = ffff.word[i];
 					if (!anagramPlaces.ContainsKey(c))
+					{
 						anagramPlaces.Add(c, i);
+					}
 					//TODO when a letter occurs twice, have a check for those two places being the same digit
+					if (!dupePlaces.ContainsKey(c)) dupePlaces.Add(c, new List<int>());
+					dupePlaces[c].Add(i);
 				}
 				places.Add(anagramPlaces);
+				placesDupeCheck.Add(dupePlaces);
 				//anagramPlaces.Dump();
 			}
 			
@@ -124,7 +131,11 @@ public static long Problem98()
 					//Use places from a differnet word with this word
 					//  And build a number from a square
 					fullAnagramSquaresList.AddRange(
-						Problem98_ConvertPlaces(anagramPairsList[f].word, places[g], SQUARES));
+						Problem98_ConvertPlaces(
+							anagramPairsList[f].word,
+							anagramPairsList[g].word,
+							places[g],
+							placesDupeCheck[g], SQUARES));
 				}
 			}
 		}
@@ -136,7 +147,12 @@ public static long Problem98()
 	return -9;
 }
 ///This will return numbers that are squares AND anagrams, given the correct input
-public static List<long> Problem98_ConvertPlaces(string word, Dictionary<char, int> places, List<string> SQUARES)
+public static List<long> Problem98_ConvertPlaces(
+	string word,
+	string fromWord,
+	Dictionary<char, int> places,
+	Dictionary<char, List<int>> dupes,
+	List<string> SQUARES)
 {
 	List<long> outputList = new List<long>();
 	StringBuilder sb = new StringBuilder(word.Length);
@@ -147,13 +163,30 @@ public static List<long> Problem98_ConvertPlaces(string word, Dictionary<char, i
 		sb.Length = 0;
 		try
 		{
+			//Check dupe places
+			bool invalid = false;
+			foreach (List<int> checkplaces in dupes.Values)
+			{
+				if (checkplaces.Count > 1)
+				{
+					for (int i = 1; i < checkplaces.Count; ++i)
+					{
+						if (sqr[i-1] != sqr[i]) invalid = true;
+					}
+				}
+			}
+			if (invalid)
+			{
+				//"found invalid".Dump();
+				continue;
+			}
+			
+			//Build the anagram of the square
 			for (int i = 0; i < word.Length; ++i)
 			{
 				//word[i].Dump();
 				sb.Append(sqr[places[word[i]]]);
 			}
-			
-			//Util.HorizontalRun(true, "InputSquare:", sqr, "Word:", word, "output:", sb.ToString()).Dump();
 			
 			//sb.ToString().Dump();
 			long outputSquare = long.Parse(sb.ToString());
@@ -162,6 +195,8 @@ public static List<long> Problem98_ConvertPlaces(string word, Dictionary<char, i
 				outputList.Add(outputSquare);
 				long thisSquare = long.Parse(sqr);
 				if (outputSquare != thisSquare) outputList.Add(thisSquare);
+				
+				Util.HorizontalRun(true, sqr, ":", sb.ToString(), " as ", word, ":", fromWord).Dump();
 				
 //				outputSquare.Dump();
 //				long.Parse(sqr).Dump();

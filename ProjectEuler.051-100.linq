@@ -4,7 +4,7 @@
 
 void Main()
 {
-	Problem98().Dump("Result");
+	Problem96().Dump("Result");
 }
 
 // Define other methods and classes here
@@ -38,7 +38,7 @@ public static long Problem98()
 //	}
 //	maxLength.Dump();
 	
-	var item = new { word = "", checkSum = 99L, square = 9L };
+	var item = new { word = "", checkSum = 99L };
 	var FullList = new[] { item }.ToList();
 	FullList.Remove(item);
 	
@@ -46,27 +46,28 @@ public static long Problem98()
 	{
 		long checkSum1 = 0;
 		long checkSum2 = 1;
-		//long lineNumber = 0;
 		for (int i = 0; i < line.Length; ++i)
 		{
 			long charVal = (line[i] - 'A') + 1;
-			//lineNumber = lineNumber * 10 + charVal;
 			
 			checkSum1 += charVal * 23;
 			checkSum2 *= charVal + 13;
 		}
 		
-		FullList.Add(new { word = line, checkSum = checkSum1+checkSum2, square = lineNumber });
+		FullList.Add(new { word = line, checkSum = checkSum1+checkSum2 });
 	}
 	
 	//FullList.Dump();
 	
-	Math.Sqrt(18135).Dump();
-	
 	var anagrams = FullList.GroupBy(g => g.checkSum).Where(g => g.Count() > 1)
 						.SelectMany(g => g);
-						//.Where(s => (Math.Sqrt(s.square) % 1) == 0);
+	
 	anagrams.Dump();
+	
+	//Then group by lengths
+	//Build all squares that are that length
+	//Compare them all brute force style... somehow
+	
 	return -9;
 }
 public static long Problem89()
@@ -129,98 +130,31 @@ public static long Problem89_RomanParse(string line)
 	long outputSum = 0;
 	int lastDenomination = 9;
 	long currentSum = 0;
-	bool subtracting = false;
-	
-	int THIS_DENOM = -1;
-	int THIS_VALUE = -1;
 	
 	foreach (char c in line)
 	{
 		switch (c)
 		{
 			case 'M':
-				THIS_DENOM = 7;
-				THIS_VALUE = 1000;
-				if (lastDenomination > THIS_DENOM)
-				{
-					outputSum += currentSum; 
-					currentSum = 0;
-				}
-				if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
-				else currentSum += THIS_VALUE;
-				lastDenomination = THIS_DENOM;
+				Problem89_RomanParseSub(7, 1000, ref lastDenomination, ref currentSum, ref outputSum);
 				break;
 			case 'D':
-				THIS_DENOM = 6;
-				THIS_VALUE = 500;
-				if (lastDenomination > THIS_DENOM)
-				{
-					outputSum += currentSum; 
-					currentSum = 0;
-				}
-				if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
-				else currentSum += THIS_VALUE;
-				lastDenomination = THIS_DENOM;
+				Problem89_RomanParseSub(6, 500, ref lastDenomination, ref currentSum, ref outputSum);
 				break;
 			case 'C':
-				THIS_DENOM = 5;
-				THIS_VALUE = 100;
-				if (lastDenomination > THIS_DENOM)
-				{
-					outputSum += currentSum; 
-					currentSum = 0;
-				}
-				if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
-				else currentSum += THIS_VALUE;
-				lastDenomination = THIS_DENOM;
+				Problem89_RomanParseSub(5, 100, ref lastDenomination, ref currentSum, ref outputSum);
 				break;
 			case 'L':
-				THIS_DENOM = 4;
-				THIS_VALUE = 50;
-				if (lastDenomination > THIS_DENOM)
-				{
-					outputSum += currentSum; 
-					currentSum = 0;
-				}
-				if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
-				else currentSum += THIS_VALUE;
-				lastDenomination = THIS_DENOM;
+				Problem89_RomanParseSub(4, 50, ref lastDenomination, ref currentSum, ref outputSum);
 				break;
 			case 'X':
-				THIS_DENOM = 3;
-				THIS_VALUE = 10;
-				if (lastDenomination > THIS_DENOM)
-				{
-					outputSum += currentSum; 
-					currentSum = 0;
-				}
-				if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
-				else currentSum += THIS_VALUE;
-				lastDenomination = THIS_DENOM;
+				Problem89_RomanParseSub(3, 10, ref lastDenomination, ref currentSum, ref outputSum);
 				break;
 			case 'V':
-				THIS_DENOM = 2;
-				THIS_VALUE = 5;
-				if (lastDenomination > THIS_DENOM)
-				{
-					outputSum += currentSum; 
-					currentSum = 0;
-				}
-				if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
-				else currentSum += THIS_VALUE;
-				lastDenomination = THIS_DENOM;
+				Problem89_RomanParseSub(2, 5, ref lastDenomination, ref currentSum, ref outputSum);
 				break;
 			case 'I':
-				THIS_DENOM = 1;
-				THIS_VALUE = 1;
-				if (lastDenomination > THIS_DENOM)
-				{
-					outputSum += currentSum; 
-					currentSum = 0;
-				}
-				if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
-				else currentSum += THIS_VALUE;
-				lastDenomination = THIS_DENOM;
+				Problem89_RomanParseSub(1, 1, ref lastDenomination, ref currentSum, ref outputSum);
 				break;
 			default:
 				throw new ArgumentException("Unknown character");
@@ -230,6 +164,18 @@ public static long Problem89_RomanParse(string line)
 //		currentSum.Dump();
 	}
 	return outputSum + currentSum;
+}
+static void Problem89_RomanParseSub(int THIS_DENOM, int THIS_VALUE,
+					ref int lastDenomination, ref long currentSum, ref long outputSum)
+{
+	if (lastDenomination > THIS_DENOM)
+	{
+		outputSum += currentSum; 
+		currentSum = 0;
+	}
+	if (lastDenomination < THIS_DENOM) { currentSum = THIS_VALUE - currentSum; }
+	else currentSum += THIS_VALUE;
+	lastDenomination = THIS_DENOM;
 }
 public static int Problem89_RomanLength2(long num)
 {
@@ -332,8 +278,11 @@ public static long Problem96()
 	//		0.6 with Problem96_sudokuCheck(grid, cell)
 	//		1 minute for the 11 in ProjectEuler_Problem96_sudoku17sOnForum.txt
 	//  laptop: 2 seconds for the 50 problem puzzles
+	//			1.3 seconds with FindNakedSingles
 	//		4:20 minutes on ProjectEuler_Problem96_sudoku17sOnForum.txt
 	//		4:55 with Problem96_sudokuCheck(grid, cell) on those
+	//		3:50 with FindNakedSingles
+	
 	
 	//Thinking about the minimal storage for it
 	//Minimal bits: 324 (4 * 81) (4bits required to store 0-9 in an array)
@@ -386,6 +335,11 @@ public static long Problem96()
 					}
 				}
 				
+				//Problem96_OutputGrid(grid, possibilities).Dump();
+				
+				//Find any single possiblities
+				while (Problem96_FindNakedSingles(grid, possibilities) > 0)
+				{ }
 				//Problem96_OutputGrid(grid, possibilities).Dump();
 				
 				//Now start solving
@@ -497,8 +451,48 @@ public static string Problem96_OutputGrid(int[] grid, BitArray possibilities)
 	}
 	return sb.ToString();
 }
+public static int Problem96_FindNakedSingles(int[] grid, BitArray possibilities)
+{
+	int count = 0;
+	for (int i = 0; i < 9; ++i)
+	{
+		for (int j = 0; j < 9; ++j)
+		{
+			int cell = 9 * i + j;
+			
+			if (grid[cell] == 0)
+			{
+				List<int> list = GetPossibles(possibilities, cell);
+				if (list.Count == 1)
+				{
+					grid[cell] = list[0];
+					MarkBitArray(possibilities, cell, list[0], false);
+					++count;
+				}
+			}
+		}
+	}
+	return count;
+}
+//public static int Problem96_FindHiddenSingles(int[] grid, BitArray possibilities)
+//{
+//	//Where there is nowhere else in a row/col/grid that a number can go
+//	
+//	//Having the BitArray being a Dictionary<int, BitArray> would be much better for this operation
+//	//Or a method that gets a bool[] for any given cell from BitArray maybe...
+//	//Or ints, or method that would get ints from BitArray
+//	
+//	//Example with three:
+//	// a:011, b:101, c:101
+//	// if (a & b.Not() & c.Not() > 0)
+//	
+//}
 public static bool Problem96_recurse(int[] grid, BitArray possibles, int lastCellPlusOne)
 {
+	//TODO: idea from forum, instead of just finding the first 0 cell, find ones with minimum amount of possibilities
+	//		This strategy would make FindSinglePossiblities redundant
+	//With current way... could have a CheckLine method, call that anytime the line changes
+	
 	int jStart = lastCellPlusOne % 9;
 	for (int i = lastCellPlusOne / 9; i < 9; ++i)
 	{
@@ -616,40 +610,40 @@ public static bool Problem96_sudokuCheck(int[] grid)
 	}
 	return true;
 }
-public static bool Problem96_sudokuCheck(int[] grid, int uptoCell)
-{
-	//If under 9, can't check anything, so just say its alright
-	if (uptoCell < 8) return true;
-	//If over 3 on a row, just return true, assume the previous rows have been checked already
-	if (uptoCell % 9 > 3) return true;
-	
-	for (int i = 0; i < 9; ++i)
-	{
-		int hLineCheck = SudokuTotal;
-//		int vLineCheck = SudokuTotal;
-//		int gridCheck = SudokuTotal;
+//public static bool Problem96_sudokuCheck(int[] grid, int uptoCell)
+//{
+//	//If under 9, can't check anything, so just say its alright
+//	if (uptoCell < 8) return true;
+//	//If over 3 on a row, just return true, assume the previous rows have been checked already
+//	if (uptoCell % 9 > 3) return true;
+//	
+//	for (int i = 0; i < 9; ++i)
+//	{
+//		int hLineCheck = SudokuTotal;
+////		int vLineCheck = SudokuTotal;
+////		int gridCheck = SudokuTotal;
+////		
+////		//hLine will simply be the if (cell > uptoCell) check
+////		bool vLineValid = true;
+////		bool gridValid = true;
 //		
-//		//hLine will simply be the if (cell > uptoCell) check
-//		bool vLineValid = true;
-//		bool gridValid = true;
-		
-		for (int j = 0; j < 9; ++j)
-		{
-			int cell = i*9+j;
-			if (cell > uptoCell) return true;
-			
-			hLineCheck -= grid[9*i+j];
-//			vLineCheck -= grid[9*j+i];
-//			if (9*j+i > uptoCell) vLineValid = false;
-//			gridCheck -= grid[9*((i/3)*3 + j/3) + ((i%3)*3 + j%3)];
-//			if (9*((i/3)*3 + j/3) + ((i%3)*3 + j%3) > uptoCell) gridValid = false;
-		}
-		if (hLineCheck != 0) return false;
-//		if (vLineCheck != 0 && vLineValid) return false;
-//		if (gridCheck != 0 && gridValid) return false;
-	}
-	return true;
-}
+//		for (int j = 0; j < 9; ++j)
+//		{
+//			int cell = i*9+j;
+//			if (cell > uptoCell) return true;
+//			
+//			hLineCheck -= grid[9*i+j];
+////			vLineCheck -= grid[9*j+i];
+////			if (9*j+i > uptoCell) vLineValid = false;
+////			gridCheck -= grid[9*((i/3)*3 + j/3) + ((i%3)*3 + j%3)];
+////			if (9*((i/3)*3 + j/3) + ((i%3)*3 + j%3) > uptoCell) gridValid = false;
+//		}
+//		if (hLineCheck != 0) return false;
+////		if (vLineCheck != 0 && vLineValid) return false;
+////		if (gridCheck != 0 && gridValid) return false;
+//	}
+//	return true;
+//}
 public static long Problem79()
 {
 	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem79_keylog.txt");

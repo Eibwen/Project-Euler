@@ -279,9 +279,11 @@ public static long Problem96()
 	//		1 minute for the 11 in ProjectEuler_Problem96_sudoku17sOnForum.txt
 	//  laptop: 2 seconds for the 50 problem puzzles
 	//			1.3 seconds with FindNakedSingles
+	//			0.15 seconds with Problem96_FindCell
 	//		4:20 minutes on ProjectEuler_Problem96_sudoku17sOnForum.txt
 	//		4:55 with Problem96_sudokuCheck(grid, cell) on those
 	//		3:50 with FindNakedSingles
+	//		1:30 with Problem96_FindCell (1:20 for just the last one...)
 	
 	
 	//Thinking about the minimal storage for it
@@ -338,12 +340,12 @@ public static long Problem96()
 				//Problem96_OutputGrid(grid, possibilities).Dump();
 				
 				//Find any single possiblities
-				while (Problem96_FindNakedSingles(grid, possibilities) > 0)
-				{ }
+//				while (Problem96_FindNakedSingles(grid, possibilities) > 0)
+//				{ }
 				//Problem96_OutputGrid(grid, possibilities).Dump();
 				
 				//Now start solving
-				if (!Problem96_recurse(grid, possibilities, 0))
+				if (!Problem96_recurse(grid, possibilities))
 				{
 					"".Dump("FAILURE line: " + l);
 				}
@@ -451,29 +453,29 @@ public static string Problem96_OutputGrid(int[] grid, BitArray possibilities)
 	}
 	return sb.ToString();
 }
-public static int Problem96_FindNakedSingles(int[] grid, BitArray possibilities)
-{
-	int count = 0;
-	for (int i = 0; i < 9; ++i)
-	{
-		for (int j = 0; j < 9; ++j)
-		{
-			int cell = 9 * i + j;
-			
-			if (grid[cell] == 0)
-			{
-				List<int> list = GetPossibles(possibilities, cell);
-				if (list.Count == 1)
-				{
-					grid[cell] = list[0];
-					MarkBitArray(possibilities, cell, list[0], false);
-					++count;
-				}
-			}
-		}
-	}
-	return count;
-}
+//public static int Problem96_FindNakedSingles(int[] grid, BitArray possibilities)
+//{
+//	int count = 0;
+//	for (int i = 0; i < 9; ++i)
+//	{
+//		for (int j = 0; j < 9; ++j)
+//		{
+//			int cell = 9 * i + j;
+//			
+//			if (grid[cell] == 0)
+//			{
+//				List<int> list = GetPossibles(possibilities, cell);
+//				if (list.Count == 1)
+//				{
+//					grid[cell] = list[0];
+//					MarkBitArray(possibilities, cell, list[0], false);
+//					++count;
+//				}
+//			}
+//		}
+//	}
+//	return count;
+//}
 //public static int Problem96_FindHiddenSingles(int[] grid, BitArray possibilities)
 //{
 //	//Where there is nowhere else in a row/col/grid that a number can go
@@ -487,67 +489,86 @@ public static int Problem96_FindNakedSingles(int[] grid, BitArray possibilities)
 //	// if (a & b.Not() & c.Not() > 0)
 //	
 //}
-public static bool Problem96_recurse(int[] grid, BitArray possibles, int lastCellPlusOne)
+public static bool Problem96_recurse(int[] grid, BitArray possibles)
 {
 	//TODO: idea from forum, instead of just finding the first 0 cell, find ones with minimum amount of possibilities
 	//		This strategy would make FindSinglePossiblities redundant
 	//With current way... could have a CheckLine method, call that anytime the line changes
 	
-	int jStart = lastCellPlusOne % 9;
-	for (int i = lastCellPlusOne / 9; i < 9; ++i)
+	List<int> possibleValues = null;
+	int cell = Problem96_FindCell(grid, possibles, out possibleValues);
+	
+	//Find first cell that is zero
+	if (cell >= 0)
 	{
-		for (int j = jStart; j < 9; ++j)
+		Util.Progress = cell *100/81;
+		
+		//possibleValues.Dump(cell.ToString());
+		if (possibleValues.Count == 0)
 		{
-			int cell = 9 * i + j;
-			//Find first cell that is zero
-			if (grid[cell] == 0)
-			{
-				Util.Progress = cell *100/81;
-				
-				List<int> possibleValues = GetPossibles(possibles, cell);
-				//possibleValues.Dump(cell.ToString());
-				if (possibleValues.Count == 0)
-				{
-					//INVALID STATE
-					//"InvalidState".Dump();
-					return false;
-				}
-				
-				foreach (int value in possibleValues)
-				{
-					grid[cell] = value;
-					MarkBitArray(possibles, cell, value, false);
-					//("Trying: " + i + "" + j + " val: " + value).Dump();
-					
-//					string test = Problem96_OutputGrid(grid, null);
-//					if (test.StartsWith("483921657"))
-//					{
-//						test.Dump();
-//						Problem96_sudokuCheck(grid, cell).Dump("Check to cell: " + cell);
-//					}
-					
-					if (Problem96_recurse(grid, possibles, cell+1))
+			//INVALID STATE
+			//"InvalidState".Dump();
+			return false;
+		}
+		
+		foreach (int value in possibleValues)
+		{
+			grid[cell] = value;
+			MarkBitArray(possibles, cell, value, false);
+			//("Trying: " + i + "" + j + " val: " + value).Dump();
+			
+			if (Problem96_recurse(grid, possibles))
 //					if (Problem96_sudokuCheck(grid, cell)
 //						&& Problem96_recurse(grid, possibles, cell+1))
-					{
-						//"WIN!!!!!!!!!!!!!!!!!".Dump();
-						return true;
-					}
-					//Unmark cell and bit array
-					grid[cell] = 0;
-					MarkBitArray(possibles, cell, value, true);
-					//Continue loop
-				}
-				
-				//"Checking".Dump();
-				return Problem96_sudokuCheck(grid);
+			{
+				//"WIN!!!!!!!!!!!!!!!!!".Dump();
+				return true;
 			}
+			//Unmark cell and bit array
+			grid[cell] = 0;
+			MarkBitArray(possibles, cell, value, true);
+			//Continue loop
 		}
-		jStart = 0;
+		
+//		//"Checking".Dump();
+//		return Problem96_sudokuCheck(grid);
 	}
+	
 	//Found no zero cells, so just check it
 	return Problem96_sudokuCheck(grid);
 	//throw new ApplicationException("Found no zero cells?: " + lastCellPlusOne);
+}
+public static int Problem96_FindCell(int[] grid, BitArray possibles, out List<int> bestPossibleValues)
+{
+	bestPossibleValues = null;
+	int bestCount = 99;
+	int bestCell = -1;
+	
+	for (int i = 0; i < 9; ++i)
+	{
+		for (int j = 0; j < 9; ++j)
+		{
+			int cell = 9 * i + j;
+			
+			if (grid[cell] == 0)
+			{
+				List<int> list = GetPossibles(possibles, cell);
+				if (list.Count == 1)
+				{
+					bestPossibleValues = list;
+					return cell;
+				}
+				else if (list.Count < bestCount)
+				{
+					bestPossibleValues = list;
+					bestCount = list.Count;
+					bestCell = cell;
+				}
+			}
+		}
+	}
+	
+	return bestCell;
 }
 public static void MarkBitArray(BitArray possibilities, int cell, int value, bool state)
 {
@@ -610,40 +631,65 @@ public static bool Problem96_sudokuCheck(int[] grid)
 	}
 	return true;
 }
-//public static bool Problem96_sudokuCheck(int[] grid, int uptoCell)
-//{
-//	//If under 9, can't check anything, so just say its alright
-//	if (uptoCell < 8) return true;
-//	//If over 3 on a row, just return true, assume the previous rows have been checked already
-//	if (uptoCell % 9 > 3) return true;
-//	
-//	for (int i = 0; i < 9; ++i)
-//	{
-//		int hLineCheck = SudokuTotal;
-////		int vLineCheck = SudokuTotal;
-////		int gridCheck = SudokuTotal;
-////		
-////		//hLine will simply be the if (cell > uptoCell) check
-////		bool vLineValid = true;
-////		bool gridValid = true;
-//		
-//		for (int j = 0; j < 9; ++j)
-//		{
-//			int cell = i*9+j;
-//			if (cell > uptoCell) return true;
-//			
-//			hLineCheck -= grid[9*i+j];
-////			vLineCheck -= grid[9*j+i];
-////			if (9*j+i > uptoCell) vLineValid = false;
-////			gridCheck -= grid[9*((i/3)*3 + j/3) + ((i%3)*3 + j%3)];
-////			if (9*((i/3)*3 + j/3) + ((i%3)*3 + j%3) > uptoCell) gridValid = false;
-//		}
-//		if (hLineCheck != 0) return false;
-////		if (vLineCheck != 0 && vLineValid) return false;
-////		if (gridCheck != 0 && gridValid) return false;
-//	}
-//	return true;
-//}
+public static bool Problem96_sudokuCheckPossible(int[] grid)
+{
+	//TODO: This too would be better with the flag data being in seperate objects...
+	
+	//FAIL: using this on every recursion made 1:30 into 3minutes
+	
+	//Check each row
+	for (int i = 0; i < 9; ++i)
+	{
+		int check = SudokuTotal;
+		for (int j = 0; j < 9; ++j)
+		{
+			int value = grid[9*i+j];
+			if (value == 0)
+			{
+				//Means this section is not complete
+				check = 0;
+				break;
+			}
+			check -= value;
+		}
+		if (check != 0) return false;
+	}
+	//Check each column
+	for (int i = 0; i < 9; ++i)
+	{
+		int check = SudokuTotal;
+		for (int j = 0; j < 9; ++j)
+		{
+			int value = grid[9*j+i];
+			if (value == 0)
+			{
+				//Means this section is not complete
+				check = 0;
+				break;
+			}
+			check -= value;
+		}
+		if (check != 0) return false;
+	}
+	//Check each grid
+	for (int i = 0; i < 9; ++i)
+	{
+		int check = SudokuTotal;
+		for (int j = 0; j < 9; ++j)
+		{
+			int value = grid[9*((i/3)*3 + j/3) + ((i%3)*3 + j%3)];
+			if (value == 0)
+			{
+				//Means this section is not complete
+				check = 0;
+				break;
+			}
+			check -= value;
+		}
+		if (check != 0) return false;
+	}
+	return true;
+}
 public static long Problem79()
 {
 	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem79_keylog.txt");

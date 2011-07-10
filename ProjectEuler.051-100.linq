@@ -4,12 +4,162 @@
 
 void Main()
 {
-	Problem98().Dump("Result");
+	Problem63().Dump("Result");
 }
 
 // Define other methods and classes here
+public static long Problem73()
+{
+	int MAX = 12000;
+//	int START = MAX / 3;
+//	int END = MAX / 2;
+	
+	double LastStart = 1;
+	//Go through each denominator
+	for (double n = 3; n <= MAX; ++n)
+	{
+		
+	}
+	
+	return -73;
+}
+public static long Problem63()
+{
+	long[] LowLimit =  new long[] { 0, 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000 };
+	long[] HighLimit = new long[] { 0, 9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999, 9999999999 };
+	long count = 0;
+	for (long i = 1; i <= 9; ++i)
+	{
+		long sqr = i;
+		for (int p = 2; p <= 10; ++p)
+		{
+			sqr *= i;
+			if (sqr >= LowLimit[p] && sqr <= HighLimit[p])
+			{
+				(i + "^" + p + ": " + sqr).Dump();
+				++count;
+			}
+			if (sqr > HighLimit[p])
+			{
+				continue;
+			}
+		}
+	}
+	return count;
+}
+public static long Problem100()
+{
+	//Good amounts: 15+6=21
+	//				85+35=120
+	((double)6/15).Dump();
+	((double)35/85).Dump();
+	
+	double TARGET = 1e12;
+	double fff = (TARGET*TARGET-TARGET)/2;
+	TARGET.Dump();
+	Math.Sqrt(fff).Dump();
+	
+	return -100;
+}
+public static long Problem99()
+{
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Question99_base_exp.txt");
+	
+	string[] numbers = File.ReadAllLines(PATH);
+	
+	//Hypothesis, if divide the bases, if the exponent is greater than that result
+	Problem99_Exponent bestNum = new Problem99_Exponent(2, 2);
+	int bestLineNum = 0;
+	
+//	var FullList = new List<Helpers.tuple_double<int, Problem99_Exponent>>();
+	
+	for (int i = 0; i < numbers.Length; ++i)
+	{
+		Problem99_Exponent currentNumber = new Problem99_Exponent(numbers[i]);
+		
+//		FullList.Add(new Helpers.tuple_double<int, Problem99_Exponent>(i+1, currentNumber));
+		
+		if (currentNumber.CompareTo(bestNum) > 0)
+		//if (currentNumber.Exponent > bestNum.Exponent)
+		{
+			//("Line: " + i + " : "+ numbers[i]).Dump();
+			bestNum = currentNumber;
+			bestLineNum = i+1;
+		}
+		//bestLineNum.Dump();
+	}
+	
+//	var workingList = FullList.Select(f => new { f.objA, f.objB.Number, f.objB.Exponent,
+//						Result = f.objB.Exponent * Math.Log(f.objB.Number, 10) })
+//						.OrderByDescending(a => a.Result);
+//						//.ThenByDescending(a => a.Number);
+//	workingList.Dump();
+	
+//	Problem99_Exponent a = new Problem99_Exponent(2, 11);
+//	Problem99_Exponent b = new Problem99_Exponent(3, 7);
+	
+//	7d.CompareTo(7+Math.Pow(1.5, 4)).Dump();
+//	11d.CompareTo(11-Math.Pow(0.66, 4)).Dump();
+	
+//	if (a.CompareTo(b) < 0) "a is smaller".Dump();
+//	if (a.CompareTo(b) > 0) "b is smaller".Dump();
+	
+	return bestLineNum;
+}
+public class Problem99_Exponent : IComparable<Problem99_Exponent>
+{
+	public Problem99_Exponent(string line)
+	{
+		string[] splitLine = line.Split(',');
+		
+		Number = long.Parse(splitLine[0]);
+		Exponent = long.Parse(splitLine[1]);
+	}
+	public Problem99_Exponent(long num, long exp)
+	{
+		Number = num;
+		Exponent = exp;
+	}
+	public long Number { get; set; }
+	public long Exponent { get; set; }
+	
+	public int CompareTo(Problem99_Exponent other)
+	{
+		if (this.Number == other.Number && this.Exponent == other.Exponent) return 0;
+		
+		if (this.Number == other.Number)
+		{
+			return this.Exponent.CompareTo(other.Exponent);
+		}
+		else
+		{
+			//return (this.Exponent - (this.Number / other.Number)).CompareTo(other.Exponent);
+////			double div = (double)this.Number / other.Number;
+////			
+////			int FIRST = ((double)this.Exponent).CompareTo(this.Exponent - Math.Pow(div, this.Exponent - other.Exponent));
+////			double divB = (double)other.Number / this.Number;
+////			int SECON = ((double)other.Exponent).CompareTo(other.Exponent - Math.Pow(divB, other.Exponent - this.Exponent));
+////			
+////			if (FIRST != SECON) "ERROR HERE".Dump();
+////			
+////			return FIRST;
+			
+			int newBase = 10;
+			
+			return (this.Exponent * Math.Log(this.Number, newBase)).CompareTo(other.Exponent * Math.Log(other.Number, newBase));
+			
+//			Problem99_Exponent a = new Problem99_Exponent(2, 11);
+//			Problem99_Exponent b = new Problem99_Exponent(3, 7);
+//			
+//			7d.CompareTo(7+Math.Pow(1.5, 4)).Dump();
+//			11d.CompareTo(11-Math.Pow(0.66, 4)).Dump();
+		}
+	}
+}
 public static long Problem98()
 {
+	//Well now i've found that it could be just an array of char[26] and int[10] to do the various mappings
+	
 	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Question98_words.txt");
 	
 //	int LONGEST_WORD = 14;
@@ -92,7 +242,7 @@ public static long Problem98()
 			}
 			++lastUsedSquare;
 		}
-		SQUARES.Count.Dump("Found Squares for Length: " + lengthGroup.Key);
+//		SQUARES.Count.Dump("Found Squares for Length: " + lengthGroup.Key);
 		
 		//Compare them all brute force style... somehow
 		var anagramGroup = lengthGroup.GroupBy(g => g.checkSum);
@@ -142,9 +292,9 @@ public static long Problem98()
 	}
 	
 	//Currently finding 496, many false it seems
-	fullAnagramSquaresList.OrderByDescending(a => a).Dump();
+//	fullAnagramSquaresList.OrderByDescending(a => a).Dump();
 	
-	return -9;
+	return fullAnagramSquaresList.Max(f => f);
 }
 ///This will return numbers that are squares AND anagrams, given the correct input
 public static List<long> Problem98_ConvertPlaces(
@@ -223,7 +373,7 @@ public static List<long> Problem98_ConvertPlaces(
 				long thisSquare = long.Parse(sqr);
 				if (outputSquare != thisSquare) outputList.Add(thisSquare);
 				
-				Util.HorizontalRun(false, sqr, ":", sb.ToString(), " as ", word, ":", fromWord).Dump();
+//				Util.HorizontalRun(false, sqr, ":", sb.ToString(), " as ", word, ":", fromWord).Dump();
 				
 //				outputSquare.Dump();
 //				long.Parse(sqr).Dump();

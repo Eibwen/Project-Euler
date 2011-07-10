@@ -4,10 +4,154 @@
 
 void Main()
 {
-	Problem63().Dump("Result");
+	Problem68().Dump("Result");
 }
 
 // Define other methods and classes here
+public static long Problem68()
+{
+	//Problem68_xGon xGon = new Problem68_xGon(5);
+	int[] testGon = new int[] { 6, 2, 5, 1, 4, 3 };
+	Problem68_xGon xGon = new Problem68_xGon(testGon);
+	
+	xGon.IsValid().Dump();
+	
+	return xGon.GetSolutionLong();
+}
+public class Problem68_xGon
+{
+	int size = 0;
+	int[] array;
+	
+	public Problem68_xGon(int gonCount)
+	{
+		size = gonCount;
+		array = new int[gonCount*2];
+	}
+	public Problem68_xGon(int[] Data)
+	{
+		size = Data.Length/2;
+		array = Data;
+	}
+	public bool IsValid()
+	{
+		//Not sure if this is a logical restriciton or what
+		if (size*2 > 99) throw new ApplicationException("Max supported node count is 99");
+		
+		int testSum = -1;
+		for (int i = 0; i < size; ++i)
+		{
+			int curSum = 0;
+			for (int j = 0; j < 3; ++j)
+			{
+				//skip over one for the 3rd item
+				if (j == 2) ++j;
+				curSum += array[(2*i+j) % 2*size];
+			}
+			//Set the testSum to the first one
+			if (testSum == -1) testSum = curSum;
+			if (testSum != curSum) return false;
+		}
+		return true;
+	}
+	
+	
+	public bool GetNext()
+	{
+		stopVisit = false;
+		visit(0);
+	}
+	int[] Value = null;
+	int level = -1;
+	bool stopVisit = false;
+	void visit(int k)
+	{
+		throw new NotImplementedException("ACTUALlY I DON'T THINK THIS WILL WORK, Since it looks like it would find all the final digits in the same loop");
+		if (stopVisit) return;
+		
+		level = level+1;
+		Value[k] = level;    // = is assignment
+		
+		if (level == size)  // == is comparison
+			AddItem();     // to the list box
+		else
+			for (int i = 0; i < size; i++)
+				if (Value[i] == 0)
+					visit(i);
+		
+		level = level-1;
+		Value[k] = 0;
+	}
+	void AddItem()
+	{
+		array = Value;
+		stopVisit = true;
+	}
+	
+	int LowestExternalNode()
+	{
+		//Find lowest external node
+		int lowestValue = 99;
+		int offsetIndex = 0;
+		for (int i = 0; i < size; ++i)
+		{
+			int index = 2*i;
+			int val = array[index];
+			if (val < lowestValue)
+			{
+				lowestValue = val;
+				offsetIndex = index;
+			}
+		}
+		return offsetIndex;
+	}
+	public long GetSolutionLong()
+	{
+		int largestLong = "1234567891011121314".Length;
+		if (size*2 > largestLong) throw new ApplicationException("Max supported solution to long exceeded");
+		//Well having the lowest external node be 9 is nearly impossible i think, so it should be safe at this length
+		
+		int offsetIndex = LowestExternalNode();
+		
+		long outputSolution = 0;
+		for (int i = 0; i < size; ++i)
+		{
+			for (int j = 0; j < 3; ++j)
+			{
+				//skip over one for the 3rd item
+				if (j == 2) ++j;
+				int index = (offsetIndex + 2*i+j) % (2*size);
+				
+				int value = array[index];
+				
+				outputSolution *= 10;
+				if (value > 9) outputSolution *= 10;
+				outputSolution += value;
+			}
+		}
+		return outputSolution;
+	}
+	public string GetSolutionString()
+	{
+		int offsetIndex = LowestExternalNode();
+		
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < size; ++i)
+		{
+			for (int j = 0; j < 3; ++j)
+			{
+				//skip over one for the 3rd item
+				if (j == 2) ++j;
+				int index = (offsetIndex + 2*i+j) % (2*size);
+				
+				int value = array[index];
+				
+				sb.Append(value.ToString());
+			}
+		}
+		return sb.ToString();
+	}
+}
 public static long Problem73()  //71 and 72 is CLOSELY related to this
 {
 	int MAX = 12000;

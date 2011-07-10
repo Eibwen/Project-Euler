@@ -8,7 +8,7 @@ void Main()
 }
 
 // Define other methods and classes here
-public static long Problem73()
+public static long Problem73()  //71 and 72 is CLOSELY related to this
 {
 	int MAX = 12000;
 //	int START = MAX / 3;
@@ -25,18 +25,62 @@ public static long Problem73()
 }
 public static long Problem63()
 {
-	long[] LowLimit =  new long[] { 0, 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000 };
-	long[] HighLimit = new long[] { 0, 9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999, 9999999999 };
+	int MAX_POWER = 30;
+	
 	long count = 0;
-	for (long i = 1; i <= 9; ++i)
+	for (int i = 1; i <= 10; ++i)
 	{
-		long sqr = i;
-		for (int p = 2; p <= 10; ++p)
+		InfiniteInt sqr = new InfiniteInt(1);
+		for (int p = 1; p <= MAX_POWER; ++p)
+		{
+			sqr.Multiply(i);
+			//sqr.Length().Dump();
+			if (sqr.Length() == p)
+			{
+//				(i + "^" + p + ": " + sqr
+//					//+ " -- " + LowLimit[p] + " > " + HighLimit[p]
+//					).Dump();
+				++count;
+			}
+			if (sqr.Length() > p)
+			{
+				continue;
+			}
+		}
+	}
+	return count;
+}
+public static long Problem63_long()
+{
+	int MAX_POWER = 19;
+//	long[] LowLimit =  new long[] { 0, 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000 };
+//	long[] HighLimit = new long[] { 0, 9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999, 9999999999 };
+	
+	List<long> LowLimit = new List<long>();
+	List<long> HighLimit = new List<long>();
+	long low = 0;
+	long high = 0;
+	for (int i = 0; i <= MAX_POWER; ++i)
+	{
+		LowLimit.Add(low);
+		HighLimit.Add(high);
+		low *= 10;
+		if (low == 0) ++low;
+		high = high * 10 + 9;
+	}
+	
+	long count = 0;
+	for (long i = 1; i <= 10; ++i)
+	{
+		long sqr = 1;
+		for (int p = 1; p <= MAX_POWER; ++p)
 		{
 			sqr *= i;
 			if (sqr >= LowLimit[p] && sqr <= HighLimit[p])
 			{
-				(i + "^" + p + ": " + sqr).Dump();
+				(i + "^" + p + ": " + sqr
+					//+ " -- " + LowLimit[p] + " > " + HighLimit[p]
+					).Dump();
 				++count;
 			}
 			if (sqr > HighLimit[p])
@@ -1703,3 +1747,281 @@ public static class Helpers
 		}
 	}
 }
+
+#region InfiniteInt
+//TODO if wanted to be more memeory efficent:
+//  do all maths in (long)
+//  use int.MaxValue as the Modular... but then have to convert everything when outputtint to string
+public class InfiniteInt
+{
+	const int TRUNC_SIZE = 100000;
+	const int TRUNC_LENGTH = 5;
+//	const int TRUNC_SIZE = 100000;
+//	const int TRUNC_LENGTH = 5;
+	List<int> array = new List<int>();
+	
+	public InfiniteInt(int start)
+	{
+		array.Add(start);
+	}
+	
+	public void Add(InfiniteInt num)
+	{
+		//TODO could check if num.array has more items, if so copy that array and add this.array into that instead
+		int remainder = 0;
+		for (int j = 0; j < num.array.Count || remainder > 0; ++j)
+		{
+			//Need to add new item
+			if (j == array.Count) array.Add(0);
+			//Add into the current item
+			array[j] += num.array[j] + remainder;
+			remainder = 0;
+			//Check for overflow
+			if (array[j] >= TRUNC_SIZE)
+			{
+				remainder = array[j] / TRUNC_SIZE;
+				array[j] %= TRUNC_SIZE;
+			}
+		}
+	}
+	[Obsolete("Untested", false)]
+	public void Add(int num)
+	{
+		for (int j = 0; j < array.Count && num > 0; ++j)
+		{
+			array[j] += num;
+			if (array[j] >= TRUNC_SIZE)
+			{
+				num = array[j] / TRUNC_SIZE;
+				array[j] %= TRUNC_SIZE;
+			}
+			else
+			{
+				return;
+			}
+		}
+//		int pos = array.Count-1;
+//		if (array[pos] + num >= TRUNC_SIZE) array.Add(0);
+//		
+//		for (int j = pos; j >= 0; --j)
+//		{
+//			array[j] += num;
+//			if (array[j] >= TRUNC_SIZE)
+//			{
+//				array[j+1] += array[j] / TRUNC_SIZE;
+//				array[j] %= TRUNC_SIZE;
+//			}
+//		}
+	}
+	public void Multiply(int factor)
+	{
+		if (factor < 0) Console.Error.WriteLine("InfiniteInt.Multiply is not not tested for negative numbers");
+		
+		int pos = array.Count-1;
+		if (array[pos] * factor >= TRUNC_SIZE)
+		{
+			//TODO idk whats the error: if (array.Count == int.MaxValue) throw new ArgumentOutOfRangeException();
+			array.Add(0);
+		}
+		
+		//Multiply each array element by factor
+		for (int j = pos; j >= 0; --j)
+		{
+			array[j] *= factor;
+			if (array[j] >= TRUNC_SIZE)
+			{
+				array[j+1] += array[j] / TRUNC_SIZE;
+				array[j] %= TRUNC_SIZE;
+				
+				//Keep pushing the overflow up one
+				for (int o = 1; array[j+o] >= TRUNC_SIZE; ++o)
+				{
+					if (j+o+1 == array.Count) array.Add(0);
+					//Util.HorizontalRun(true, j+o+1, "==", array.Count).Dump();
+					array[j+o+1] += array[j+o] / TRUNC_SIZE;
+					array[j+o] %= TRUNC_SIZE;
+					//Util.HorizontalRun(false, j+o+1, ": ", array[j+o+1]).Dump();
+				}
+			}
+		}
+
+////THIS IS FAIL:
+//		//Multiply each array element by factor
+//		for (int j = 0; j < array.Count; ++j)
+//		{
+//			array[j] *= factor;
+//			
+//			//Keep pushing the overflow up one
+//			for (int o = 0; array[j+o] > TRUNC_SIZE; ++o)
+//			{
+//				if (j+o+1 == array.Count) array.Add(0);
+//				//Util.HorizontalRun(true, j+o+1, "==", array.Count).Dump();
+//				//FUCK going forward like this, array[j+o+1] has not yet been multiplied, but i'm trying to add something that has been
+//				array[j+o+1] += array[j+o] / TRUNC_SIZE;
+//				array[j+o] %= TRUNC_SIZE;
+//				Util.HorizontalRun(false, j+o+1, ": ", array[j+o+1]).Dump();
+//			}
+//		}
+	}
+	public void Divide(int factor)
+	{
+		if (factor < 0) Console.Error.WriteLine("InfiniteInt.Divide is not not tested for negative numbers");
+		
+		int pos = array.Count-1;
+		
+		//Divide each array element by factor
+		for (int j = pos; j >= 0; --j)
+		{
+			int remainder = array[j] % factor;
+			array[j] /= factor;
+			if (remainder > 0 && j == 0)
+			{
+				throw new NotSupportedException("DIVIDE RESULTED IN A DECIMAL");
+			}
+			if (remainder > 0)
+			{
+				array[j-1] += remainder * TRUNC_SIZE;
+				
+//				//Keep pushing the overflow up one
+//				for (int o = 1; array[j+o] >= TRUNC_SIZE; ++o)
+//				{
+//					if (j+o+1 == array.Count) array.Add(0);
+//					//Util.HorizontalRun(true, j+o+1, "==", array.Count).Dump();
+//					array[j+o+1] += array[j+o] / TRUNC_SIZE;
+//					array[j+o] %= TRUNC_SIZE;
+//					//Util.HorizontalRun(false, j+o+1, ": ", array[j+o+1]).Dump();
+//				}
+			}
+		}
+	}
+	[Obsolete("Not tested", true)]
+	public void MultiplyByPow(int baseNum, long exponent)
+	{
+		for (int i = 0; i < exponent; ++i)
+		{
+			this.Multiply(baseNum);
+		}
+	}
+	public long Length()
+	{
+//		//Never allowed to have zero
+//		long filled = (array.Count-2) * TRUNC_LENGTH;
+//		if (array.Count == 1) filled = 0;
+//		if (array.Count == 2) filled = TRUNC_LENGTH;
+//		
+//		int tmp = array[array.Count-1];
+//		while (tmp > 0)
+//		{
+//			tmp /= 10;
+//			++filled;
+//		}
+//		return filled;
+		long filled = 0;
+		int i = array.Count-1;
+		for (; i >= 0; --i)
+		{
+			//Find first non-zero
+			if (array[i] > 0)
+			{
+				//Count digits in this number
+				int tmp = array[i];
+				while (tmp > 0)
+				{
+					tmp /= 10;
+					++filled;
+				}
+				break;
+			}
+		}
+		//Calculate the length of the rest of the numbers
+		if (i > 0)
+		{
+			filled += i * TRUNC_LENGTH;
+		}
+		return filled;
+	}
+	public long SumDigits()
+	{
+		//Sum them up
+		int sum = 0;
+		for (int i = 0; i < array.Count; ++i)
+		{
+			int t = array[i];
+			while (t > 0)
+			{
+				sum += t % 10;
+				t /= 10;
+			}
+		}
+		return sum;
+	}
+	public override string ToString()
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		string format = "{0:d" + TRUNC_LENGTH + "}";
+		
+		//Add the first number without padding
+		int pos = array.Count-1;
+		//Skip any leading 0's
+		while (array[pos] == 0) --pos;
+		sb.Append(array[pos]);
+		//Add the rest of the numbers, padding to TRUNC_LENGTH
+		for (int i = pos-1; i >= 0 ; --i)
+		{
+			long l = array[i];
+			sb.AppendFormat(format, l);
+		}
+		return sb.ToString();
+	}
+	public string ToString(int startIndex, int length)
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		string format = "{0:d" + TRUNC_LENGTH + "}";
+		
+		//Add the first number without padding
+		int pos = array.Count-1;
+		//Skip any leading 0's
+		while (array[pos] == 0) --pos;
+		sb.Append(array[pos]);
+		//Add the rest of the numbers, padding to TRUNC_LENGTH
+		for (int i = pos-1; i >= 0 ; --i)
+		{
+			long l = array[i];
+			sb.AppendFormat(format, l);
+		}
+		//Remove anything before the startIndex
+		sb.Remove(0, sb.Length - (startIndex + length));
+		//Trim length to specified
+		sb.Length = length;
+		return sb.ToString();
+	}
+}
+public static void InfiniteIntTest()
+{
+	InfiniteInt iint = new InfiniteInt(1);
+	iint.Multiply(999);
+	iint.Multiply(999);
+	iint.Multiply(999);
+	iint.Multiply(999);
+	iint.Multiply(999);
+	iint.Multiply(999);
+	//"994014980014994001" //InfiniteInt 07/05/2011
+	//"994014980014994001" //Windows calculator
+	Debug.Assert(iint.ToString().Dump() == "994014980014994001", "MULITIPLY FAIL");
+	Debug.Assert(iint.Length().Dump() == "994014980014994001".Length, "LENGTH FAIL");
+	iint.Divide(999);
+	Debug.Assert(iint.ToString().Dump() == "995009990004999", "DIVIDE FAIL");
+	Debug.Assert(iint.Length().Dump() == "995009990004999".Length, "LENGTH FAIL");
+	iint.Divide(9);
+	Debug.Assert(iint.ToString().Dump() == "110556665556111", "DIVIDE2 FAIL");
+	Debug.Assert(iint.Length().Dump() == "110556665556111".Length, "LENGTH FAIL");
+	iint.Divide(999);
+	iint.Divide(999);
+	Debug.Assert(iint.ToString().Dump() == "110778111", "DIVIDE3 FAIL");
+	Debug.Assert(iint.Length().Dump() == "110778111".Length, "LENGTH FAIL");
+//	iint.Divide(2);
+//	Debug.Assert(iint.ToString().Dump() == "55389055.5", "DIVIDE3 FAIL");
+}
+#endregion InfiniteInt

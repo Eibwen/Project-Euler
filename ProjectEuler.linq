@@ -3635,12 +3635,51 @@ public class InfiniteInt
 			}
 		}
 	}
+	[Obsolete("Not tested", true)]
+	public void MultiplyByPow(int baseNum, long exponent)
+	{
+		for (int i = 0; i < exponent; ++i)
+		{
+			this.Multiply(baseNum);
+		}
+	}
 	public long Length()
 	{
-		long filled = (array.Count-2) * TRUNC_LENGTH;
-		throw new ApplicationException();
-		//THIS IS NOT SUM DIGITS
-		return filled + Helpers.SumDigits(array[array.Count-1]);
+//		//Never allowed to have zero
+//		long filled = (array.Count-2) * TRUNC_LENGTH;
+//		if (array.Count == 1) filled = 0;
+//		if (array.Count == 2) filled = TRUNC_LENGTH;
+//		
+//		int tmp = array[array.Count-1];
+//		while (tmp > 0)
+//		{
+//			tmp /= 10;
+//			++filled;
+//		}
+//		return filled;
+		long filled = 0;
+		int i = array.Count-1;
+		for (; i >= 0; --i)
+		{
+			//Find first non-zero
+			if (array[i] > 0)
+			{
+				//Count digits in this number
+				int tmp = array[i];
+				while (tmp > 0)
+				{
+					tmp /= 10;
+					++filled;
+				}
+				break;
+			}
+		}
+		//Calculate the length of the rest of the numbers
+		if (i > 0)
+		{
+			filled += i * TRUNC_LENGTH;
+		}
+		return filled;
 	}
 	public long SumDigits()
 	{
@@ -3712,13 +3751,17 @@ public static void InfiniteIntTest()
 	//"994014980014994001" //InfiniteInt 07/05/2011
 	//"994014980014994001" //Windows calculator
 	Debug.Assert(iint.ToString().Dump() == "994014980014994001", "MULITIPLY FAIL");
+	Debug.Assert(iint.Length().Dump() == "994014980014994001".Length, "LENGTH FAIL");
 	iint.Divide(999);
 	Debug.Assert(iint.ToString().Dump() == "995009990004999", "DIVIDE FAIL");
+	Debug.Assert(iint.Length().Dump() == "995009990004999".Length, "LENGTH FAIL");
 	iint.Divide(9);
 	Debug.Assert(iint.ToString().Dump() == "110556665556111", "DIVIDE2 FAIL");
+	Debug.Assert(iint.Length().Dump() == "110556665556111".Length, "LENGTH FAIL");
 	iint.Divide(999);
 	iint.Divide(999);
 	Debug.Assert(iint.ToString().Dump() == "110778111", "DIVIDE3 FAIL");
+	Debug.Assert(iint.Length().Dump() == "110778111".Length, "LENGTH FAIL");
 //	iint.Divide(2);
 //	Debug.Assert(iint.ToString().Dump() == "55389055.5", "DIVIDE3 FAIL");
 }

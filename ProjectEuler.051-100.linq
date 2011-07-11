@@ -15,6 +15,9 @@ public static long Problem94()
 	long MAX = 1000000000;
 	//long MAX = 600000;
 	
+	// http://oeis.org/A120893
+	//1, 1, 5, 17, 65, 241, 901, 3361, 12545, 46817, 174725, 652081, 2433601, 9082321, 33895685, 126500417, 472105985
+	
 	long outputSum = 0;
 	long count = 0;
 	

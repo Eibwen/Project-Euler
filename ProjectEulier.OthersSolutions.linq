@@ -5,10 +5,43 @@ void Main()
 	//Problem47.kevingong_20060204().Dump();
 	//Problem91.grimbal_20050218().Dump();
 	//(Problem76.CalcPn(100) -1).Dump();
-	Problem76.hultan_20040830().Dump();
+	//Problem76.hultan_20040830().Dump();
+	Problem77.cyph1e_20050222().Dump();
 }
 
 // Define other methods and classes here
+public static class Problem77
+{
+	static List<int> _primes = null;
+	public static List<int> primes
+	{
+		get
+		{
+			if (_primes == null)
+			{
+				_primes = Helpers.PrimesLessThan(200);
+				_primes.Insert(0, 0);
+			}
+			return _primes;
+		}
+	}
+	public static int cyph1e_20050222()
+	{
+		int i=1;
+		while(part(++i,primes.Count-1) <= 5000);
+		return i;
+	}
+	
+	private static long part(long a, long b)
+	{
+		if(a == 0)
+			return 1;
+		else if(a < 0 || b == 0)
+			return 0;
+		else return (part(a, b-1) +
+		part(a-primes[(int)b], b));
+	}
+}
 public static class Problem76
 {
 	//harpanet_20040827 == 0.001 seconds
@@ -243,5 +276,43 @@ public class Problem38_paddington1_20060125
 		for (int i=0; i<9; i++)
 			if (array[i]!=1) return false;
 		return true;
+	}
+}
+public static class Helpers
+{
+	public static BitArray GetPrimeSieve(int limit)
+	{
+		int sieveBound = (limit-1) / 2; //last index of sieve
+		BitArray sieve = new BitArray(sieveBound);
+		int crosslimit = ((int)Math.Sqrt(limit)-1) / 2;
+		for (int i = 1; i < crosslimit; ++i)
+		{
+			if (!sieve[i]) // 2*i+1 is prime, mark multiples
+			{
+				for (int j = 2*i*(i+1); j < sieveBound; j += 2*i+1)
+				{
+					sieve[j] = true;
+				}
+			}
+		}
+		return sieve;
+	}
+	public static List<int> PrimesLessThan(int limit)
+	{
+		int sieveBound = (limit-1) / 2; //last index of sieve
+		BitArray sieve = GetPrimeSieve(limit);
+		List<int> primes = new List<int>();
+		primes.Add(2);
+		for (int i = 1; i < sieveBound; ++i)
+		{
+			if (!sieve[i]) primes.Add(2*i+1);
+		}
+		return primes;
+//		int sum = 2; //2 is prime
+//		for (int i = 1; i < sieveBound; ++i)
+//		{
+//			if (!sieve[i]) sum += 2*i+1;
+//		}
+//		return sum;
 	}
 }

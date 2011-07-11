@@ -11,22 +11,45 @@ void Main()
 public static long Problem68()
 {
 	//Problem68_xGon xGon = new Problem68_xGon(5);
-	int[] testGon = new int[] { 6, 2, 5, 1, 4, 3 };
-	Problem68_xGon xGon = new Problem68_xGon(testGon);
+//	int[] testGon = new int[] { 6, 2, 5, 1, 4, 3 };
+//	Problem68_xGon xGon = new Problem68_xGon(testGon);
+//	
+//	xGon.IsValid().Dump();
+//	
+//	return xGon.GetSolutionLong();
 	
-	xGon.IsValid().Dump();
+//	int[] testGon = new int[] { 6, 5, 9, 4, 8, 3, 7, 2, 10, 1 };
+//	Problem68_xGon xGon = new Problem68_xGon(testGon);
+//	xGon.IsValid().Dump();
+//	if (xGon.GetSolutionLong() != 6549438327211015) "FAIL".Dump();
+//	return xGon.GetSolutionLong();
 	
-	return xGon.GetSolutionLong();
+	long MAX_VALID = 9999999999999999;
+	Problem68_xGon xGon = new Problem68_xGon(5);
+	
+	long bestSolution = 0;
+	while (xGon.MoveNextValid())
+	{
+		long curSolution = xGon.GetSolutionLong();
+		if (curSolution < MAX_VALID && curSolution > bestSolution)
+		{
+			bestSolution = curSolution;
+			//bestSolution.Dump();
+		}
+	}
+	//bestSolution.ToString().Length.Dump("Length");
+	return bestSolution;
 }
 public class Problem68_xGon
 {
 	int size = 0;
-	int[] array;
+	int[] array = null;
+	
+	public int[] StorageArray { get { return array; } }
 	
 	public Problem68_xGon(int gonCount)
 	{
 		size = gonCount;
-		array = new int[gonCount*2];
 	}
 	public Problem68_xGon(int[] Data)
 	{
@@ -35,6 +58,8 @@ public class Problem68_xGon
 	}
 	public bool IsValid()
 	{
+		if (array == null) throw new InvalidDataException("Not initalized");
+		
 		//Not sure if this is a logical restriciton or what
 		if (size*2 > 99) throw new ApplicationException("Max supported node count is 99");
 		
@@ -46,9 +71,10 @@ public class Problem68_xGon
 			{
 				//skip over one for the 3rd item
 				if (j == 2) ++j;
-				curSum += array[(2*i+j) % 2*size];
+				curSum += array[(2*i+j) % (2*size)];
 			}
 			//Set the testSum to the first one
+			//curSum.Dump();
 			if (testSum == -1) testSum = curSum;
 			if (testSum != curSum) return false;
 		}
@@ -56,36 +82,56 @@ public class Problem68_xGon
 	}
 	
 	
-	public bool GetNext()
+	public bool MoveNextValid()
 	{
-		stopVisit = false;
-		visit(0);
+		if (array == null)
+		{
+			array = new int[size*2];
+			for (int i = 0; i < array.Length; ++i)
+			{
+				array[i] = i+1;
+			}
+			//Test the default one... unlikely
+			if (IsValid()) return true;
+		}
+		
+		while (getNextPermutation())
+		{
+			if (IsValid()) return true;
+		}
+		return false;
 	}
-	int[] Value = null;
-	int level = -1;
-	bool stopVisit = false;
-	void visit(int k)
+	bool getNextPermutation()
 	{
-		throw new NotImplementedException("ACTUALlY I DON'T THINK THIS WILL WORK, Since it looks like it would find all the final digits in the same loop");
-		if (stopVisit) return;
+		int N = array.Length;
 		
-		level = level+1;
-		Value[k] = level;    // = is assignment
+		int i = N - 1;
+		while (i > 0 && array[i-1] >= array[i])
+			i = i-1;
 		
-		if (level == size)  // == is comparison
-			AddItem();     // to the list box
-		else
-			for (int i = 0; i < size; i++)
-				if (Value[i] == 0)
-					visit(i);
+		if (i == 0) return false;
 		
-		level = level-1;
-		Value[k] = 0;
+		int j = N;
+		while (array[j-1] <= array[i-1])
+			j = j-1;
+		
+		swap(i-1, j-1);    // swap values at positions (i-1) and (j-1)
+		
+		i++; j = N;
+		while (i < j)
+		{
+			swap(i-1, j-1);
+			i++;
+			j--;
+		}
+		
+		return true;
 	}
-	void AddItem()
+	void swap(int i, int j)
 	{
-		array = Value;
-		stopVisit = true;
+		int tmp = array[i];
+		array[i] = array[j];
+		array[j] = tmp;
 	}
 	
 	int LowestExternalNode()
@@ -107,6 +153,8 @@ public class Problem68_xGon
 	}
 	public long GetSolutionLong()
 	{
+		if (array == null) throw new InvalidDataException("Not initalized");
+		
 		int largestLong = "1234567891011121314".Length;
 		if (size*2 > largestLong) throw new ApplicationException("Max supported solution to long exceeded");
 		//Well having the lowest external node be 9 is nearly impossible i think, so it should be safe at this length
@@ -126,6 +174,7 @@ public class Problem68_xGon
 				
 				outputSolution *= 10;
 				if (value > 9) outputSolution *= 10;
+				//(outputSolution + "+" + value).Dump();
 				outputSolution += value;
 			}
 		}
@@ -133,6 +182,8 @@ public class Problem68_xGon
 	}
 	public string GetSolutionString()
 	{
+		if (array == null) throw new InvalidDataException("Not initalized");
+		
 		int offsetIndex = LowestExternalNode();
 		
 		StringBuilder sb = new StringBuilder();

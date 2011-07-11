@@ -2039,7 +2039,7 @@ public static class Helpers
 			return aiPn[n];
 		
 		long Pn = 0;
-		for(long k = 1; k <= Math.Sqrt(n); k++)
+		for(long k = 1; k*k <= n; k++)
 		{
 			// A little bit of recursion
 			long n1 = n - k * (3 * k - 1) / 2;

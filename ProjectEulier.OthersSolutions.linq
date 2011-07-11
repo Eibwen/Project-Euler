@@ -6,10 +6,113 @@ void Main()
 	//Problem91.grimbal_20050218().Dump();
 	//(Problem76.CalcPn(100) -1).Dump();
 	//Problem76.hultan_20040830().Dump();
-	Problem77.cyph1e_20050222().Dump();
+	//Problem77.cyph1e_20050222().Dump();
+	Problem97.qbtruk_20050816().Dump();
 }
 
 // Define other methods and classes here
+public static class Problem97
+{
+	//markr_20050603
+	//Since the last 10 digits of 2^N have a period of 7812500 (4*5^9), this was my Ruby solution:
+	public static long markr_20050603()
+	{
+		//print (2**(7830457 % (4 * 5**9)) * 28433 + 1) % 10000000000;
+		//FAIL Overflow: return (long)(Math.Pow(2, 7830457 % (4 * Math.Pow(5,9))) * 28433 + 1) % 10000000000;
+		
+		//2^N has period of 7812500 (4*5^9)
+		long period = 7812500;
+		
+		long output = 28433;
+		for (int i = 0; i < (7830457 % period); ++i)
+		{
+			output *= 2;
+			output %= 10000000000;
+		}
+		return output + 1;
+	}
+	
+	//sfabriz_20050603 linked, but others discused same thing
+	//From: http://www.osix.net/modules/article/?id=696
+	private static double Power(double a, int b)
+	{
+		if (b<0) {
+			throw new ApplicationException("B must be a positive integer or zero");
+		}
+		if (b==0) return 1;
+		if (a==0) return 0;
+		if (b%2==0) {
+			return Power(a*a, b/2);
+		} else if (b%2==1) {
+			return a*Power(a*a,b/2);
+		}
+		return 0;
+	}
+	public static long re_sfabriz_20050603()
+	{
+		long start = 28433;
+	
+		int loopCount = 7830457;
+		start *= (long)Power(2, loopCount);
+		
+		start += 1;
+		
+		return start;
+	}
+	
+	//ALSO:
+	//rayfil_20050609: instead of multipying by 2, add the last 10 digits on each loop
+	//					I got curious about how much I could reduce that 5 seconds using BCD multiplications and additions instead of only the 7830457 BCD additions. The problem can be broken down into 22 multiplications and 16 additions to compute the 10 least significant digits of 2^7830457. One more multiplication by the 5-digit 28433 and incrementing the least significant digit yielded the answer so fast that I couldn't even time the entire process with the GetTickCount function (i.e. less than 0.001 second).
+	
+	public static long grimbal_20050606()
+	{
+		long n;
+		long p, b;
+	
+		p = 7830457;
+		// compute 2^p;
+		for( b=1 ; b<p ; b <<= 1 );
+		for( n=1 ; b>0 ; b >>= 1 ){
+			if((p & b) != 0) n = ( n*n * 2 )%1000000000L;
+			else n = ( n*n )%1000000000L;
+		}
+		// n is 2^p mod 10^9;
+		n = ( n*28433 + 1 )%1000000000L;
+		"Only last 9 digits!".Dump();
+		//unfortunately the size of 64 bit integers is not enough to square a 10-digit number, so this code does only 9 digits.
+		//xenon_20050623 adds: You can square a ten digit integer using 64 bits with a little extra work. 
+		//					   Split the number into two 5 digit numbers: n = 100000*a + b, then n^2 = 10000000000*a*a + 200000*a*b + b*b. Throw away the first term and truncate the remaining sum to 10 digits for the answer. 
+		return n;
+	}
+	public static double grimbal_20050606_double()
+	{
+		double n;
+		long p, b;
+	
+		p = 7830457;
+		for( b=1 ; b<p ; b <<= 1 );
+		for( n=1 ; b>0 ; b >>= 1 ){
+			if( (p&b) > 0 ) n = ( n*n * 2 ) % 10000000000.0;
+			else n = ( n*n ) % 10000000000.0;
+		}
+		n = ( n*28433 + 1 ) % 10000000000.0;
+		return n;
+	}
+	
+	public static long qbtruk_20050816()
+	{
+		long start = 28433;
+		long pow10 = 10000000000L;
+		int power = 7830457;
+		
+		for (int loop = 0; loop < power / 29; loop++)
+			start = (start << 29) % pow10;
+		
+		start = (start << 22) % pow10 + 1;
+		
+		return start;
+	}
+}
 public static class Problem77
 {
 	static List<int> _primes = null;
@@ -61,23 +164,23 @@ public static class Problem77
 	// od:
 	// answer := i - 1:
 	// print(answer): # 0.8 seconds
-	public static long arn_zarn_20060419()
-	{
-		long N = 5000;
-		int g = 1;
-		int p = 2;
-		int maxcoeff = 0;
-		
-		int i = 0;
-		for (; maxcoeff < N; ++i)
-		{
-			g *= 1/(1 - x^p);
-			s = series(g, x=0, i+1);
-			maxcoeff = max(coeffs(convert(s,polynom)));
-			p = nextprime(p);
-		}
-		return i-1;
-	}
+//	public static long arn_zarn_20060419()
+//	{
+//		long N = 5000;
+//		int g = 1;
+//		int p = 2;
+//		int maxcoeff = 0;
+//		
+//		int i = 0;
+//		for (; maxcoeff < N; ++i)
+//		{
+//			g *= 1/(1 - x^p);
+//			s = series(g, x=0, i+1);
+//			maxcoeff = max(coeffs(convert(s,polynom)));
+//			p = nextprime(p);
+//		}
+//		return i-1;
+//	}
 	
 	//schnappi 20070712
 //	primes = primes_below_limit(5000)

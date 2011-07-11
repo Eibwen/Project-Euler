@@ -4,19 +4,131 @@
 
 void Main()
 {
-	Problem97().Dump("Result");
+	Problem94().Dump("Result");
 }
 
 // Define other methods and classes here
+public static long Problem94()
+{
+//	Problem94_isTriangleAreaWhole(6, 5).Dump();
+//	Problem94_isTriangleAreaWhole(5, 6).Dump();
+	long MAX = 1000000000;
+	//long MAX = 600000;
+	
+	long outputSum = 0;
+	long count = 0;
+	
+	for (long i = 3; i*3 <= MAX+3; ++i)
+	{
+		Util.Progress = (int)(i * 300 / MAX);
+		//if (Problem94_isTriangleAreaWhole(i-1, i))
+		if (Problem94_isTriangleAreaWhole(i, i, i-1))
+		{
+			long per = i*2 + i-1;
+			//(i + "-" + i + "-" + (i-1) + " : " + per).Dump();
+			if (per <= MAX)
+			{
+				outputSum += per;
+				++count;
+			}
+			else per.Dump();
+		}
+		//if (Problem94_isTriangleAreaWhole(i+1, i))
+		if (Problem94_isTriangleAreaWhole(i+1, i, i))
+		{
+			long per = i*2 + i+1;
+			//(i + "-" + i + "-" + (i+1) + " : " + per).Dump();
+			if (per <= MAX)
+			{
+				outputSum += per;
+				++count;
+			}
+			else per.Dump();
+		}
+		if (outputSum > 291730143224420738) "Error".Dump();
+	}
+	count.Dump("Count");
+	//312531789417673499.Dump("First result");	//36 seconds
+	//312531791417673503.Dump("Second result");
+	//New area function -- 33 seconds
+	//291730145224420748
+	//291730142224420744
+	//291730143224420738  //Including 1000000000?
+	//Casting to (int) and comparing is faster than mod: 23 seconds
+	//Yet another Problem94_isTriangleAreaWhole, now supporting all triangles, 21 seconds
+	//37026344060
+	//178477667381
+	//178477667386
+	return outputSum;
+}
+//public static double Problem94_triangleArea(long a, long b)
+//{
+//	//Math.Sqrt(((double)b*b)/(a*a) - (double)1/4).Dump();
+//	return a*a*Math.Sqrt(((double)b*b)/(a*a) - (double)1/4) / 2;
+//}
+/////b side occurs twice!!
+//public static bool Problem94_isTriangleAreaWhole(long a, long b)
+//{
+//	//Math.Sqrt(((double)b*b)/(a*a) - (double)1/4).Dump();
+//	return a*a*Math.Sqrt(((double)b*b)/(a*a) - (double)1/4) % 2 == 0;
+//}
+///b side occurs twice!!
+//public static bool Problem94_isTriangleAreaWhole(long a, long b)
+//{
+//	double ha = (double)a/2;
+//	double height = Math.Sqrt(b*b - ha*ha);
+//	
+////	double area = height*a;
+////	//area.Dump();
+////	return area % 4.0 == 0;
+//	double area = height*a/4;
+//	//area.Dump();
+//	return (long)area == area;
+//}
+/////b side occurs twice!!
+//public static bool Problem94_isTriangleAreaWhole(long a, long b)
+//{
+//	//Area =.25*sqrt{(3a+1)(a+1)(a+1)(a-1)}
+//}
+/// a ≥ b ≥ c
+public static bool Problem94_isTriangleAreaWhole(long a, long b, long c)
+{
+//	double area = Math.Sqrt(((a + (b + c))*(c - (a - b))*(c + (a - b))*(a + (b - c))) / 16);
+//	double area = Math.Sqrt(((a + (b + c))*(c - (a - b))*(c + (a - b))*(a + (b - c)))) / 4;
+//	return (long)area == area;
+	
+	double area = -1.1;
+	
+	//Given in problem description
+	if (a == b && b == c) return false;
+	if (a == b)
+	{
+		area = Math.Sqrt(((2*a+c)*c*c*(2*a-c)) / 16);
+	}
+	if (b == c)
+	{
+		area = Math.Sqrt(((a+2*b)*(2*b-a)*a*a) / 16);
+	}
+	
+	return (long)area == area;
+}
 public static long Problem97()
 {
 	//28433×2^7830457+1
 	long start = 28433;
-	for (int i = 0; i < 7830457; ++i)
+	
+	int loopCount = 7830457;
+	for (int i = 0; i < loopCount / 16; ++i)
+	{
+		start *= 65536;
+		start %= 10000000000;
+	}
+	for (int i = 0; i < loopCount % 16; ++i)
 	{
 		start *= 2;
 		start %= 10000000000;
 	}
+	
 	start += 1;
 	8739992577.Dump();
 	return start;

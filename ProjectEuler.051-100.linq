@@ -4,7 +4,7 @@
 
 void Main()
 {
-	Problem77().Dump("Result");
+	Problem76().Dump("Result");
 }
 
 // Define other methods and classes here
@@ -43,7 +43,60 @@ public static long Problem77_recurse(int target,
 	}
 	return count;
 }
+//From just talking to CAV about dynamic programming: "<cav> as far as i know, you save solutions to any problem you've solved in the event that it comes up again, and just reuse the old solution"
 public static long Problem76()
+{
+	//TODO this recursive solution takes 25 seconds on laptop
+	long[] Solutions = new long[Problem76_TARGET+1];
+	
+	for (int i = 1; i <= Problem76_TARGET; ++i)
+	{
+		Problem76_recurse(ref Solutions, i, 0, 0);
+	}
+	
+	return Solutions[Problem76_TARGET];
+	
+	//return Problem76_recurse(ref Solutions, Problem76_TARGET-1, 0, 0);
+}
+public static long Problem76_recurse(ref long[] Solutions, int index, long count, int sum) //Based on Question31_recurse
+{
+	if (sum > Problem76_TARGET) return count;
+	if (sum == Problem76_TARGET) return ++count;
+	
+//	long curCount = Solutions[index];
+//	if (curCount > 0)
+//	{
+//		count = curCount;
+//	}
+//	else
+//	{
+//		curCount = Problem76_recurse(ref Solutions, index, count, sum + index);
+////		(index + " set to " + curCount).Dump();
+////		Solutions[index] = curCount;
+//		count = curCount;
+//	}
+	count = Problem76_recurse(ref Solutions, index, count, sum + index);
+	if (index > 1)
+	{
+		long curCount = Solutions[index-1];
+		if (curCount > 0) count = curCount;
+		else
+		{
+			curCount = Problem76_recurse(ref Solutions, index-1, count, sum);
+			//Solutions[index-1] = curCount;
+			count = curCount;
+		}
+//		count = Problem76_recurse(ref Solutions, index-1, count, sum);
+	}
+	
+	if (Solutions[index] == 0)
+	{
+		(index + " set to " + count).Dump();
+		Solutions[index] = count;
+	}
+	return count;
+}
+public static long Problem76RecurseSolution()
 {
 	//TODO this recursive solution takes 25 seconds on laptop
 	

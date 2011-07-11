@@ -4,12 +4,34 @@
 
 void Main()
 {
-	Problem68().Dump("Result");
+	Problem76().Dump("Result");
 }
 
 // Define other methods and classes here
+public static long Problem76()
+{
+	return Problem76_recurse(Problem76_TARGET-1, 0, 0);
+}
+const int Problem76_TARGET = 100;
+public static long Problem76_recurse(int index, long count, int sum) //Based on Question31_recurse
+{
+	if (sum > Problem76_TARGET) return count;
+	if (sum == Problem76_TARGET) return ++count;
+	
+	count = Problem76_recurse(index, count, sum + index);
+	if (index > 1)
+	{
+		count = Problem76_recurse(index-1, count, sum);
+	}
+	return count;
+}
 public static long Problem68()
 {
+	//TODO could figure out a way to limit this...
+	//  option1: method to check if 10 is in an edge node or not, if its not that means it cannot be 16 digit solution
+	//  analayse for ways to find invalid permutations quicker
+	
+	
 	//Problem68_xGon xGon = new Problem68_xGon(5);
 //	int[] testGon = new int[] { 6, 2, 5, 1, 4, 3 };
 //	Problem68_xGon xGon = new Problem68_xGon(testGon);

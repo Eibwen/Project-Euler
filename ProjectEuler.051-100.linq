@@ -4,12 +4,49 @@
 
 void Main()
 {
-	Problem76().Dump("Result");
+	Problem77().Dump("Result");
 }
 
 // Define other methods and classes here
+public static long Problem77()
+{
+	int[] Primes = Helpers.PrimesLessThan(200).ToArray();
+	
+	int TARGET_COUNT = 5000;
+	
+	//for (int i = 2000; i > 0; --i) //A lot smaller than i would have thought... so count up instead
+	for (int i = 10; i < 1000; ++i)
+	{
+		long count = Problem77_recurse(i, ref Primes, Primes.Length-1, 0, TARGET_COUNT, 0);
+		if (count > TARGET_COUNT)
+		{
+			i.Dump();
+			return i;
+		}
+	}
+	
+	return -1;
+}
+public static long Problem77_recurse(int target,
+	ref int[] Currencies, int index,
+	long count, long MaxCount, int sum) //Based on Question31_recurse
+{
+	if (count > MaxCount) return count;
+	
+	if (sum > target) return count;
+	if (sum == target) return ++count;
+	
+	count = Problem77_recurse(target, ref Currencies, index, count, MaxCount, sum + Currencies[index]);
+	if (index > 0)
+	{
+		count = Problem77_recurse(target, ref Currencies, index-1, count, MaxCount, sum);
+	}
+	return count;
+}
 public static long Problem76()
 {
+	//TODO this recursive solution takes 25 seconds on laptop
+	
 	return Problem76_recurse(Problem76_TARGET-1, 0, 0);
 }
 const int Problem76_TARGET = 100;

@@ -2705,9 +2705,7 @@ public static long Question31()
 //	}
 	
 	//LOL sort shocked this worked... wrote in like 2 minutes after trying a loop first
-	Question31_recurse(ref Currencies, 7, 0, 0).Dump();
-	
-	return -1;
+	return Question31_recurse(ref Currencies, 7, 0, 0);
 }
 public static long Question31_recurse(ref int[] Currencies, int index, long count, int sum)
 {

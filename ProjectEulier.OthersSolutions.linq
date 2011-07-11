@@ -3,52 +3,122 @@
 void Main()
 {
 	//Problem47.kevingong_20060204().Dump();
-	Problem91.grimbal_20050218().Dump();
+	//Problem91.grimbal_20050218().Dump();
+	//(Problem76.CalcPn(100) -1).Dump();
+	Problem76.hultan_20040830().Dump();
 }
 
 // Define other methods and classes here
-public static class Problem96
+public static class Problem76
 {
-	//DeX_20061031
-	private static boolean solveSudoku(int s) {
-		int x = s % 9;
-		int y = s / 9;
-		if (s == 81) return true;	//reached max depth
-		if (sudoku[y][x] == 0) {
-			for (int n = 1; n <= 9; n++) {
-				if (testPlace(x, y, n)) {
-					sudoku[y][x] = n;
-					if (solveSudoku(s+1)) return true;
-				}
-			}
-			//if we reach here then we've tried all numbers 1-9 without success
-			sudoku[y][x] = 0;
-			return false;
+	//harpanet_20040827 == 0.001 seconds
+	//This is my interpretation of the function. Things to note:
+	// aiPn is an array to cache the values already calculated.
+	// aiPn[0] is initialised to 1 (I got this info from another website)
+	// aiPn[<0] = 0. Another convention not mentioned on the Mathworld page.
+	// It is recursive
+	//snq_20040827
+	// Mine looks almost identical to harpanet's, except my loop runs while k <= sqrt(n) instead of k <= n. 
+	static int[] aiPn = null;
+	public static int CalcPn(long n)
+	{
+		//I added this:
+		if (aiPn == null)
+		{
+			aiPn = new int[n+1];
+			aiPn[0] = 1;
 		}
-		return solveSudoku(s+1);
+		
+		// P(<0) = 0 by convention
+		if(n < 0)
+			return 0;
+		
+		// Use cached value if already calculated
+		if(aiPn[n] > 0)
+			return aiPn[n];
+		
+		int Pn = 0;
+		for(long k = 1; k <= Math.Sqrt(n); k++)
+		{
+			// A little bit of recursion
+			long n1 = n - k * (3 * k - 1) / 2;
+			long n2 = n - k * (3 * k + 1) / 2;
+			
+			int Pn1 = CalcPn(n1);
+			int Pn2 = CalcPn(n2);
+			
+			// elements are alternately added and subtracted
+			if(k % 2 == 1)
+				Pn = Pn + Pn1 + Pn2;
+			else
+				Pn = Pn - Pn1 - Pn2;
+		}
+		
+		// Cache calculated valued
+		aiPn[n] = Pn;
+		return Pn;
 	}
 	
-	//Checks whether the given number fits in the sudoku
-	private static boolean testPlace(int nx, int ny, int n) {
-		//Check the box
-		int bx = (int)(nx / 3) * 3;
-		int by = (int)(ny / 3) * 3;
-		for (int y = by; y < by + 3; y++) {
-			for (int x = bx; x < bx + 3; x++) {
-				if (sudoku[y][x] == n) return false;
-			}
-		}
-		//Check the row
-		for (int x = 0; x < 9; x++) {
-			if (sudoku[ny][x] == n) return false;
-		}
-		//Check the column
-		for (int y = 0; y < 9; y++) {
-			if (sudoku[y][nx] == n) return false;
-		}
-		return true;
+	//hultan_20040830 == 8 seconds
+	public static long hultan_20040830()
+	{
+	// Calling code
+		long sum=0;
+		for (long k=1;k<100;k++)
+			sum+=TNK(100,k);
+		return sum;
+	}
+	// The recursive routine that calculates T(n,k)
+	private static long TNK(long n, long k)
+	{
+		if (k==1 || n==k) return 1;
+		if (k>n) return 0;
+		
+		return TNK(n-1,k-1) + TNK(n-k,k);
 	}
 }
+//public static class Problem96
+//{
+//	//DeX_20061031
+//	private static bool solveSudoku(int s) {
+//		int x = s % 9;
+//		int y = s / 9;
+//		if (s == 81) return true;	//reached max depth
+//		if (sudoku[y][x] == 0) {
+//			for (int n = 1; n <= 9; n++) {
+//				if (testPlace(x, y, n)) {
+//					sudoku[y][x] = n;
+//					if (solveSudoku(s+1)) return true;
+//				}
+//			}
+//			//if we reach here then we've tried all numbers 1-9 without success
+//			sudoku[y][x] = 0;
+//			return false;
+//		}
+//		return solveSudoku(s+1);
+//	}
+//	
+//	//Checks whether the given number fits in the sudoku
+//	private static bool testPlace(int nx, int ny, int n) {
+//		//Check the box
+//		int bx = (int)(nx / 3) * 3;
+//		int by = (int)(ny / 3) * 3;
+//		for (int y = by; y < by + 3; y++) {
+//			for (int x = bx; x < bx + 3; x++) {
+//				if (sudoku[y][x] == n) return false;
+//			}
+//		}
+//		//Check the row
+//		for (int x = 0; x < 9; x++) {
+//			if (sudoku[ny][x] == n) return false;
+//		}
+//		//Check the column
+//		for (int y = 0; y < 9; y++) {
+//			if (sudoku[y][nx] == n) return false;
+//		}
+//		return true;
+//	}
+//}
 public static class Problem91
 {
 	//Here is my code.

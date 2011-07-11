@@ -4,10 +4,28 @@
 
 void Main()
 {
-	Problem76().Dump("Result");
+	Problem78().Dump("Result");
 }
 
 // Define other methods and classes here
+public static long Problem78()
+{
+	int MAX = 2000;
+	long[] Array = new long[MAX];
+	Array[0] = 1;
+	
+	for (long i = 100; i < MAX; ++i)
+	{
+		Util.Progress = (int)i * 100 / MAX;
+		(i + " : " + Helpers.CalcPn(ref Array, i)).Dump();
+		if (Helpers.CalcPn(ref Array, i) % 1000000 == 0)
+		{
+			return i;
+		}
+	}
+	
+	return -78;
+}
 public static long Problem77()
 {
 	int[] Primes = Helpers.PrimesLessThan(200).ToArray();
@@ -43,60 +61,7 @@ public static long Problem77_recurse(int target,
 	}
 	return count;
 }
-//From just talking to CAV about dynamic programming: "<cav> as far as i know, you save solutions to any problem you've solved in the event that it comes up again, and just reuse the old solution"
 public static long Problem76()
-{
-	//TODO this recursive solution takes 25 seconds on laptop
-	long[] Solutions = new long[Problem76_TARGET+1];
-	
-	for (int i = 1; i <= Problem76_TARGET; ++i)
-	{
-		Problem76_recurse(ref Solutions, i, 0, 0);
-	}
-	
-	return Solutions[Problem76_TARGET];
-	
-	//return Problem76_recurse(ref Solutions, Problem76_TARGET-1, 0, 0);
-}
-public static long Problem76_recurse(ref long[] Solutions, int index, long count, int sum) //Based on Question31_recurse
-{
-	if (sum > Problem76_TARGET) return count;
-	if (sum == Problem76_TARGET) return ++count;
-	
-//	long curCount = Solutions[index];
-//	if (curCount > 0)
-//	{
-//		count = curCount;
-//	}
-//	else
-//	{
-//		curCount = Problem76_recurse(ref Solutions, index, count, sum + index);
-////		(index + " set to " + curCount).Dump();
-////		Solutions[index] = curCount;
-//		count = curCount;
-//	}
-	count = Problem76_recurse(ref Solutions, index, count, sum + index);
-	if (index > 1)
-	{
-		long curCount = Solutions[index-1];
-		if (curCount > 0) count = curCount;
-		else
-		{
-			curCount = Problem76_recurse(ref Solutions, index-1, count, sum);
-			//Solutions[index-1] = curCount;
-			count = curCount;
-		}
-//		count = Problem76_recurse(ref Solutions, index-1, count, sum);
-	}
-	
-	if (Solutions[index] == 0)
-	{
-		(index + " set to " + count).Dump();
-		Solutions[index] = count;
-	}
-	return count;
-}
-public static long Problem76RecurseSolution()
 {
 	//TODO this recursive solution takes 25 seconds on laptop
 	
@@ -2052,6 +2017,47 @@ public static class Helpers
 			get { return _b; }
 			set { _b = value; }
 		}
+	}
+	public static long CalcPn(ref long[] aiPn, long n)
+	{
+		//I added this:
+		if (aiPn[0] != 1)
+		{
+			throw new ApplicationException("Array failure");
+		}
+		if (n > 405)
+		{
+			throw new ApplicationException("Overflows long at this point");
+		}
+		
+		// P(<0) = 0 by convention
+		if(n < 0)
+			return 0;
+		
+		// Use cached value if already calculated
+		if(aiPn[n] > 0)
+			return aiPn[n];
+		
+		long Pn = 0;
+		for(long k = 1; k <= Math.Sqrt(n); k++)
+		{
+			// A little bit of recursion
+			long n1 = n - k * (3 * k - 1) / 2;
+			long n2 = n - k * (3 * k + 1) / 2;
+			
+			long Pn1 = CalcPn(ref aiPn, n1);
+			long Pn2 = CalcPn(ref aiPn, n2);
+			
+			// elements are alternately added and subtracted
+			if(k % 2 == 1)
+				Pn = Pn + Pn1 + Pn2;
+			else
+				Pn = Pn - Pn1 - Pn2;
+		}
+		
+		// Cache calculated valued
+		aiPn[n] = Pn;
+		return Pn;
 	}
 }
 

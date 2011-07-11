@@ -61,7 +61,7 @@ public static class Problem77
 	// od:
 	// answer := i - 1:
 	// print(answer): # 0.8 seconds
-	public static long arn.zarn_20060419()
+	public static long arn_zarn_20060419()
 	{
 		long N = 5000;
 		int g = 1;

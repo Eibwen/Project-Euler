@@ -4,21 +4,71 @@
 
 void Main()
 {
-	Problem78().Dump("Result");
+	Problem97().Dump("Result");
 }
 
 // Define other methods and classes here
+public static long Problem97()
+{
+	//28433×2^7830457+1
+	long start = 28433;
+	for (int i = 0; i < 7830457; ++i)
+	{
+		start *= 2;
+		start %= 10000000000;
+	}
+	start += 1;
+	8739992577.Dump();
+	return start;
+}
+public static long Problem92()
+{
+	long MAX = 10000000;
+	
+	long count = 0;
+	for (int i = 2; i < MAX; ++i)
+	{
+		long curSum = Problem92_SumSquareDigits(i);
+		while (curSum != 1 && curSum != 89)
+		{
+			curSum = Problem92_SumSquareDigits(curSum);
+		}
+		if (curSum == 89)
+		{
+			//i.Dump();
+			++count;
+		}
+//		else
+//		{
+//			("Not: " + i).Dump();
+//		}
+	}
+	
+	return count;
+}
+public static long Problem92_SumSquareDigits(long num)
+{
+	long sum = 0;
+	while (num > 0)
+	{
+		sum += (num % 10)*(num % 10);
+		num /= 10;
+	}
+	return sum;
+}
 public static long Problem78()
 {
-	int MAX = 2000;
+	int SKIP = 1;
+	int MAX = 500;
 	long[] Array = new long[MAX];
 	Array[0] = 1;
 	
-	for (long i = 100; i < MAX; ++i)
+	for (long i = SKIP; i < MAX; ++i)
 	{
-		Util.Progress = (int)i * 100 / MAX;
-		(i + " : " + Helpers.CalcPn(ref Array, i)).Dump();
-		if (Helpers.CalcPn(ref Array, i) % 1000000 == 0)
+		Util.Progress = (int)(i-SKIP) * 100 / MAX;
+		long value = Helpers.CalcPn(ref Array, i);
+		(i + " : " + value).Dump();
+		if (value % 1000000 == 0)
 		{
 			return i;
 		}
@@ -64,6 +114,7 @@ public static long Problem77_recurse(int target,
 public static long Problem76()
 {
 	//TODO this recursive solution takes 25 seconds on laptop
+	//		10 seconds on work computer
 	
 	return Problem76_recurse(Problem76_TARGET-1, 0, 0);
 }
@@ -2054,6 +2105,49 @@ public static class Helpers
 			else
 				Pn = Pn - Pn1 - Pn2;
 		}
+		
+		// Cache calculated valued
+		aiPn[n] = Pn;
+		return Pn;
+	}
+	public static long CalcPnTrunc(ref long[] aiPn, long n)
+	{
+		//I added this:
+		if (aiPn[0] != 1)
+		{
+			throw new ApplicationException("Array failure");
+		}
+		
+		//long TRUNC_TO = 1000000000000000000;
+		long TRUNC_TO = 10000000000;
+		
+		// P(<0) = 0 by convention
+		if(n < 0)
+			return 0;
+		
+		// Use cached value if already calculated
+		if(aiPn[n] > 0)
+			return aiPn[n];
+		
+		long Pn = 0;
+		for(long k = 1; k*k <= n; k++)
+		{
+			// A little bit of recursion
+			long n1 = n - k * (3 * k - 1) / 2;
+			long n2 = n - k * (3 * k + 1) / 2;
+			
+			long Pn1 = CalcPnTrunc(ref aiPn, n1);
+			long Pn2 = CalcPnTrunc(ref aiPn, n2);
+			
+			// elements are alternately added and subtracted
+			if(k % 2 == 1)
+				Pn = Pn + Pn1 + Pn2;
+			else
+				Pn = Pn - Pn1 - Pn2;
+		}
+		
+		//Truncate
+		Pn %= TRUNC_TO;
 		
 		// Cache calculated valued
 		aiPn[n] = Pn;

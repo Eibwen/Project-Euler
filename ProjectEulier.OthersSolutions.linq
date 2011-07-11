@@ -39,8 +39,65 @@ public static class Problem77
 		else if(a < 0 || b == 0)
 			return 0;
 		else return (part(a, b-1) +
-		part(a-primes[(int)b], b));
+					part(a-primes[(int)b], b));
 	}
+	
+	//hk_20050410
+	// This is Sloane's A000607.
+	// On this page a formula can be found:
+	// a(n):=1/n*Sum_{k=1..n} A008472(k)*a(n-k).
+	// Here A008472 is the sum of the distict primefactors of k.
+	// I used this formula and it worked pretty fast.
+	
+	//arn.zarn_20060419
+	//Maple Code:
+	// N := 5000;
+	// g := 1: p := 2: maxcoeff := 0:
+	// for i while maxcoeff < N do
+	//   g := g * 1/(1 - x^p);
+	//   s := series(g, x=0, i+1);
+	//   maxcoeff := max(coeffs(convert(s,polynom))); 
+	//   p := nextprime(p);
+	// od:
+	// answer := i - 1:
+	// print(answer): # 0.8 seconds
+	public static long arn.zarn_20060419()
+	{
+		long N = 5000;
+		int g = 1;
+		int p = 2;
+		int maxcoeff = 0;
+		
+		int i = 0;
+		for (; maxcoeff < N; ++i)
+		{
+			g *= 1/(1 - x^p);
+			s = series(g, x=0, i+1);
+			maxcoeff = max(coeffs(convert(s,polynom)));
+			p = nextprime(p);
+		}
+		return i-1;
+	}
+	
+	//schnappi 20070712
+//	primes = primes_below_limit(5000)
+//	solutions = [0]*primes[-1]
+//	solutions[0] = 1
+//	limit = len(solutions)
+//	
+//	for p in primes:
+//		if p > limit:
+//			break
+//	
+//	# this is a copy of problem 31
+//	for idx in xrange(p, limit):
+//		solutions[idx] += solutions[idx - p]
+//	
+//	if solutions[idx] > cutoff:
+//		limit = min(limit, idx)
+//		break
+//	
+//	print "Solutions:", limit 
 }
 public static class Problem76
 {

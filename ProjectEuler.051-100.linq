@@ -18,14 +18,34 @@ public static long Problem94()
 	long outputSum = 0;
 	long count = 0;
 	
-	for (long i = 3; i*3 <= MAX+3; ++i)
+	for (long i = 2; i*3 <= MAX+3; ++i)
 	{
 		Util.Progress = (int)(i * 300 / MAX);
+		
+//		double areaPlus = Math.Sqrt(((3*a+1)*(a+1)*(a+1)*(a-1)) / 16);
+//		double areaMinus = Math.Sqrt(((3*a-1)*(a-1)*(a-1)*(a+1)) / 16);
+//		double areaPlus = Math.Sqrt((double)(((3m*i+1)*(i+1)*(i+1)*(i-1)) / 16));
+//		double areaMinus = Math.Sqrt((double)(((3m*i-1)*(i-1)*(i-1)*(i+1)) / 16));
+//		double areaPlus = Math.Sqrt((3*i+1)*(i+1)*(i+1)*(i-1)) / 4;
+//		double areaMinus = Math.Sqrt((3*i-1)*(i-1)*(i-1)*(i+1)) / 4;
+//		double areaPlus = Math.Sqrt(3*i+1)
+//						* Math.Sqrt(i+1)
+//						* Math.Sqrt(i+1)
+//						* Math.Sqrt(i-1) / 4;
+//		double areaMinus = Math.Sqrt(3*i-1)
+//						* Math.Sqrt(i-1)
+//						* Math.Sqrt(i-1)
+//						* Math.Sqrt(i+1) / 4;
+		double areaPlus = Math.Sqrt(3*i+1)
+						* Math.Sqrt((i+1) * (i+1) * (i-1)) / 4;
+		double areaMinus = Math.Sqrt((3*i-1))
+						* Math.Sqrt((i-1) * (i-1) * (i+1)) / 4;
+		
 		//if (Problem94_isTriangleAreaWhole(i-1, i))
-		if (Problem94_isTriangleAreaWhole(i, i, i-1))
+		if ((int)areaMinus == areaMinus)
 		{
 			long per = i*2 + i-1;
-			//(i + "-" + i + "-" + (i-1) + " : " + per).Dump();
+			(i + "-" + i + "-" + (i-1) + " : " + per).Dump();
 			if (per <= MAX)
 			{
 				outputSum += per;
@@ -34,10 +54,10 @@ public static long Problem94()
 			else per.Dump();
 		}
 		//if (Problem94_isTriangleAreaWhole(i+1, i))
-		if (Problem94_isTriangleAreaWhole(i+1, i, i))
+		if ((int)areaPlus == areaPlus)
 		{
 			long per = i*2 + i+1;
-			//(i + "-" + i + "-" + (i+1) + " : " + per).Dump();
+			(i + "-" + i + "-" + (i+1) + " : " + per).Dump();
 			if (per <= MAX)
 			{
 				outputSum += per;
@@ -59,6 +79,15 @@ public static long Problem94()
 	//37026344060
 	//178477667381
 	//178477667386
+	//double areaPlus and areaMinus 17 seconds
+	//88076575199
+	//40552
+	//82498623397 //Oops dividing by 16 out of the sqrt
+	//88076575199 //FUCK: ((int)areaPlus == areaMinus) WON'T WORK
+	//178477667381
+	//191856	//Using 3.0
+	//Split sqrts out 24 seconds
+	//48490
 	return outputSum;
 }
 //public static double Problem94_triangleArea(long a, long b)
@@ -91,27 +120,27 @@ public static long Problem94()
 //	//Area =.25*sqrt{(3a+1)(a+1)(a+1)(a-1)}
 //}
 /// a ≥ b ≥ c
-public static bool Problem94_isTriangleAreaWhole(long a, long b, long c)
-{
-//	double area = Math.Sqrt(((a + (b + c))*(c - (a - b))*(c + (a - b))*(a + (b - c))) / 16);
-//	double area = Math.Sqrt(((a + (b + c))*(c - (a - b))*(c + (a - b))*(a + (b - c)))) / 4;
+//public static bool Problem94_isTriangleAreaWhole(long a, long b, long c)
+//{
+////	double area = Math.Sqrt(((a + (b + c))*(c - (a - b))*(c + (a - b))*(a + (b - c))) / 16);
+////	double area = Math.Sqrt(((a + (b + c))*(c - (a - b))*(c + (a - b))*(a + (b - c)))) / 4;
+////	return (long)area == area;
+//	
+//	double area = -1.1;
+//	
+//	//Given in problem description
+//	if (a == b && b == c) return false;
+//	if (a == b)
+//	{
+//		area = Math.Sqrt(((2*a+c)*c*c*(2*a-c)) / 16);
+//	}
+//	if (b == c)
+//	{
+//		area = Math.Sqrt(((a+2*b)*(2*b-a)*a*a) / 16);
+//	}
+//	
 //	return (long)area == area;
-	
-	double area = -1.1;
-	
-	//Given in problem description
-	if (a == b && b == c) return false;
-	if (a == b)
-	{
-		area = Math.Sqrt(((2*a+c)*c*c*(2*a-c)) / 16);
-	}
-	if (b == c)
-	{
-		area = Math.Sqrt(((a+2*b)*(2*b-a)*a*a) / 16);
-	}
-	
-	return (long)area == area;
-}
+//}
 public static long Problem97()
 {
 	//28433×2^7830457+1

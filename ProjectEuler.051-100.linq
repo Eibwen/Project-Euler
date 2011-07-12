@@ -16,7 +16,18 @@ public static long Problem94()
 	//long MAX = 600000;
 	
 	// http://oeis.org/A120893
-	//1, 1, 5, 17, 65, 241, 901, 3361, 12545, 46817, 174725, 652081, 2433601, 9082321, 33895685, 126500417, 472105985
+	int[] expected = new int[] { 5, 17, 65, 241, 901, 3361, 12545, 46817, 174725, 652081, 2433601, 9082321, 33895685, 126500417, 472105985 };
+	(expected.Sum() * 3).Dump("Near Expected Result");
+	//  15 answers...
+	
+	
+#region Testing doubles
+	Problem94TEST_long();
+	"".Dump();
+	Problem94TEST_double();
+	return -94;
+#endregion Testing doubles
+	
 	
 	long outputSum = 0;
 	long count = 0;
@@ -45,7 +56,7 @@ public static long Problem94()
 						* Math.Sqrt((i-1) * (i-1) * (i+1)) / 4;
 		
 		//if (Problem94_isTriangleAreaWhole(i-1, i))
-		if ((int)areaMinus == areaMinus)
+		if ((long)areaMinus == areaMinus)
 		{
 			long per = i*2 + i-1;
 			(i + "-" + i + "-" + (i-1) + " : " + per).Dump();
@@ -57,7 +68,7 @@ public static long Problem94()
 			else per.Dump();
 		}
 		//if (Problem94_isTriangleAreaWhole(i+1, i))
-		if ((int)areaPlus == areaPlus)
+		if ((long)areaPlus == areaPlus)
 		{
 			long per = i*2 + i+1;
 			(i + "-" + i + "-" + (i+1) + " : " + per).Dump();
@@ -92,6 +103,80 @@ public static long Problem94()
 	//Split sqrts out 24 seconds
 	//48490
 	return outputSum;
+}
+public static void Problem94TEST_long()
+{
+	long i = 472105985;
+
+//		double areaPlus = Math.Sqrt(((3*a+1)*(a+1)*(a+1)*(a-1)) / 16);
+//		double areaMinus = Math.Sqrt(((3*a-1)*(a-1)*(a-1)*(a+1)) / 16);
+//		double areaPlus = Math.Sqrt((double)(((3m*i+1)*(i+1)*(i+1)*(i-1)) / 16));
+//		double areaMinus = Math.Sqrt((double)(((3m*i-1)*(i-1)*(i-1)*(i+1)) / 16));
+//		double areaPlus = Math.Sqrt((3*i+1)*(i+1)*(i+1)*(i-1)) / 4;
+//		double areaMinus = Math.Sqrt((3*i-1)*(i-1)*(i-1)*(i+1)) / 4;
+//		double areaPlus = Math.Sqrt(3*i+1)
+//						* Math.Sqrt(i+1)
+//						* Math.Sqrt(i+1)
+//						* Math.Sqrt(i-1) / 4;
+//		double areaMinus = Math.Sqrt(3*i-1)
+//						* Math.Sqrt(i-1)
+//						* Math.Sqrt(i-1)
+//						* Math.Sqrt(i+1) / 4;
+	
+	var a = Math.Sqrt((3*i+1)*(i-1)).Dump();
+	var b = Math.Sqrt((i-1)*(i+1)).Dump();
+	var x = (a % 10000 / 2).Dump();
+	var y = (b % 10000 / 2).Dump();
+	(x * y).Dump("area mod");
+	
+	double areaPlus = Math.Sqrt((3*i+1) * (i+1)) % 1000000
+					* Math.Sqrt((i+1) * (i-1)) % 1000000 / 4;
+	double areaMinus = Math.Sqrt((3*i-1) * (i-1)) % 1000000
+					* Math.Sqrt((i-1) * (i+1)) % 1000000 / 4;
+
+	areaPlus.Dump();
+	((long)areaPlus).Dump();
+	((long)areaPlus == areaPlus).Dump();
+	areaMinus.Dump();
+	((long)areaMinus).Dump();
+	((long)areaMinus == areaMinus).Dump();
+}
+public static void Problem94TEST_double()
+{
+	double i = 472105985;
+	
+//		double areaPlus = Math.Sqrt(((3*a+1)*(a+1)*(a+1)*(a-1)) / 16);
+//		double areaMinus = Math.Sqrt(((3*a-1)*(a-1)*(a-1)*(a+1)) / 16);
+//		double areaPlus = Math.Sqrt((double)(((3m*i+1)*(i+1)*(i+1)*(i-1)) / 16));
+//		double areaMinus = Math.Sqrt((double)(((3m*i-1)*(i-1)*(i-1)*(i+1)) / 16));
+//		double areaPlus = Math.Sqrt((3*i+1)*(i+1)*(i+1)*(i-1)) / 4;
+//		double areaMinus = Math.Sqrt((3*i-1)*(i-1)*(i-1)*(i+1)) / 4;
+//		double areaPlus = Math.Sqrt(3*i+1)
+//						* Math.Sqrt(i+1)
+//						* Math.Sqrt(i+1)
+//						* Math.Sqrt(i-1) / 4;
+//		double areaMinus = Math.Sqrt(3*i-1)
+//						* Math.Sqrt(i-1)
+//						* Math.Sqrt(i-1)
+//						* Math.Sqrt(i+1) / 4;
+	
+	var a = Math.Sqrt((3*i+1)*(i-1)).Dump();
+	var b = Math.Sqrt((i-1)*(i+1)).Dump();
+	var x = (a % 10000).Dump();
+	var y = ((b % 10000) / 4).Dump();
+	(x * y).Dump("area mod");
+	
+	double areaPlus = Math.Sqrt((3*i+1) * (i+1)) % 1000000
+					* Math.Sqrt((i+1) * (i-1)) % 1000000 / 4;
+	double areaMinus = Math.Sqrt((3*i-1) * (i-1)) % 1000000
+					* Math.Sqrt((i-1) * (i+1)) % 1000000 / 4;
+	
+	areaPlus.Dump();
+	((long)areaPlus).Dump();
+	((long)areaPlus == areaPlus).Dump();
+	areaMinus.Dump();
+	((long)areaMinus).Dump();
+	((long)areaMinus == areaMinus).Dump();
 }
 //public static double Problem94_triangleArea(long a, long b)
 //{

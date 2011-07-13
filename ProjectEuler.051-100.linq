@@ -4,10 +4,82 @@
 
 void Main()
 {
-	Problem94().Dump("Result");
+	Problem51().Dump("Result");
 }
 
 // Define other methods and classes here
+public static long Problem51()
+{
+	List<int> PRIMES = Helpers.PrimesLessThan(1000000);
+	
+	int length = 1;
+	int lengthLimit = 9;
+	int lengthCount = 0;
+//	
+//	for (int i = 0; i < PRIMES.Count; ++i)
+//	{
+//		if (PRIMES[i] > lengthLimit)
+//		{
+//			lengthLimit = lengthLimit * 10 + 9;
+//			++length;
+//			lengthCount.Dump();
+//			lengthCount = 0;
+//			
+//			
+//			
+//		}
+//		++lengthCount;
+//	}
+	
+	List<Helpers.Tuple<int, int>> ReplaceList = new List<Helpers.Tuple<int, int>>();
+	
+	for (int i = 0; i < PRIMES.Count; ++i)
+	{
+		//could replace each number by letters
+		//  eg. 56113 => abccd, 56333 => abccd, 98435 => abcdef
+		
+		if (PRIMES[i] > lengthLimit)
+		{
+			lengthLimit = lengthLimit * 10 + 9;
+			++length;
+			lengthCount.Dump();
+			lengthCount = 0;
+			
+			if (length > 4)
+			{
+				//Check for eight prime value family
+				ReplaceList.GroupBy(n => n.objB).Where(g => g.Count() >= 8).Dump();
+			}
+			
+			
+			//Reset list
+			ReplaceList = new List<Helpers.Tuple<int, int>>();
+		}
+		++lengthCount;
+		
+		
+		ReplaceList.Add(new Helpers.Tuple<int, int>(PRIMES[i], Problem51_swapNumbers(PRIMES[i])));
+	}
+	
+	return 48;
+}
+public static int Problem51_swapNumbers(int num)
+{
+	int[] replace = new int[10];
+	
+	int output = 0;
+	int next = 1;
+	
+	while (num > 0)
+	{
+		int index = num % 10;
+		if (replace[index] == 0) replace[index] = next++;
+		output = output * 10 + replace[index];
+		num /= 10;
+	}
+	
+	return output;
+}
 public static long Problem94()
 {
 //	Problem94_isTriangleAreaWhole(6, 5).Dump();
@@ -111,7 +183,7 @@ public static void Problem94TESTTEST()
 	string g = "good";
 	string b = "bad";
 	
-	long areaAbout = 2433601*2433601/2;
+	//long areaAbout = 2433601*2433601/2;
 	
 	//KNOWN
 	long known1 = 2433601;
@@ -700,13 +772,13 @@ public static long Problem99()
 	Problem99_Exponent bestNum = new Problem99_Exponent(2, 2);
 	int bestLineNum = 0;
 	
-//	var FullList = new List<Helpers.tuple_double<int, Problem99_Exponent>>();
+//	var FullList = new List<Helpers.Tuple<int, Problem99_Exponent>>();
 	
 	for (int i = 0; i < numbers.Length; ++i)
 	{
 		Problem99_Exponent currentNumber = new Problem99_Exponent(numbers[i]);
 		
-//		FullList.Add(new Helpers.tuple_double<int, Problem99_Exponent>(i+1, currentNumber));
+//		FullList.Add(new Helpers.Tuple<int, Problem99_Exponent>(i+1, currentNumber));
 		
 		if (currentNumber.CompareTo(bestNum) > 0)
 		//if (currentNumber.Exponent > bestNum.Exponent)
@@ -2120,7 +2192,7 @@ public static long Problem90()
 	
 	//requiredPairs.Dump();
 	
-	List<Helpers.tuple_double<List<int>, List<int>>> finishedList = 
+	List<Helpers.Tuple<List<int>, List<int>>> finishedList = 
 		Problem90_Recurse(requiredPairsInt, 0, new List<int>(), new List<int>());
 	
 //	//finishedList.Dump();
@@ -2162,9 +2234,9 @@ public static long Problem90()
 	
 	return -90;
 }
-public static List<Helpers.tuple_double<List<int>, List<int>>> Problem90_PadDice(List<Helpers.tuple_double<List<int>, List<int>>> dicePairs)
+public static List<Helpers.Tuple<List<int>, List<int>>> Problem90_PadDice(List<Helpers.Tuple<List<int>, List<int>>> dicePairs)
 {
-	//List<Helpers.tuple_double<List<int>, List<int>>> newOutputList = new List<Helpers.tuple_double<List<int>, List<int>>>(dicePairs.Count);
+	//List<Helpers.Tuple<List<int>, List<int>>> newOutputList = new List<Helpers.Tuple<List<int>, List<int>>>(dicePairs.Count);
 	
 	//Fuck it all, ugly way going through eveyrthing twice
 	for (int n = 0; n < dicePairs.Count; ++n)
@@ -2186,7 +2258,7 @@ public static List<Helpers.tuple_double<List<int>, List<int>>> Problem90_PadDice
 					List<int> newDie = die.ToList();
 					newDie.Add(i);
 					
-					dicePairs.Add(new Helpers.tuple_double<List<int>, List<int>>(newDie, dicePairs[n].objB));
+					dicePairs.Add(new Helpers.Tuple<List<int>, List<int>>(newDie, dicePairs[n].objB));
 				}
 			}
 			//Remove this die
@@ -2215,7 +2287,7 @@ public static List<Helpers.tuple_double<List<int>, List<int>>> Problem90_PadDice
 					List<int> newDie = die.ToList();
 					newDie.Add(i);
 					
-					dicePairs.Add(new Helpers.tuple_double<List<int>, List<int>>(dicePairs[n].objA, newDie));
+					dicePairs.Add(new Helpers.Tuple<List<int>, List<int>>(dicePairs[n].objA, newDie));
 				}
 			}
 			//Remove this die
@@ -2230,9 +2302,9 @@ public static List<Helpers.tuple_double<List<int>, List<int>>> Problem90_PadDice
 }
 public static int SuccessCount = 0;
 public static int TotalCount = 0;
-public static List<Helpers.tuple_double<List<int>, List<int>>> Problem90_Recurse(int[] requiredPairs, int index, List<int> die1, List<int> die2)
+public static List<Helpers.Tuple<List<int>, List<int>>> Problem90_Recurse(int[] requiredPairs, int index, List<int> die1, List<int> die2)
 {
-	List<Helpers.tuple_double<List<int>, List<int>>> output = new List<Helpers.tuple_double<List<int>, List<int>>>();
+	List<Helpers.Tuple<List<int>, List<int>>> output = new List<Helpers.Tuple<List<int>, List<int>>>();
 	
 	if (index == requiredPairs.Length)
 	{
@@ -2248,7 +2320,7 @@ public static List<Helpers.tuple_double<List<int>, List<int>>> Problem90_Recurse
 			
 			//TODO if die.Count < 6, that is 4 possible matches
 			
-			output.Add(new Helpers.tuple_double<List<int>, List<int>>(die1, die2));
+			output.Add(new Helpers.Tuple<List<int>, List<int>>(die1, die2));
 			return output;
 		}
 		return output;
@@ -2310,9 +2382,9 @@ public static class Helpers
 //		return sum;
 	}
 	
-	public class tuple_double<A, B>
+	public class Tuple<A, B>
 	{
-		public tuple_double(A a, B b)
+		public Tuple(A a, B b)
 		{
 			_a = a;
 			_b = b;
@@ -2329,6 +2401,34 @@ public static class Helpers
 		{
 			get { return _b; }
 			set { _b = value; }
+		}
+	}
+	public class Tuple<A, B, C>
+	{
+		public Tuple(A a, B b, C c)
+		{
+			_a = a;
+			_b = b;
+			_c = c;
+		}
+		A _a;
+		B _b;
+		C _c;
+		
+		public A objA
+		{
+			get { return _a; }
+			set { _a = value; }
+		}
+		public B objB
+		{
+			get { return _b; }
+			set { _b = value; }
+		}
+		public C objC
+		{
+			get { return _c; }
+			set { _c = value; }
 		}
 	}
 	public static long CalcPn(ref long[] aiPn, long n)

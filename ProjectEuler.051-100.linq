@@ -22,9 +22,11 @@ public static long Problem94()
 	
 	
 #region Testing doubles
-	Problem94TEST_long();
-	"".Dump();
-	Problem94TEST_double();
+	//I need to impliment this: http://social.msdn.microsoft.com/Forums/en-US/csharplanguage/thread/c13d3fec-21d9-4f74-92de-a6132d5e9915/
+	Problem94TESTTEST();
+//	Problem94TEST_long();
+//	"".Dump();
+//	Problem94TEST_double();
 	return -94;
 #endregion Testing doubles
 	
@@ -103,6 +105,37 @@ public static long Problem94()
 	//Split sqrts out 24 seconds
 	//48490
 	return outputSum;
+}
+public static void Problem94TESTTEST()
+{
+	string g = "good";
+	string b = "bad";
+	
+	long areaAbout = 2433601*2433601/2;
+	
+	//KNOWN
+	long known1 = 2433601;
+	GetArea(known1, g, b);
+	long known2 = 126500417;
+	GetArea(known2, null, null);
+	
+	//Known NOT
+	long not1 = 472105988;
+	GetArea(not1, b, b);
+	
+	//Largest valid:
+	long largest = 472105985;
+	GetArea(largest, null, null);
+}
+public static void GetArea(double i, string plus, string minus)
+{
+	double areaPlus = Math.Sqrt((3*i+1) * (i+1))
+					* Math.Sqrt((i+1) * (i-1)) / 4;
+	double areaMinus = Math.Sqrt((3*i-1) * (i-1))
+					* Math.Sqrt((i-1) * (i+1)) / 4;
+	
+	((long)areaPlus).Dump(plus);
+	areaMinus.Dump(minus);
 }
 public static void Problem94TEST_long()
 {

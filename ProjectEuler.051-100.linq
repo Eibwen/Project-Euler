@@ -80,12 +80,27 @@ public static long Problem82_FindBestFromInverseF(int SIZE, long[] array, int x,
 	//Check from the lower left.. NEED TO CHECK MULTIPLE STEPS DOWNWARD
 	if (y < SIZE-1 && x > 0)
 	{
-		int indexD = x+((y+1)*SIZE);
-		int indexDL = (x-1)+((y+1)*SIZE);
-		long pathSum = array[indexD] + array[indexDL];
-		if (lowest > pathSum)
+//		int indexD = x+((y+1)*SIZE);
+//		int indexDL = (x-1)+((y+1)*SIZE);
+//		long pathSum = array[indexD] + array[indexDL];
+//		if (lowest > pathSum)
+//		{
+//			lowest = pathSum;
+//		}
+		long downSum = 0;
+		for (int yb = y+1; yb < SIZE; ++yb)
 		{
-			lowest = pathSum;
+			int indexD = x+(yb*SIZE);
+			downSum += array[indexD];
+			//escape early if possible
+			if (downSum > lowest) break;
+			
+			int indexDL = (x-1)+(yb*SIZE);
+			long pathSum = downSum + array[indexDL];
+			if (lowest > pathSum)
+			{
+				lowest = pathSum;
+			}
 		}
 	}
 	

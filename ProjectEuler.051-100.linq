@@ -10,18 +10,91 @@ void Main()
 // Define other methods and classes here
 public static long Problem83()
 {
-	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem82_matrix.txt");
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem81_matrix_test.txt");
 	
-	int SIZE = 80;
+	int SIZE = 5;
 	long[] array;// = new int[SIZE*SIZE];
+	long[] smallestPath = new long[SIZE*SIZE];
 	
 	array = (from s in File.ReadAllText(PATH).Split(',', '\n', '\r')
 				where s.Length > 0
 				select Int64.Parse(s)).ToArray();
 	
-	BitArray path = new BitArray(SIZE*SIZE);
+	if (array.Length != SIZE*SIZE)
+	{
+		throw new ApplicationException("Error size");
+	}
+	
+	
+	for (int x = 0; x < SIZE; ++x)
+	{
+		for (int y = 0; y < SIZE; ++y)
+		{
+			Problem83_trace(SIZE, array, smallestPath, x, y);
+		}
+	}
+	
+	StringBuilder sb = new StringBuilder();
+	for (int i = 0; i < SIZE; ++i)
+	{
+		for (int j = 0; j < SIZE; ++j)
+		{
+			sb.Append(smallestPath[j+i*SIZE]).Append("\t");
+		}
+		sb.AppendLine();
+	}
+	sb.ToString().Dump();
 	
 	return -482;
+}
+public static void Problem83_trace(int SIZE, long[] array, long[] smallestPath, int x, int y) //Based on Problem81_FindBestFromAbove
+{
+	//Attempting a non-recursive one... not sure how it will work
+	//And would most likely be O(n^2) so not sure if its worth bothering at all hah
+	
+	int indexThis = x+(y*SIZE);
+	
+	int indexLeft = x-1+(y*SIZE);
+	int indexRight = x+1+(y*SIZE);
+	int indexUp = x+((y-1)*SIZE);
+	int indexDown = x+((y+1)*SIZE);
+	
+	long setValue = smallestPath[indexThis];
+	if (setValue == 0) setValue = long.MaxValue;
+	
+	//Left
+	if (x > 0)
+	{
+		setValue = Problem83_min(smallestPath, setValue, indexLeft);
+	}
+	//Right
+	if (x < SIZE-1)
+	{
+		setValue = Problem83_min(smallestPath, setValue, indexRight);
+	}
+	//Up
+	if (y > 0)
+	{
+		setValue = Problem83_min(smallestPath, setValue, indexUp);
+	}
+	//Down
+	if (y < SIZE-1)
+	{
+		setValue = Problem83_min(smallestPath, setValue, indexDown);
+	}
+	
+	smallestPath[indexThis] = setValue + array[indexThis];
+	
+	//If found no values, take this as the starting point
+	if (setValue == long.MaxValue) smallestPath[indexThis] = array[indexThis];
+}
+public static long Problem83_min(long[] smallestPath, long curValue, int index)
+{
+	if (smallestPath[index] > 0 && smallestPath[index] < curValue)
+	{
+		return smallestPath[index];
+	}
+	return curValue;
 }
 public static long Problem82()
 {

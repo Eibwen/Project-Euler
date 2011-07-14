@@ -26,6 +26,22 @@ public static long Problem83()
 	}
 	
 	
+	//A single loop solves for 81
+	//Three loops solves for 83 test...
+	for (int x = 0; x < SIZE; ++x)
+	{
+		for (int y = 0; y < SIZE; ++y)
+		{
+			Problem83_trace(SIZE, array, smallestPath, x, y);
+		}
+	}
+	for (int x = 0; x < SIZE; ++x)
+	{
+		for (int y = 0; y < SIZE; ++y)
+		{
+			Problem83_trace(SIZE, array, smallestPath, x, y);
+		}
+	}
 	for (int x = 0; x < SIZE; ++x)
 	{
 		for (int y = 0; y < SIZE; ++y)
@@ -45,7 +61,7 @@ public static long Problem83()
 	}
 	sb.ToString().Dump();
 	
-	return -482;
+	return smallestPath[SIZE*SIZE-1];
 }
 public static void Problem83_trace(int SIZE, long[] array, long[] smallestPath, int x, int y) //Based on Problem81_FindBestFromAbove
 {

@@ -27,7 +27,20 @@ public static long Problem83()
 	
 	try
 	{
-		return Problem83_trace(SIZE, array, smallestPath, 0, 0);
+		long output = Problem83_trace(SIZE, array, smallestPath, 0, 0);
+		
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < SIZE; ++i)
+		{
+			for (int j = 0; j < SIZE; ++j)
+			{
+				sb.Append(smallestPath[j+i*SIZE]).Append("\t");
+			}
+			sb.AppendLine();
+		}
+		sb.ToString().Dump();
+		
+		return output;
 	}
 	catch (Exception ex)
 	{
@@ -77,32 +90,39 @@ public static long Problem83_trace(int SIZE, long[] array, long[] smallestPath, 
 	int indexUp = x+((y-1)*SIZE);
 	int indexDown = x+((y+1)*SIZE);
 	
-	long setValue = smallestPath[indexThis];
-	if (setValue == 0) setValue = long.MaxValue;
-	
 	//Left
 	if (x > 0)
 	{
-		setValue = Math.Min(setValue, array[indexThis] + Problem83_trace(SIZE, array, smallestPath, x-1, y));
+		Problem83_Min(array, smallestPath, indexThis, Problem83_trace(SIZE, array, smallestPath, x-1, y));
 	}
 	//Right
 	if (x < SIZE-1)
 	{
-		setValue = Math.Min(setValue, array[indexThis] + Problem83_trace(SIZE, array, smallestPath, x+1, y));
+		Problem83_Min(array, smallestPath, indexThis, Problem83_trace(SIZE, array, smallestPath, x+1, y));
 	}
 	//Up
 	if (y > 0)
 	{
-		setValue = Math.Min(setValue, array[indexThis] + Problem83_trace(SIZE, array, smallestPath, x, y-1));
+		Problem83_Min(array, smallestPath, indexThis, Problem83_trace(SIZE, array, smallestPath, x, y-1));
 	}
 	//Down
 	if (y < SIZE-1)
 	{
-		setValue = Math.Min(setValue, array[indexThis] + Problem83_trace(SIZE, array, smallestPath, x, y+1));
+		Problem83_Min(array, smallestPath, indexThis, Problem83_trace(SIZE, array, smallestPath, x, y+1));
 	}
 	
-	smallestPath[indexThis] = setValue;
-	return setValue;
+	if (smallestPath[indexThis] == 0) smallestPath[indexThis] = array[indexThis];
+	
+	return smallestPath[indexThis];
+}
+public static void Problem83_Min(long[] array, long[] smallestPath, int indexThis, long recursedValue)
+{
+	//Find the final recurse value
+	long temp = array[indexThis] + recursedValue;
+	//If nothing, just take the recurse value
+	if (smallestPath[indexThis] == 0) smallestPath[indexThis] = temp;
+	//Otherwise take the lower
+	else smallestPath[indexThis] = Math.Min(smallestPath[indexThis], temp);
 }
 #region Problem83 Fail
 public static long fail_Problem83()

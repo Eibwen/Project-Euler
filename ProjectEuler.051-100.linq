@@ -15,6 +15,7 @@ public static long Problem83()
 	int SIZE = 5;
 	long[] array;// = new int[SIZE*SIZE];
 	long[] smallestPath = new long[SIZE*SIZE];
+	BitArray visited = new BitArray(SIZE*SIZE);
 	
 	array = (from s in File.ReadAllText(PATH).Split(',', '\n', '\r')
 				where s.Length > 0
@@ -27,7 +28,7 @@ public static long Problem83()
 	
 	try
 	{
-		long output = Problem83_trace(SIZE, array, smallestPath, 0, 0);
+		long output = Problem83_trace(SIZE, array, smallestPath, visited, 0, 0);
 		
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < SIZE; ++i)
@@ -48,40 +49,49 @@ public static long Problem83()
 		return -83;
 	}
 }
-public static long Problem83_trace(int SIZE, long[] array, long[] smallestPath, int x, int y) //Based on Problem81_FindBestFromAbove
+public static long Problem83_trace(int SIZE, long[] array, long[] smallestPath, BitArray visited, int x, int y) //Based on Problem81_FindBestFromAbove
 {
 	if (x < 0 || y < 0) throw new ApplicationException("Went off top or left");
 	
 	int indexThis = x+(y*SIZE);
 	
-	//Already seen this path
-	if (smallestPath[indexThis] != 0) return smallestPath[indexThis];
+//	//Already seen this path
+//	if (smallestPath[indexThis] != 0) return smallestPath[indexThis];
 	//Reached end point
 	if (x == SIZE-1 && y == SIZE-1)
 	{
 		return array[indexThis];
 	}
 	
-	//Reached right edge, sum them until it reaches bottom corner
-	if (x >= SIZE-1)
+	//These don't work when you can move in 4 directions...
+//	//Reached right edge, sum them until it reaches bottom corner
+//	if (x >= SIZE-1)
+//	{
+//		long count = 0;
+//		for (int a = y + 0; a < SIZE; ++a)
+//		{
+//			count += array[x+(a*SIZE)];
+//		}
+//		return count;
+//	}
+//	//Reached bottom edge, sum them until it reaches bottom corner
+//	if (y >= SIZE-1)
+//	{
+//		long count = 0;
+//		for (int a = x + 0; a < SIZE; ++a)
+//		{
+//			count += array[a+(y*SIZE)];
+//		}
+//		return count;
+//	}
+	
+	if (visited[indexThis])
 	{
-		long count = 0;
-		for (int a = y + 0; a < SIZE; ++a)
-		{
-			count += array[x+(a*SIZE)];
-		}
-		return count;
+		return 99999999;
 	}
-	//Reached bottom edge, sum them until it reaches bottom corner
-	if (y >= SIZE-1)
-	{
-		long count = 0;
-		for (int a = x + 0; a < SIZE; ++a)
-		{
-			count += array[a+(y*SIZE)];
-		}
-		return count;
-	}
+	//Make a recursive copy
+	BitArray vistedRecurse = new BitArray(visited);
+	vistedRecurse[indexThis] = true;
 	
 	//Done with special cases, recurse in all directions
 	
@@ -93,25 +103,27 @@ public static long Problem83_trace(int SIZE, long[] array, long[] smallestPath, 
 	//Left
 	if (x > 0)
 	{
-		Problem83_Min(array, smallestPath, indexThis, Problem83_trace(SIZE, array, smallestPath, x-1, y));
+		Problem83_Min(array, smallestPath, indexThis, Problem83_trace(SIZE, array, smallestPath, vistedRecurse, x-1, y));
 	}
 	//Right
 	if (x < SIZE-1)
 	{
-		Problem83_Min(array, smallestPath, indexThis, Problem83_trace(SIZE, array, smallestPath, x+1, y));
+		Problem83_Min(array, smallestPath, indexThis, Problem83_trace(SIZE, array, smallestPath, vistedRecurse, x+1, y));
 	}
 	//Up
 	if (y > 0)
 	{
-		Problem83_Min(array, smallestPath, indexThis, Problem83_trace(SIZE, array, smallestPath, x, y-1));
+		Problem83_Min(array, smallestPath, indexThis, Problem83_trace(SIZE, array, smallestPath, vistedRecurse, x, y-1));
 	}
 	//Down
 	if (y < SIZE-1)
 	{
-		Problem83_Min(array, smallestPath, indexThis, Problem83_trace(SIZE, array, smallestPath, x, y+1));
+		Problem83_Min(array, smallestPath, indexThis, Problem83_trace(SIZE, array, smallestPath, vistedRecurse, x, y+1));
 	}
 	
 	if (smallestPath[indexThis] == 0) smallestPath[indexThis] = array[indexThis];
+	
+	vistedRecurse[indexThis] = false;
 	
 	return smallestPath[indexThis];
 }
@@ -149,21 +161,21 @@ public static long fail_Problem83()
 	{
 		for (int y = 0; y < SIZE; ++y)
 		{
-			Problem83_trace(SIZE, array, smallestPath, x, y);
+			fail_Problem83_trace(SIZE, array, smallestPath, x, y);
 		}
 	}
 	for (int x = 0; x < SIZE; ++x)
 	{
 		for (int y = 0; y < SIZE; ++y)
 		{
-			Problem83_trace(SIZE, array, smallestPath, x, y);
+			fail_Problem83_trace(SIZE, array, smallestPath, x, y);
 		}
 	}
 	for (int x = 0; x < SIZE; ++x)
 	{
 		for (int y = 0; y < SIZE; ++y)
 		{
-			Problem83_trace(SIZE, array, smallestPath, x, y);
+			fail_Problem83_trace(SIZE, array, smallestPath, x, y);
 		}
 	}
 	

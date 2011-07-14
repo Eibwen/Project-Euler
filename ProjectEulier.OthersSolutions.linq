@@ -8,7 +8,7 @@ void Main()
 	//Problem76.hultan_20040830().Dump();
 	//Problem77.cyph1e_20050222().Dump();
 	//Problem97.qbtruk_20050816().Dump();
-	Problem81.SekaiAi_20060523_Port().Dump();
+	Problem81.AliPang_20060410().Dump();
 }
 
 // Define other methods and classes here
@@ -106,6 +106,73 @@ public static class Problem81
 			if (cache[x][y] > 0) min = Math.Min(min, cache[x][y]);
 			cache[x][y] = min;
 			return min;
+		}
+	}
+	
+	
+	//AliPang_20060410
+	// java recursive dijkstra solution.
+	// 83: hmm, had to add two and modify one line of code from problem 81 :)
+//	public class Problem81 {
+//		static int size = 80;
+//		static int[][] mins = new int[size][size];
+//		static int[][] matrix = new int[size][size];
+//	
+//		static void rek(int sum, int i, int j){
+//			if(i >= size || j >= size) return;
+//			sum += matrix[i][j];
+//			if(sum < mins[i][j]){
+//				mins[i][j] = sum;
+//				rek(sum,i,j+1);
+//				rek(sum,i+1,j);
+//			}
+//		}
+//		public static void main(String[] args) throws Exception{		
+//			Scanner in = new Scanner(new File("prob81.txt"));
+//			int i = 0;
+//			while (in.hasNextInt()){
+//				matrix[i/size][i%size] = in.nextInt();
+//				i++;
+//			}
+//			for(int[] v : mins){
+//				Arrays.fill(v,Integer.MAX_VALUE);
+//			}
+//			rek(0,0,0);
+//			System.out.println(mins[size-1][size-1]);
+//		}
+//	}
+	public static long AliPang_20060410()
+	{
+		string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem82_matrix.txt");
+		
+		int size = 80;
+		long[][] mins = new long[size][];
+		for (int i = 0; i < size; ++i)
+		{
+			mins[i] = new long[size];
+			for (int j = 0; j < size; ++j)
+				mins[i][j] = long.MaxValue;
+		}
+		
+		string[] linesTemp = File.ReadAllLines(PATH);
+		long[][] matrix = (from l in linesTemp
+							select (from c in l.Split(',')
+								where c.Length > 0
+								select Int64.Parse(c)).ToArray()).ToArray();
+		
+		AliPang_20060410_rek(0, 0, 0, size, mins, matrix);
+		return mins[size-1][size-1];
+	}
+	public static void AliPang_20060410_rek(long sum, int i, int j,
+										int size, long[][] mins, long[][] matrix)
+	{
+		if(i >= size || j >= size) return;
+		sum += matrix[i][j];
+		if(sum < mins[i][j])
+		{
+			mins[i][j] = sum;
+			AliPang_20060410_rek(sum,i,j+1, size, mins, matrix);
+			AliPang_20060410_rek(sum,i+1,j, size, mins, matrix);
 		}
 	}
 }

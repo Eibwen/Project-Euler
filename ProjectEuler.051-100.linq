@@ -4,7 +4,7 @@
 
 void Main()
 {
-	Problem83().Dump("Result");
+	fail_Problem83().Dump("Result");
 }
 
 // Define other methods and classes here
@@ -123,7 +123,7 @@ public static long Problem83_trace(int SIZE, long[] array, long[] smallestPath, 
 	
 	if (smallestPath[indexThis] == 0) smallestPath[indexThis] = array[indexThis];
 	
-	vistedRecurse[indexThis] = false;
+	//vistedRecurse[indexThis] = false;
 	
 	return smallestPath[indexThis];
 }
@@ -139,9 +139,9 @@ public static void Problem83_Min(long[] array, long[] smallestPath, int indexThi
 #region Problem83 Fail
 public static long fail_Problem83()
 {
-	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem81_matrix_test.txt");
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem81_matrix.txt");
 	
-	int SIZE = 5;
+	int SIZE = 80;
 	long[] array;// = new int[SIZE*SIZE];
 	long[] smallestPath = new long[SIZE*SIZE];
 	
@@ -157,6 +157,14 @@ public static long fail_Problem83()
 	
 	//A single loop solves for 81
 	//Three loops solves for 83 test...
+	//Four loops solves for 83 full
+	for (int x = 0; x < SIZE; ++x)
+	{
+		for (int y = 0; y < SIZE; ++y)
+		{
+			fail_Problem83_trace(SIZE, array, smallestPath, x, y);
+		}
+	}
 	for (int x = 0; x < SIZE; ++x)
 	{
 		for (int y = 0; y < SIZE; ++y)
@@ -179,16 +187,16 @@ public static long fail_Problem83()
 		}
 	}
 	
-	StringBuilder sb = new StringBuilder();
-	for (int i = 0; i < SIZE; ++i)
-	{
-		for (int j = 0; j < SIZE; ++j)
-		{
-			sb.Append(smallestPath[j+i*SIZE]).Append("\t");
-		}
-		sb.AppendLine();
-	}
-	sb.ToString().Dump();
+//	StringBuilder sb = new StringBuilder();
+//	for (int i = 0; i < SIZE; ++i)
+//	{
+//		for (int j = 0; j < SIZE; ++j)
+//		{
+//			sb.Append(smallestPath[j+i*SIZE]).Append("\t");
+//		}
+//		sb.AppendLine();
+//	}
+//	sb.ToString().Dump();
 	
 	return smallestPath[SIZE*SIZE-1];
 }

@@ -4,11 +4,11 @@
 
 void Main()
 {
-	fail_Problem83().Dump("Result");
+	Problem83().Dump("Result");
 }
 
 // Define other methods and classes here
-public static long Problem83()
+public static long Problem83_basedOnOthers81()
 {
 	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem81_matrix_test.txt");
 	
@@ -136,8 +136,8 @@ public static void Problem83_Min(long[] array, long[] smallestPath, int indexThi
 	//Otherwise take the lower
 	else smallestPath[indexThis] = Math.Min(smallestPath[indexThis], temp);
 }
-#region Problem83 Fail
-public static long fail_Problem83()
+#region Problem83
+public static long Problem83()
 {
 	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem81_matrix.txt");
 	
@@ -158,32 +158,23 @@ public static long fail_Problem83()
 	//A single loop solves for 81
 	//Three loops solves for 83 test...
 	//Four loops solves for 83 full
-	for (int x = 0; x < SIZE; ++x)
+	long bestSolution = long.MaxValue;
+	while (true)
 	{
-		for (int y = 0; y < SIZE; ++y)
+		for (int x = 0; x < SIZE; ++x)
 		{
-			fail_Problem83_trace(SIZE, array, smallestPath, x, y);
+			for (int y = 0; y < SIZE; ++y)
+			{
+				Problem83_trace(SIZE, array, smallestPath, x, y);
+			}
 		}
-	}
-	for (int x = 0; x < SIZE; ++x)
-	{
-		for (int y = 0; y < SIZE; ++y)
+		if (smallestPath[SIZE*SIZE-1] < bestSolution)
 		{
-			fail_Problem83_trace(SIZE, array, smallestPath, x, y);
+			bestSolution = smallestPath[SIZE*SIZE-1];
 		}
-	}
-	for (int x = 0; x < SIZE; ++x)
-	{
-		for (int y = 0; y < SIZE; ++y)
+		else
 		{
-			fail_Problem83_trace(SIZE, array, smallestPath, x, y);
-		}
-	}
-	for (int x = 0; x < SIZE; ++x)
-	{
-		for (int y = 0; y < SIZE; ++y)
-		{
-			fail_Problem83_trace(SIZE, array, smallestPath, x, y);
+			return bestSolution;
 		}
 	}
 	
@@ -200,7 +191,7 @@ public static long fail_Problem83()
 	
 	return smallestPath[SIZE*SIZE-1];
 }
-public static void fail_Problem83_trace(int SIZE, long[] array, long[] smallestPath, int x, int y) //Based on Problem81_FindBestFromAbove
+public static void Problem83_trace(int SIZE, long[] array, long[] smallestPath, int x, int y) //Based on Problem81_FindBestFromAbove
 {
 	//Attempting a non-recursive one... not sure how it will work
 	//And would most likely be O(n^2) so not sure if its worth bothering at all hah
@@ -249,7 +240,7 @@ public static long Problem83_min(long[] smallestPath, long curValue, int index)
 	}
 	return curValue;
 }
-#endregion Problem83 Fail
+#endregion Problem83
 public static long Problem82()
 {
 	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem82_matrix.txt");

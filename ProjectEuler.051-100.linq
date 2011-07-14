@@ -4,10 +4,25 @@
 
 void Main()
 {
-	Problem82().Dump("Result");
+	Problem83().Dump("Result");
 }
 
 // Define other methods and classes here
+public static long Problem83()
+{
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem82_matrix.txt");
+	
+	int SIZE = 80;
+	long[] array;// = new int[SIZE*SIZE];
+	
+	array = (from s in File.ReadAllText(PATH).Split(',', '\n', '\r')
+				where s.Length > 0
+				select Int64.Parse(s)).ToArray();
+	
+	BitArray path = new BitArray(SIZE*SIZE);
+	
+	return -482;
+}
 public static long Problem82()
 {
 	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem82_matrix.txt");
@@ -111,76 +126,76 @@ public static long Problem82_FindBestFromInverseF(int SIZE, long[] array, int x,
 	
 	return array[x+y*SIZE];
 }
-//public static long Problem81()
-//{
-//	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem81_matrix.txt");
-//	
-//	int SIZE = 80;
-//	long[] array;// = new int[SIZE*SIZE];
-//	
-//	array = (from s in File.ReadAllText(PATH).Split(',', '\n', '\r')
-//				where s.Length > 0
-//				select Int64.Parse(s)).ToArray();
-//	
-//	for (int waveRow = 0; waveRow < SIZE; ++waveRow)
+public static long Problem81()
+{
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem81_matrix.txt");
+	
+	int SIZE = 80;
+	long[] array;// = new int[SIZE*SIZE];
+	
+	array = (from s in File.ReadAllText(PATH).Split(',', '\n', '\r')
+				where s.Length > 0
+				select Int64.Parse(s)).ToArray();
+	
+	for (int waveRow = 0; waveRow < SIZE; ++waveRow)
+	{
+		//Go along the row
+		for (int x = 0; x < waveRow; ++x)
+		{
+			//Util.HorizontalRun(true, array[x + waveRow*SIZE], "=>", Problem81_FindBestFromAbove(array, x, waveRow)).Dump();
+			array[x + waveRow*SIZE] = Problem81_FindBestFromAbove(SIZE, array, x, waveRow);
+		}
+		//Go along the Column
+		for (int y = 0; y < waveRow; ++y)
+		{
+			//Util.HorizontalRun(true, array[waveRow + y*SIZE], "=>", Problem81_FindBestFromAbove(array, waveRow, y)).Dump();
+			array[waveRow + y*SIZE] = Problem81_FindBestFromAbove(SIZE, array, waveRow, y);
+		}
+		//Go to the point of it after both have been calculated
+		array[waveRow + waveRow*SIZE] = Problem81_FindBestFromAbove(SIZE, array, waveRow, waveRow);
+	}
+	
+//	StringBuilder sb = new StringBuilder();
+//	for (int i = 0; i < SIZE; ++i)
 //	{
-//		//Go along the row
-//		for (int x = 0; x < waveRow; ++x)
+//		for (int j = 0; j < SIZE; ++j)
 //		{
-//			//Util.HorizontalRun(true, array[x + waveRow*SIZE], "=>", Problem81_FindBestFromAbove(array, x, waveRow)).Dump();
-//			array[x + waveRow*SIZE] = Problem81_FindBestFromAbove(SIZE, array, x, waveRow);
+//			sb.Append(array[j+i*SIZE]).Append("\t");
 //		}
-//		//Go along the Column
-//		for (int y = 0; y < waveRow; ++y)
-//		{
-//			//Util.HorizontalRun(true, array[waveRow + y*SIZE], "=>", Problem81_FindBestFromAbove(array, waveRow, y)).Dump();
-//			array[waveRow + y*SIZE] = Problem81_FindBestFromAbove(SIZE, array, waveRow, y);
-//		}
-//		//Go to the point of it after both have been calculated
-//		array[waveRow + waveRow*SIZE] = Problem81_FindBestFromAbove(SIZE, array, waveRow, waveRow);
+//		sb.AppendLine();
 //	}
-//	
-////	StringBuilder sb = new StringBuilder();
-////	for (int i = 0; i < SIZE; ++i)
-////	{
-////		for (int j = 0; j < SIZE; ++j)
-////		{
-////			sb.Append(array[j+i*SIZE]).Append("\t");
-////		}
-////		sb.AppendLine();
-////	}
-////	sb.ToString().Dump();
-//	
-//	return array[SIZE*SIZE - 1];
-//}
-//public static long Problem81_FindBestFromAbove(int SIZE, long[] array, int x, int y)
-//{
-//	long lowest = long.MaxValue;
-//	
-//	//Check from the left
-//	if (x > 0)
-//	{
-//		int index = x-1+(y*SIZE);
-//		//Since this is the first check possible, just use it
-//		lowest = array[index];
-//	}
-//	//Check from the top
-//	if (y > 0)
-//	{
-//		int index = x+((y-1)*SIZE);
-//		if (lowest > array[index])
-//		{
-//			lowest = array[index];
-//		}
-//	}
-//	
-//	if (lowest != long.MaxValue)
-//	{
-//		return array[x+y*SIZE] + lowest;
-//	}
-//	
-//	return array[x+y*SIZE];
-//}
+//	sb.ToString().Dump();
+	
+	return array[SIZE*SIZE - 1];
+}
+public static long Problem81_FindBestFromAbove(int SIZE, long[] array, int x, int y)
+{
+	long lowest = long.MaxValue;
+	
+	//Check from the left
+	if (x > 0)
+	{
+		int index = x-1+(y*SIZE);
+		//Since this is the first check possible, just use it
+		lowest = array[index];
+	}
+	//Check from the top
+	if (y > 0)
+	{
+		int index = x+((y-1)*SIZE);
+		if (lowest > array[index])
+		{
+			lowest = array[index];
+		}
+	}
+	
+	if (lowest != long.MaxValue)
+	{
+		return array[x+y*SIZE] + lowest;
+	}
+	
+	return array[x+y*SIZE];
+}
 public static long Problem51()
 {
 	List<int> PRIMES = Helpers.PrimesLessThan(1000000);

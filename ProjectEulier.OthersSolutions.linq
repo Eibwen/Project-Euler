@@ -7,10 +7,108 @@ void Main()
 	//(Problem76.CalcPn(100) -1).Dump();
 	//Problem76.hultan_20040830().Dump();
 	//Problem77.cyph1e_20050222().Dump();
-	Problem97.qbtruk_20050816().Dump();
+	//Problem97.qbtruk_20050816().Dump();
+	Problem81.SekaiAi_20060523_Port().Dump();
 }
 
 // Define other methods and classes here
+public static class Problem81
+{
+	//SekaiAi_20060523
+	// Php Code using Djikstra Implementation and Dynamic Programming 
+//  $lines = file("matrix.txt");
+// 
+//  $jml = count($lines);
+//  $min = 999999;
+//  $cache = array();
+// 
+//  for ($a = 0 ; $a < $jml ; $a++) {
+//	$lines[$a] = explode("," , $lines[$a]);
+//  }
+// 
+//  function trace($x, $y) {
+//	global $jml, $min , $lines, $cache;
+//	if ($cache[$x][$y] != 0) return $cache[$x][$y];
+//	if ($x == ($jml-1) && $y == ($jml-1)) {
+//	  return $lines[$x][$y];
+//	}
+//	elseif ($x >= ($jml - 1)) {
+//	  $count = 0;
+//	  for ($a = $y + 0; $a <= ($jml-1) ; $a++) {
+//		$count += $lines[$x][$a];
+//	  }
+//	  return $count;
+//	}
+//	elseif ($y >= ($jml - 1)) {
+//	  $count = 0;
+//	  for ($a = $x + 0; $a <= ($jml-1) ; $a++) {
+//		$count += $lines[$a][$y];
+//	  }
+//	  return $count;
+//	}
+//	else {
+//	  $a = $lines[$x][$y];
+//	  $b = $lines[$x][$y];
+//	  $a += trace($x + 1 , $y);
+//	  $b += trace($x, $y + 1);
+//	  $min = min($a , $b);
+//	  if ($cache[$x][$y] > 0) $min = min($min , $cache[$x][$y]);
+//	  $cache[$x][$y] = $min;
+//	  return $min;
+//	}
+//  }  
+// 
+//  echo trace(0,0);
+	public static long SekaiAi_20060523_Port()
+	{
+		string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem82_matrix.txt");
+		
+		int jml = 80;
+		long min = long.MaxValue;
+		long[][] cache = new long[jml][];
+		for (int i = 0; i < jml; ++i) cache[i] = new long[jml];
+		
+		string[] linesTemp = File.ReadAllLines(PATH);
+		long[][] lines = (from l in linesTemp
+							select (from c in l.Split(',')
+								where c.Length > 0
+								select Int64.Parse(c)).ToArray()).ToArray();
+		
+		return SekaiAi_20060523_trace(0, 0, jml, min, lines, cache);
+	}
+	public static long SekaiAi_20060523_trace(int x, int y,
+					int jml, long min, long[][] lines, long[][] cache)
+	{
+		if (cache[x][y] != 0) return cache[x][y];
+		if (x == (jml-1) && y == (jml-1)) {
+			return lines[x][y];
+		}
+		else if (x >= (jml - 1)) {
+			long count = 0;
+			for (int a = y + 0; a <= (jml-1) ; a++) {
+				count += lines[x][a];
+			}
+			return count;
+		}
+		else if (y >= (jml - 1)) {
+			long count = 0;
+			for (int a = x + 0; a <= (jml-1) ; a++) {
+				count += lines[a][y];
+			}
+			return count;
+		}
+		else {
+			long a = lines[x][y];
+			long b = lines[x][y];
+			a += SekaiAi_20060523_trace(x + 1 , y, jml, min, lines, cache);
+			b += SekaiAi_20060523_trace(x, y + 1, jml, min, lines, cache);
+			min = Math.Min(a , b);
+			if (cache[x][y] > 0) min = Math.Min(min, cache[x][y]);
+			cache[x][y] = min;
+			return min;
+		}
+	}
+}
 public static class Problem97
 {
 	//markr_20050603

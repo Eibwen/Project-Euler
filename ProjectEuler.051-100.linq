@@ -25,6 +25,103 @@ public static long Problem83()
 		throw new ApplicationException("Error size");
 	}
 	
+	try
+	{
+		return Problem83_trace(SIZE, array, smallestPath, 0, 0);
+	}
+	catch (Exception ex)
+	{
+		ex.ToString().Dump();
+		return -83;
+	}
+}
+public static long Problem83_trace(int SIZE, long[] array, long[] smallestPath, int x, int y) //Based on Problem81_FindBestFromAbove
+{
+	if (x < 0 || y < 0) throw new ApplicationException("Went off top or left");
+	
+	int indexThis = x+(y*SIZE);
+	
+	//Already seen this path
+	if (smallestPath[indexThis] != 0) return smallestPath[indexThis];
+	//Reached end point
+	if (x == SIZE-1 && y == SIZE-1)
+	{
+		return array[indexThis];
+	}
+	
+	//Reached right edge, sum them until it reaches bottom corner
+	if (x >= SIZE-1)
+	{
+		long count = 0;
+		for (int a = y + 0; a < SIZE; ++a)
+		{
+			count += array[x+(a*SIZE)];
+		}
+		return count;
+	}
+	//Reached bottom edge, sum them until it reaches bottom corner
+	if (y >= SIZE-1)
+	{
+		long count = 0;
+		for (int a = x + 0; a < SIZE; ++a)
+		{
+			count += array[a+(y*SIZE)];
+		}
+		return count;
+	}
+	
+	//Done with special cases, recurse in all directions
+	
+	int indexLeft = x-1+(y*SIZE);
+	int indexRight = x+1+(y*SIZE);
+	int indexUp = x+((y-1)*SIZE);
+	int indexDown = x+((y+1)*SIZE);
+	
+	long setValue = smallestPath[indexThis];
+	if (setValue == 0) setValue = long.MaxValue;
+	
+	//Left
+	if (x > 0)
+	{
+		setValue = Math.Min(setValue, array[indexThis] + Problem83_trace(SIZE, array, smallestPath, x-1, y));
+	}
+	//Right
+	if (x < SIZE-1)
+	{
+		setValue = Math.Min(setValue, array[indexThis] + Problem83_trace(SIZE, array, smallestPath, x+1, y));
+	}
+	//Up
+	if (y > 0)
+	{
+		setValue = Math.Min(setValue, array[indexThis] + Problem83_trace(SIZE, array, smallestPath, x, y-1));
+	}
+	//Down
+	if (y < SIZE-1)
+	{
+		setValue = Math.Min(setValue, array[indexThis] + Problem83_trace(SIZE, array, smallestPath, x, y+1));
+	}
+	
+	smallestPath[indexThis] = setValue;
+	return setValue;
+}
+#region Problem83 Fail
+public static long fail_Problem83()
+{
+	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem81_matrix_test.txt");
+	
+	int SIZE = 5;
+	long[] array;// = new int[SIZE*SIZE];
+	long[] smallestPath = new long[SIZE*SIZE];
+	
+	array = (from s in File.ReadAllText(PATH).Split(',', '\n', '\r')
+				where s.Length > 0
+				select Int64.Parse(s)).ToArray();
+	
+	if (array.Length != SIZE*SIZE)
+	{
+		throw new ApplicationException("Error size");
+	}
+	
 	
 	//A single loop solves for 81
 	//Three loops solves for 83 test...
@@ -63,7 +160,7 @@ public static long Problem83()
 	
 	return smallestPath[SIZE*SIZE-1];
 }
-public static void Problem83_trace(int SIZE, long[] array, long[] smallestPath, int x, int y) //Based on Problem81_FindBestFromAbove
+public static void fail_Problem83_trace(int SIZE, long[] array, long[] smallestPath, int x, int y) //Based on Problem81_FindBestFromAbove
 {
 	//Attempting a non-recursive one... not sure how it will work
 	//And would most likely be O(n^2) so not sure if its worth bothering at all hah
@@ -112,6 +209,7 @@ public static long Problem83_min(long[] smallestPath, long curValue, int index)
 	}
 	return curValue;
 }
+#endregion Problem83 Fail
 public static long Problem82()
 {
 	string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem82_matrix.txt");

@@ -10,71 +10,12 @@ void Main()
 // Define other methods and classes here
 public static long Problem66()
 {
-//	int MAX_TRY = 50000;
-////	long[] SQUARES = new long[MAX_TRY + 1];
-////	for (int i = 0; i <= MAX_TRY; ++i)
-////	{
-////		SQUARES[i] = i*i;
-////	}
-//	
-//	
-//	int BASE_D = 600; //2;
-//	int MAX_D = 1000;
-//	
-//	long bestX = 0;
-//	long count = 0;
-//	long missCount = 0;
-//	for (int D = 600; D <= MAX_D; ++D)
-//	{
-//		//TODO need is_sqr function
-////		if (SQUARES.Contains(D)) continue;
-//		
-//		Util.Progress = (D - BASE_D) * 100 / (MAX_D-BASE_D);
-//		
-//		bool foundLowX = false;
-//		for (int x = (int)Math.Sqrt(D); x <= MAX_TRY; ++x)
-//		{
-//			for (int y = 1; y <= MAX_TRY; ++y)
-//			{
-////				long result = SQUARES[x] - D * SQUARES[y];
-//				long result = x*x - D * y * y;
-//				if (result == 1)
-//				{
-//					foundLowX = true;
-//					++count;
-//					
-//					Util.HorizontalRun(true, x, "-", D, "*", y, "= 1").Dump();
-//					
-//					if (bestX < x)
-//					{
-//						bestX = x;
-//					}
-//					
-//					break;
-//				}
-//				if (result < 1) break;
-//			}
-//			if (foundLowX) break;
-//			else if (x == MAX_TRY)
-//			{
-//				Util.HorizontalRun(true, "miss:", D).Dump();
-//				++missCount;
-//			}
-//		}
-//	}
-//	
-//	count.Dump("Found");
-//	missCount.Dump("Misses");
-	
-	
+	long MAX_TRY = 8000000;
 	long[] SQUARES = new long[34];
 	for (int i = 0; i <= 33; ++i)
 	{
 		SQUARES[i] = i*i;
 	}
-	
-	
-	long MAX_TRY = 2000000;
 	
 	
 	int BASE_D = 600; //2;
@@ -86,26 +27,22 @@ public static long Problem66()
 	long missCount = 0;
 	for (int D = BASE_D; D <= MAX_D; ++D)
 	{
+		//TODO need is_sqr function
 		if (SQUARES.Contains(D)) continue;
 		
 		Util.Progress = (D - BASE_D) * 100 / (MAX_D-BASE_D);
 		
 		bool foundLowX = false;
-		for (long x = (long)Math.Sqrt(D); x <= MAX_TRY; ++x)
+		for (long x = (int)Math.Sqrt(D); x <= MAX_TRY; ++x)
 		{
-			long y = (long)Math.Sqrt(x*x/D);
-//			y.Dump();
-			if (y < 1) y = 1;
-//			y.Dump();
-			for (; y <= MAX_TRY; ++y)
+			
+			long ySol = x*x-1;
+			if (ySol % D == 0)
 			{
-				long result = x*x - D * y * y;
-				if (result == 1)
+				ySol /= D;
+				if (Problem66_IsSquare(ySol))
 				{
-					foundLowX = true;
-					++count;
-					
-					Util.HorizontalRun(true, x, "-", D, "*", y, "= 1").Dump();
+					Util.HorizontalRun(true, x, "-", D, "*", ySol, "= 1").Dump();
 					
 					if (bestX < x)
 					{
@@ -113,19 +50,80 @@ public static long Problem66()
 						bestD = D;
 					}
 					
+					++count;
+					foundLowX = true;
 					break;
 				}
-				
-				if (result < 1) break;
-			}
-			if (foundLowX) break;
-			else if (x == MAX_TRY)
-			{
-				Util.HorizontalRun(true, "miss:", D).Dump();
-				++missCount;
 			}
 		}
+		if (!foundLowX)
+		{
+			Util.HorizontalRun(true, "miss:", D).Dump();
+			++missCount;
+		}
 	}
+	
+	
+	
+//	long[] SQUARES = new long[34];
+//	for (int i = 0; i <= 33; ++i)
+//	{
+//		SQUARES[i] = i*i;
+//	}
+//	
+//	
+//	long MAX_TRY = 2000000;
+//	
+//	
+//	int BASE_D = 600; //2;
+//	int MAX_D = 1000;
+//	
+//	long bestX = 0;
+//	long bestD = 0;
+//	long count = 0;
+//	long missCount = 0;
+//	for (int D = BASE_D; D <= MAX_D; ++D)
+//	{
+//		if (SQUARES.Contains(D)) continue;
+//		
+//		Util.Progress = (D - BASE_D) * 100 / (MAX_D-BASE_D);
+//		
+//		bool foundLowX = false;
+//		for (long x = (long)Math.Sqrt(D); x <= MAX_TRY; ++x)
+//		{
+//			long y = (long)Math.Sqrt(x*x/D);
+////			y.Dump();
+//			if (y < 1) y = 1;
+////			y.Dump();
+//			for (; y <= MAX_TRY; ++y)
+//			{
+//				long result = x*x - D * y * y;
+//				if (result == 1)
+//				{
+//					foundLowX = true;
+//					++count;
+//					
+//					Util.HorizontalRun(true, x, "-", D, "*", y, "= 1").Dump();
+//					
+//					if (bestX < x)
+//					{
+//						bestX = x;
+//						bestD = D;
+//					}
+//					
+//					break;
+//				}
+//				
+//				if (result < 1) break;
+//			}
+//			if (foundLowX) break;
+//			else if (x == MAX_TRY)
+//			{
+//				Util.HorizontalRun(true, "miss:", D).Dump();
+//				++missCount;
+//			}
+//		}
+//	}
 	
 	count.Dump("Found");
 	missCount.Dump("Misses");
@@ -133,6 +131,11 @@ public static long Problem66()
 	bestX.Dump("Best X Value");
 	
 	return bestD;
+}
+public static bool Problem66_IsSquare(long num)
+{
+	long i = (long)Math.Sqrt(num);
+	return i*i == num;
 }
 public static long Problem83_basedOnOthers81()
 {

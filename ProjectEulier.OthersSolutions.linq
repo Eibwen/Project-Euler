@@ -8,7 +8,7 @@ void Main()
 	//Problem76.hultan_20040830().Dump();
 	//Problem77.cyph1e_20050222().Dump();
 	//Problem97.qbtruk_20050816().Dump();
-	Problem81.AliPang_20060410().Dump();
+	Problem81.BigBin_20080623().Dump();
 }
 
 // Define other methods and classes here
@@ -111,8 +111,9 @@ public static class Problem81
 	
 	
 	//AliPang_20060410
-	// java recursive dijkstra solution.
+	// java recursive dijkstra solution. 
 	// 83: hmm, had to add two and modify one line of code from problem 81 :)
+	// RESULTS: original one takes 0.040 seconds, modified for 83 takes 12 seconds... so not super good on either account, but does only take 3 line changes
 //	public class Problem81 {
 //		static int size = 80;
 //		static int[][] mins = new int[size][size];
@@ -166,13 +167,160 @@ public static class Problem81
 	public static void AliPang_20060410_rek(long sum, int i, int j,
 										int size, long[][] mins, long[][] matrix)
 	{
-		if(i >= size || j >= size) return;
+		if(i >= size || j >= size || i < 0 || j < 0) return;
 		sum += matrix[i][j];
 		if(sum < mins[i][j])
 		{
 			mins[i][j] = sum;
 			AliPang_20060410_rek(sum,i,j+1, size, mins, matrix);
 			AliPang_20060410_rek(sum,i+1,j, size, mins, matrix);
+			AliPang_20060410_rek(sum,i,j-1, size, mins, matrix);
+			AliPang_20060410_rek(sum,i-1,j, size, mins, matrix);
+		}
+	}
+	
+	
+	//BigBin_20080623
+	// I use dijkstra to and i use priority queue so it in O(n^2log(n))
+	// here this code it run less than 0.03 seconds
+	// RESULTS: Runs in 0.012 on work computer
+//	#include <stdio.h>
+//	#include <string.h>
+//	#include <queue>
+//	#define n 80
+//	
+//	using namespace std;
+//	
+//	typedef struct node {
+//		int i, j, w;
+//	}Node;
+//	
+//	bool operator<(Node a, Node b) {
+//		return a.w > b.w;
+//	}
+//	
+//	int main() {
+//		freopen("83.in", "r", stdin);
+//		int b[n][n], path[n][n];
+//	
+//		for(int i = 0; i < n; i++)
+//			for(int j = 0; j < n; j++)
+//				scanf("%d", &b[i][j]);
+//	
+//		memset(path, -1, sizeof path);
+//	
+//	
+//		priority_queue <Node> Q;
+//		Node t;
+//		t.i = t.j = 0; t.w = b[0][0];
+//		Q.push(t);
+//	
+//		int cx[] = {0, 1, 0, -1}, cy[] = {1, 0, -1, 0};
+//	
+//		path[0][0] = b[0][0];
+//		while( !Q.empty() ) {
+//			Node t = Q.top();
+//			Q.pop();
+//			for(int k = 0; k < 4; k++) {
+//				int nx = t.i + cx[k];
+//				int ny = t.j + cy[k];
+//				if( nx < 0 || nx >= n ) continue;
+//				if( ny < 0 || ny >= n ) continue;
+//				if( path[t.i][t.j] + b[nx][ny] >= path[nx][ny] && path[nx][ny] != -1 ) continue;
+//	
+//				Node s;
+//				s.i = nx; s.j = ny; s.w = path[t.i][t.j] + b[nx][ny];
+//				path[nx][ny] = s.w;
+//				Q.push(s);
+//			}
+//		}
+//		printf("%d\n", path[n-1][n-1]);
+//		return 0;
+//	}
+	public static long BigBin_20080623()
+	{
+		string PATH = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "ProjectEuler_Problem82_matrix.txt");
+		
+		int n = 80;
+		long[][] path = new long[n][];
+		for (int i = 0; i < n; ++i)
+		{
+			path[i] = new long[n];
+			for (int j = 0; j < n; ++j)
+				path[i][j] = -1;
+		}
+		
+		string[] linesTemp = File.ReadAllLines(PATH);
+		long[][] b = (from l in linesTemp
+							select (from c in l.Split(',')
+								where c.Length > 0
+								select Int64.Parse(c)).ToArray()).ToArray();
+		
+		Queue<BigBin_20080623_Node> Q = new Queue<BigBin_20080623_Node>();
+		Q.Enqueue(new BigBin_20080623_Node(0, 0, b[0][0]));
+		
+		int DIRECTIONS = 4;
+		int[] cx = {0, 1, 0, -1};
+		int[] cy = {1, 0, -1, 0};
+	
+		path[0][0] = b[0][0];
+		while(Q.Count > 0)
+		{
+			BigBin_20080623_Node t = Q.Peek();
+			Q.Dequeue();
+			for(int k = 0; k < DIRECTIONS; k++)
+			{
+				int nx = t.i + cx[k];
+				int ny = t.j + cy[k];
+				if( nx < 0 || nx >= n ) continue;
+				if( ny < 0 || ny >= n ) continue;
+				if( path[t.i][t.j] + b[nx][ny] >= path[nx][ny] && path[nx][ny] != -1 ) continue;
+	
+				BigBin_20080623_Node s = new BigBin_20080623_Node();
+				s.i = nx; s.j = ny; s.w = path[t.i][t.j] + b[nx][ny];
+				path[nx][ny] = s.w;
+				Q.Enqueue(s);
+			}
+		}
+		return path[n-1][n-1];
+	}
+	public class BigBin_20080623_Node
+	{
+		public BigBin_20080623_Node()
+		{ }
+		public BigBin_20080623_Node(int a, int b, long c)
+		{
+			_a = a;
+			_b = b;
+			_c = c;
+		}
+		int _a;
+		int _b;
+		long _c;
+		
+		public int i
+		{
+			get { return _a; }
+			set { _a = value; }
+		}
+		public int j
+		{
+			get { return _b; }
+			set { _b = value; }
+		}
+		public long w
+		{
+			get { return _c; }
+			set { _c = value; }
+		}
+		
+		public static bool operator<(BigBin_20080623_Node a, BigBin_20080623_Node b)
+		{
+			return a.w > b.w;
+		}
+		public static bool operator>(BigBin_20080623_Node a, BigBin_20080623_Node b)
+		{
+			return a.w < b.w;
 		}
 	}
 }

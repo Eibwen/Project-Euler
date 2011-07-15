@@ -2,10 +2,35 @@
 
 void Main()
 {
-	Problem204();
+	Problem234();
 }
 
 // Define other methods and classes here
+public static long Problem234()
+{
+	long MAX = 16;//1000000;
+	BitArray SQUARES = Helpers.GetPrimeSieve(MAX);
+	
+	for (int i = 2; i < MAX; ++i)
+	{
+		
+	}
+}
+public static long Problem234_lps(BitArray SQUARES, int sqrN)
+{
+	//CRAP need to work in: 2*i+1
+	for (int i = sqrN; i > 0; --i)
+	{
+		
+	}
+}
+public static long Problem234_ups(BitArray SQUARES, int sqrN)
+{
+	for (int i = sqrN; i < SQUARES.Count; ++i)
+	{
+		
+	}
+}
 public static long Problem204()
 {
 	long MAX = 100000000;
@@ -89,6 +114,23 @@ public static bool Problem204_IsHammingNumber(int type, long n)  //Based on Help
 #region Helpers
 public static class Helpers
 {
+	public static BitArray GetPrimeSieve(int limit)
+	{
+		int sieveBound = (limit-1) / 2; //last index of sieve
+		BitArray sieve = new BitArray(sieveBound);
+		int crosslimit = ((int)Math.Sqrt(limit)-1) / 2;
+		for (int i = 1; i < crosslimit; ++i)
+		{
+			if (!sieve[i]) // 2*i+1 is prime, mark multiples
+			{
+				for (int j = 2*i*(i+1); j < sieveBound; j += 2*i+1)
+				{
+					sieve[j] = true;
+				}
+			}
+		}
+		return sieve;
+	}
 	public static List<long> GetPrimeFactors(long n)  //Based on Question21_CountDivisorsPDF
 	{
 		List<long> divisors = new List<long>();

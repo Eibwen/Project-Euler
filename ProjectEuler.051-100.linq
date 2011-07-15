@@ -566,7 +566,7 @@ public static long Problem51()
 //		++lengthCount;
 //	}
 	
-	List<Helpers.Tuple<int, int>> ReplaceList = new List<Helpers.Tuple<int, int>>();
+	List<Helpers.Tuple<int, string>> ReplaceList = new List<Helpers.Tuple<int, string>>();
 	
 	for (int i = 0; i < PRIMES.Count; ++i)
 	{
@@ -590,12 +590,12 @@ public static long Problem51()
 			
 			
 			//Reset list
-			ReplaceList = new List<Helpers.Tuple<int, int>>();
+			ReplaceList = new List<Helpers.Tuple<int, string>>();
 		}
 		++lengthCount;
 		
 		
-		ReplaceList.Add(new Helpers.Tuple<int, int>(PRIMES[i], Problem51_swapNumbers(PRIMES[i])));
+		ReplaceList.Add(new Helpers.Tuple<int, string>(PRIMES[i], Problem51_swapNumbers(PRIMES[i])));
 	}
 	
 	
@@ -605,56 +605,56 @@ public static long Problem51()
 	//PROCESS THIS LIST
 	//var Canidates = ReplaceList.GroupBy(n => n.objB).Where(g => g.Count() >= 8);
 	var CanidateKeys = ReplaceList.Select(n => n.objB).Distinct();
-	foreach (int key in CanidateKeys)
+	foreach (string key in CanidateKeys)
 	{
 		//grp.Key.Dump("Key");
 		//grp.Dump();
-		int tempKey = key;
 		bool[] CheckedReplacements = new bool[10];
-		while (tempKey > 0)
+		foreach (char testingRep in key)
 		{
-			int testingRep = tempKey % 10;
-			tempKey /= 10;
-			if (CheckedReplacements[testingRep] == false)
+			if (CheckedReplacements[testingRep - 'a'] == false)
 			{
 				//Mark that we've tried this one already
-				CheckedReplacements[testingRep] = true;
+				CheckedReplacements[testingRep - 'a'] = true;
 				
-				List<Helpers.Tuple<int, int>> testingMatches = new List<Helpers.Tuple<int, int>>();
+				List<Helpers.Tuple<int, string>> testingMatches = new List<Helpers.Tuple<int, string>>();
 				
 				foreach (var item in ReplaceList)
 				{
 					int num = item.objA;
-					int mask = item.objB;
-					int outputNum = 0;
+					string mask = item.objB;
+					int maskPos = 0;
+					string outputNum = "";
 					
 					int digitCount = 0;
 					
 					while (num > 0)
 					{
-						if (mask % 10 == testingRep)
+						if (mask[maskPos] == testingRep && (num % 10) != testingRep)
 						{
 							//Use mask digit
-							outputNum = outputNum * 10 + (mask % 10);
+							outputNum = "_" + outputNum;
 						}
 						else
 						{
 							//Use num digit
-							outputNum = outputNum * 10 + (num % 10);
+							outputNum = (num % 10) + outputNum;
 							++digitCount;
 						}
 						num /= 10;
-						mask /= 10;
+						++maskPos;
 					}
 					
-					if (digitCount > 0)
-					{
-						testingMatches.Add(new Helpers.Tuple<int, int>(item.objA, outputNum));
-					}
+//					if (digitCount > 0)
+//					{
+						testingMatches.Add(new Helpers.Tuple<int, string>(item.objA, outputNum));
+//					}
 				}
 				
+				//testingMatches.GroupBy(f => f.objB).Where(g => g.Count() > 4).Dump();
+				
 				//var matches = testingMatches.GroupBy(f => f.objB).Where(g => g.Count() >= 7);
-				var matches = testingMatches.GroupBy(f => f.objB).Where(g => g.Count() == 7);
+				var matches = testingMatches.GroupBy(f => f.objB).Where(g => g.Count() == 8);
 				if (matches.Count() > 0)
 				{
 					matches.Dump();
@@ -676,22 +676,20 @@ public static long Problem51()
 	
 	return bestMatch;
 }
-public static int Problem51_swapNumbers(int num)
+public static string Problem51_swapNumbers(int num)
 {
-	int[] replace = new int[10];
+	char[] replace = new char[10];
 	
-	int output = 0;
-	int next = 1;
-	
-	int place = 1;
+	string output = "";
+	int next = 0;
 	
 	while (num > 0)
 	{
 		int index = num % 10;
-		if (replace[index] == 0) replace[index] = next++;
+		if (replace[index] == 0) replace[index] = (char)('a' + next);
+		next++;
 		//output = output * 10 + replace[index];
-		output += place * replace[index];
-		place *= 10;
+		output = replace[index] + output;
 		num /= 10;
 	}
 	

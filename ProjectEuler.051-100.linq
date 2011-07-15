@@ -599,6 +599,7 @@ public static long Problem51()
 	}
 	
 	
+	List<int> bestNums = new List<int>();
 	int bestMatch = int.MaxValue;
 	
 	//PROCESS THIS LIST
@@ -627,6 +628,8 @@ public static long Problem51()
 					int mask = item.objB;
 					int outputNum = 0;
 					
+					int digitCount = 0;
+					
 					while (num > 0)
 					{
 						if (mask % 10 == testingRep)
@@ -638,24 +641,32 @@ public static long Problem51()
 						{
 							//Use num digit
 							outputNum = outputNum * 10 + (num % 10);
+							++digitCount;
 						}
 						num /= 10;
 						mask /= 10;
 					}
 					
-					testingMatches.Add(new Helpers.Tuple<int, int>(item.objA, outputNum));
+					if (digitCount > 0)
+					{
+						testingMatches.Add(new Helpers.Tuple<int, int>(item.objA, outputNum));
+					}
 				}
 				
 				//var matches = testingMatches.GroupBy(f => f.objB).Where(g => g.Count() >= 7);
-				var matches = testingMatches.GroupBy(f => f.objB).Where(g => g.Count() == 8);
+				var matches = testingMatches.GroupBy(f => f.objB).Where(g => g.Count() == 7);
 				if (matches.Count() > 0)
 				{
 					matches.Dump();
 					
-					int tmp = matches.Select(g => g.First().objA).Min();
-					if (tmp < bestMatch)
+					var tmpList = matches.Select(g => g.First().objA);
+					bestNums.AddRange(tmpList);
+					foreach (int tmp in tmpList)
 					{
-						bestMatch = tmp;
+						if (tmp < bestMatch)
+						{
+							bestMatch = tmp;
+						}
 					}
 				}
 			}

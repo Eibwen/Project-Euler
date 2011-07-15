@@ -4,7 +4,7 @@
 
 void Main()
 {
-	Problem66().Dump("Result");
+	Problem51().Dump("Result");
 }
 
 // Define other methods and classes here
@@ -580,10 +580,12 @@ public static long Problem51()
 			lengthCount.Dump();
 			lengthCount = 0;
 			
-			if (length > 4)
+			if (length > 5)
 			{
 				//Check for eight prime value family
-				ReplaceList.GroupBy(n => n.objB).Where(g => g.Count() >= 8).Dump();
+				//ReplaceList.GroupBy(n => n.objB).Where(g => g.Count() >= 8);
+				"PROCESS THIS LIST".Dump();
+				break;
 			}
 			
 			
@@ -596,7 +598,72 @@ public static long Problem51()
 		ReplaceList.Add(new Helpers.Tuple<int, int>(PRIMES[i], Problem51_swapNumbers(PRIMES[i])));
 	}
 	
-	return 48;
+	
+	int bestMatch = int.MaxValue;
+	
+	//PROCESS THIS LIST
+	//var Canidates = ReplaceList.GroupBy(n => n.objB).Where(g => g.Count() >= 8);
+	var CanidateKeys = ReplaceList.Select(n => n.objB).Distinct();
+	foreach (int key in CanidateKeys)
+	{
+		//grp.Key.Dump("Key");
+		//grp.Dump();
+		int tempKey = key;
+		bool[] CheckedReplacements = new bool[10];
+		while (tempKey > 0)
+		{
+			int testingRep = tempKey % 10;
+			tempKey /= 10;
+			if (CheckedReplacements[testingRep] == false)
+			{
+				//Mark that we've tried this one already
+				CheckedReplacements[testingRep] = true;
+				
+				List<Helpers.Tuple<int, int>> testingMatches = new List<Helpers.Tuple<int, int>>();
+				
+				foreach (var item in ReplaceList)
+				{
+					int num = item.objA;
+					int mask = item.objB;
+					int outputNum = 0;
+					
+					while (num > 0)
+					{
+						if (mask % 10 == testingRep)
+						{
+							//Use mask digit
+							outputNum = outputNum * 10 + (mask % 10);
+						}
+						else
+						{
+							//Use num digit
+							outputNum = outputNum * 10 + (num % 10);
+						}
+						num /= 10;
+						mask /= 10;
+					}
+					
+					testingMatches.Add(new Helpers.Tuple<int, int>(item.objA, outputNum));
+				}
+				
+				//var matches = testingMatches.GroupBy(f => f.objB).Where(g => g.Count() >= 7);
+				var matches = testingMatches.GroupBy(f => f.objB).Where(g => g.Count() == 8);
+				if (matches.Count() > 0)
+				{
+					matches.Dump();
+					
+					int tmp = matches.Select(g => g.First().objA).Min();
+					if (tmp < bestMatch)
+					{
+						bestMatch = tmp;
+					}
+				}
+			}
+		}
+	}
+	
+	
+	return bestMatch;
 }
 public static int Problem51_swapNumbers(int num)
 {
@@ -605,11 +672,15 @@ public static int Problem51_swapNumbers(int num)
 	int output = 0;
 	int next = 1;
 	
+	int place = 1;
+	
 	while (num > 0)
 	{
 		int index = num % 10;
 		if (replace[index] == 0) replace[index] = next++;
-		output = output * 10 + replace[index];
+		//output = output * 10 + replace[index];
+		output += place * replace[index];
+		place *= 10;
 		num /= 10;
 	}
 	

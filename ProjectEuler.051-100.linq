@@ -32,29 +32,37 @@ public static long Problem65()
 //	}
 	#endregion PATTERN FOR SQRT(2)
 	
-	long prevNum = 2;
-	long prevDec = 1;
-	Util.HorizontalRun(false, prevNum, "/", prevDec).Dump();
+	InfiniteInt prevNum = new InfiniteInt(2);
+	//long prevDec = 1;
+	//Util.HorizontalRun(false, prevNum, "/", prevDec).Dump();
 	
-	long num = 3;
-	long dec = 1;
-	Util.HorizontalRun(false, num, "/", dec).Dump();
+	InfiniteInt num = new InfiniteInt(3);
+	//long dec = 1;
+	//Util.HorizontalRun(false, num, "/", dec).Dump();
 	
-	for (int i = 2; i < 10; ++i)
+	for (int i = 2; i < 100; ++i)
 	{
-		long tempNum = num;
-		long tempDec = dec;
+		//Need to create a new object... not the most efficent but works
+		InfiniteInt tempNum = new InfiniteInt(num);
+		//long tempDec = dec;
 		
-		num = num*Problem65_e_continuedFraction(i)+prevNum;
-		dec = dec*Problem65_e_continuedFraction(i)+prevDec;
+		//num = num*Problem65_e_continuedFraction(i)+prevNum;
+		num.Multiply(Problem65_e_continuedFraction(i));
+		num.Add(prevNum);
+		//dec = dec*Problem65_e_continuedFraction(i)+prevDec;
 		
 		prevNum = tempNum;
-		prevDec = tempDec;
+		//prevDec = tempDec;
 		
-		Util.HorizontalRun(false, num, "/", dec).Dump();
+		//Util.HorizontalRun(false, num, "/", dec).Dump();
 	}
 	
-	return -1;
+	//num should contain the 100th convergent of the continued fraction for e
+	num.ToString().Dump();
+	//Now need to sum the digits for the answer:
+	long sum = num.SumDigits();
+	
+	return sum;
 }
 public static int Problem65_e_continuedFraction(int k)
 {
@@ -3247,6 +3255,10 @@ public class InfiniteInt
 	{
 		array.Add(start);
 	}
+	public InfiniteInt(InfiniteInt start)
+	{
+		array = new List<int>(start.array);
+	}
 	
 	public void Add(InfiniteInt num)
 	{
@@ -3257,7 +3269,8 @@ public class InfiniteInt
 			//Need to add new item
 			if (j == array.Count) array.Add(0);
 			//Add into the current item
-			array[j] += num.array[j] + remainder;
+			if (num.array.Count > j) array[j] += num.array[j];
+			array[j] += remainder;
 			remainder = 0;
 			//Check for overflow
 			if (array[j] >= TRUNC_SIZE)

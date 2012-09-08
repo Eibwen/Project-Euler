@@ -3519,5 +3519,13 @@ public static void InfiniteIntTest()
 	Debug.Assert(iint.Length().Dump() == "110778111".Length, "LENGTH FAIL");
 //	iint.Divide(2);
 //	Debug.Assert(iint.ToString().Dump() == "55389055.5", "DIVIDE3 FAIL");
+	
+	
+	//Bug: Add fails when adding smaller to larger
+	InfiniteInt iint2 = new InfiniteInt(23);
+	iint.Add(iint2);
+	Debug.Assert(iint.ToString().Dump() == "110778134", "Add small IInt fail");
+	iint2.Add(iint);
+	Debug.Assert(iint2.ToString().Dump() == "110778157", "Add large IInt fail");
 }
 #endregion InfiniteInt

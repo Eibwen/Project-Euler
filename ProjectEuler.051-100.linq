@@ -8,6 +8,67 @@ void Main()
 }
 
 // Define other methods and classes here
+public static long Problem65()
+{
+	#region PATTERN FOR SQRT(2)
+//	long prevNum = 1;
+//	long prevDec = 1;
+//	
+//	long num = 3;
+//	long dec = 2;
+//	
+//	for (int i = 0; i < 10; ++i)
+//	{
+//		long tempNum = num;
+//		long tempDec = dec;
+//		
+//		num = num*2+prevNum;
+//		dec = dec*2+prevDec;
+//		
+//		prevNum = tempNum;
+//		prevDec = tempDec;
+//		
+//		Util.HorizontalRun(false, num, "/", dec).Dump();
+//	}
+	#endregion PATTERN FOR SQRT(2)
+	
+	long prevNum = 2;
+	long prevDec = 1;
+	Util.HorizontalRun(false, prevNum, "/", prevDec).Dump();
+	
+	long num = 3;
+	long dec = 1;
+	Util.HorizontalRun(false, num, "/", dec).Dump();
+	
+	for (int i = 2; i < 10; ++i)
+	{
+		long tempNum = num;
+		long tempDec = dec;
+		
+		num = num*Problem65_e_continuedFraction(i)+prevNum;
+		dec = dec*Problem65_e_continuedFraction(i)+prevDec;
+		
+		prevNum = tempNum;
+		prevDec = tempDec;
+		
+		Util.HorizontalRun(false, num, "/", dec).Dump();
+	}
+	
+	return -1;
+}
+public static int Problem65_e_continuedFraction(int k)
+{
+	//e = [2; 1,2,1, 1,4,1, 1,6,1 , ... , 1,2k,1, ...].
+	
+	if (k % 3 == 2)
+	{
+		return ((k / 3)+1)*2;
+	}
+	else
+	{
+		return 1;
+	}
+}
 public static long Problem66()
 {
 	//long MAX_TRY = 8000000;
